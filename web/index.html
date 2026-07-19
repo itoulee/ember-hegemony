@@ -5,20 +5,73 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
   <title>星域制霸：余烬 — P2</title>
   <meta name="description" content="多剧本、成就图鉴、音效、角色、中英切换的开源星域 SLG。" />
+  <!-- GitHub Pages 项目页：无尾斜杠时相对路径会指错目录，用 base 固定 -->
+  <script>
+    (function () {
+      var p = location.pathname;
+      // /ember-hegemony 或 /ember-hegemony/ 或 /ember-hegemony/index.html
+      if (p.indexOf("/ember-hegemony") === 0) {
+        var b = document.createElement("base");
+        b.href = "/ember-hegemony/";
+        document.head.appendChild(b);
+      } else if (p.endsWith("/") === false && p.split("/").pop().indexOf(".") === -1) {
+        // 其它静态托管：保证目录 base
+        var b2 = document.createElement("base");
+        b2.href = p + "/";
+        document.head.appendChild(b2);
+      }
+    })();
+  </script>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div id="boot" class="boot">
     <div class="boot-card">
       <h1 id="boot-title">星域制霸：余烬</h1>
-      <p id="boot-sub" class="muted">P2 · 选择剧本开始</p>
-      <div id="scenario-list" class="scenario-list"></div>
+      <p id="boot-sub" class="muted">选择剧本开始 · 若列表为空请刷新或点下方备用入口</p>
+      <div id="boot-error" class="boot-error hidden"></div>
+      <div id="scenario-list" class="scenario-list">
+        <!-- 无 JS / 加载失败时的静态备用（会被 renderScenarioList 替换） -->
+        <button type="button" class="scenario-card" data-static-sc="tutorial">
+          <h3>教程：余烬港一百天</h3>
+          <p>引导：航行、占星、回合、交战、事件。</p>
+        </button>
+        <button type="button" class="scenario-card" data-static-sc="sandbox">
+          <h3>沙盒：无主星域</h3>
+          <p>标准开局，自由游玩。</p>
+        </button>
+        <button type="button" class="scenario-card" data-static-sc="weak">
+          <h3>剧本：小国中兴</h3>
+          <p>国力薄弱，合纵连横。</p>
+        </button>
+        <button type="button" class="scenario-card" data-static-sc="coup">
+          <h3>剧本：北阙夜（政变）</h3>
+          <p>航官开局，黄袍加身。</p>
+        </button>
+        <button type="button" class="scenario-card" data-static-sc="raider">
+          <h3>剧本：黑旗十年</h3>
+          <p>掠航者占星建国。</p>
+        </button>
+        <button type="button" class="scenario-card" data-static-sc="civilian">
+          <h3>剧本：布衣卿相</h3>
+          <p>流民起步。</p>
+        </button>
+        <button type="button" class="scenario-card" data-static-sc="hegemony">
+          <h3>剧本：制霸主环</h3>
+          <p>控制 80% 节点并维持 3 月。</p>
+        </button>
+      </div>
       <div class="boot-row">
         <button type="button" id="boot-lang">中文 / EN</button>
-        <button type="button" id="boot-audio">音效:开</button>
-        <button type="button" id="boot-bgm">BGM:关</button>
+        <button type="button" id="boot-audio">音效</button>
+        <button type="button" id="boot-bgm">BGM</button>
+        <button type="button" id="boot-retry">重新加载列表</button>
       </div>
-      <p class="hint"><a href="https://github.com/itoulee/ember-hegemony" target="_blank" rel="noopener">GitHub</a></p>
+      <p class="hint">
+        在线：<a href="https://itoulee.github.io/ember-hegemony/">https://itoulee.github.io/ember-hegemony/</a>
+        （请带末尾 <code>/</code>）·
+        <a href="https://github.com/itoulee/ember-hegemony" target="_blank" rel="noopener">GitHub</a>
+      </p>
     </div>
   </div>
 
@@ -28,7 +81,7 @@
         <button type="button" id="btn-toggle-left" class="icon-btn">☰</button>
         <div>
           <h1 id="ui-title">星域制霸：余烬</h1>
-          <p class="sub" id="ui-sub">P2 网页试玩 · <a href="https://github.com/itoulee/ember-hegemony" target="_blank" rel="noopener">GitHub</a></p>
+          <p class="sub" id="ui-sub">P2 网页试玩 · <a href="https://github.com/itoulee/ember-hegemony/" target="_blank" rel="noopener">GitHub</a></p>
         </div>
       </div>
       <div id="tutorial-bar" class="tutorial-bar hidden"></div>
@@ -123,7 +176,7 @@
             <p class="hint" id="save-meta"></p>
           </div>
         </div>
-        <p class="hint" id="hint-main">点星图选节点。滚轮缩放，拖拽平移。</p>
+        <p class="hint" id="hint-main">点星图选节点。滚轮缩放，拖拽平移。系统→返回剧本选单。</p>
       </aside>
 
       <section class="center">
@@ -172,5 +225,8 @@
   <script src="i18n.js"></script>
   <script src="audio.js"></script>
   <script src="game.js"></script>
+  <noscript>
+    <p style="padding:2rem;color:#fff;background:#111">需要启用 JavaScript 才能游玩。</p>
+  </noscript>
 </body>
 </html>

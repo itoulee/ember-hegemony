@@ -1,6 +1,7 @@
 # 路线图（Roadmap）
 
-在线：**https://itoulee.github.io/ember-hegemony/**
+在线：**https://itoulee.github.io/ember-hegemony/**（请带末尾 `/`）  
+扩展建议（含 R18 分轨）：[EXPANSION.md](./EXPANSION.md)
 
 ---
 

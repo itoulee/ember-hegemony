@@ -13,11 +13,39 @@
   let EVENT_DEFS = [];
   let TECH_DEFS = { branches: [] };
   let MOD_EVENTS = [];
-  let SCENARIOS = [];
+  /** 内置剧本（不依赖 fetch，避免 Pages 路径问题导致空白列表） */
+  const BUILTIN_SCENARIOS = [
+    { id: "tutorial", name_zh: "教程：余烬港一百天", name_en: "Tutorial", mode: "magistrate", tutorial: true, desc_zh: "引导：航行、占星、回合、交战、事件。", desc_en: "Guided start." },
+    { id: "sandbox", name_zh: "沙盒：无主星域", name_en: "Sandbox", mode: "magistrate", desc_zh: "标准开局，自由游玩。", desc_en: "Free play." },
+    { id: "weak", name_zh: "剧本：小国中兴", name_en: "Weak Revival", mode: "magistrate", flags: { weakStart: true }, desc_zh: "国力薄弱，合纵连横。", desc_en: "Weak start." },
+    { id: "coup", name_zh: "剧本：北阙夜（政变）", name_en: "Coup Night", mode: "officer", flags: { boostCoup: true }, desc_zh: "航官开局，黄袍加身。", desc_en: "Officer coup." },
+    { id: "raider", name_zh: "剧本：黑旗十年", name_en: "Black Flag", mode: "raider", desc_zh: "掠航者占星建国。", desc_en: "Raider founding." },
+    { id: "civilian", name_zh: "剧本：布衣卿相", name_en: "Commoner", mode: "civilian", desc_zh: "流民起步。", desc_en: "Civilian path." },
+    { id: "hegemony", name_zh: "剧本：制霸主环", name_en: "Hegemony", mode: "magistrate", flags: { winHegemony: true }, desc_zh: "控制 80% 节点并维持 3 月。", desc_en: "Hold 80% nodes 3 months." },
+  ];
+  let SCENARIOS = BUILTIN_SCENARIOS.slice();
   let CHARACTERS = [];
   let ACH_DEFS = [];
   let unlockedAch = {};
   let codex = { nodes: {}, factions: {}, chars: {}, techs: {} };
+
+  function startScenarioById(id) {
+    const sc = (SCENARIOS.length ? SCENARIOS : BUILTIN_SCENARIOS).find((s) => s.id === id) || BUILTIN_SCENARIOS[1];
+    try {
+      if (window.EmberAudio) EmberAudio.ensure();
+    } catch (_) {}
+    newGame({
+      scenarioId: sc.id,
+      mode: sc.mode || "magistrate",
+      tutorial: !!sc.tutorial,
+      flags: sc.flags || {},
+      seed: Date.now() & 0xffffffff,
+    });
+    state.mapView.scale = 0.85;
+    state.mapView.ox = 20;
+    state.mapView.oy = 10;
+    render();
+  }
 
   const TUTORIAL_STEPS = [
     { id: "move", text: "教程①：点击邻星「灰轨一号/正交矿带」等，再点「航行」。", need: "move" },
@@ -1797,31 +1825,42 @@
       };
     });
 
-    document.getElementById("btn-move").onclick = () => moveTo(state.selected);
-    document.getElementById("btn-attack").onclick = requestAttack;
-    document.getElementById("btn-claim").onclick = claim;
-    document.getElementById("btn-raid").onclick = raid;
-    document.getElementById("btn-end").onclick = endTurn;
-    document.getElementById("btn-ally").onclick = ally;
-    document.getElementById("btn-break").onclick = breakAlly;
-    document.getElementById("btn-vassal").onclick = vassal;
-    document.getElementById("btn-tribute").onclick = tribute;
-    document.getElementById("btn-marry").onclick = marry;
-    document.getElementById("btn-joint").onclick = jointResearch;
-    document.getElementById("btn-join-officer").onclick = joinOfficer;
-    document.getElementById("btn-go-raider").onclick = goRaider;
-    document.getElementById("btn-found").onclick = foundNation;
-    document.getElementById("btn-coup-prep").onclick = coupPrep;
-    document.getElementById("btn-coup-start").onclick = coupStart;
-    document.getElementById("btn-escape").onclick = escapePrison;
-    document.getElementById("btn-tut").onclick = () => newGame({
-      tutorial: true, mode: "magistrate", scenarioId: "tutorial", seed: 20260719,
-    });
-    document.getElementById("btn-sandbox").onclick = () => {
+    on("btn-move", () => moveTo(state.selected));
+    on("btn-attack", requestAttack);
+    on("btn-claim", claim);
+    on("btn-raid", raid);
+    on("btn-end", endTurn);
+    on("btn-ally", ally);
+    on("btn-break", breakAlly);
+    on("btn-vassal", vassal);
+    on("btn-tribute", tribute);
+    on("btn-marry", marry);
+    on("btn-joint", jointResearch);
+    on("btn-join-officer", joinOfficer);
+    on("btn-go-raider", goRaider);
+    on("btn-found", () => foundNation(false));
+    on("btn-coup-prep", coupPrep);
+    on("btn-coup-start", coupStart);
+    on("btn-escape", escapePrison);
+    on("btn-tut", () => startScenarioById("tutorial"));
+    on("btn-sandbox", () => {
       const pick = window.prompt("1执政官 2航官 3流民 4掠航者", "1");
       const map = { 1: "magistrate", 2: "officer", 3: "civilian", 4: "raider" };
       newGame({ mode: map[pick] || "magistrate", scenarioId: "sandbox" });
-    };
+    });
+    // 静态 HTML 备用卡片（JS 重绘前也可点）
+    document.querySelectorAll("[data-static-sc]").forEach((btn) => {
+      btn.addEventListener("click", () => startScenarioById(btn.getAttribute("data-static-sc")));
+    });
+    on("boot-retry", async () => {
+      try {
+        await loadData();
+        renderScenarioList();
+        applyI18nUi();
+      } catch (e) {
+        showBootError("加载失败：" + (e && e.message ? e.message : e));
+      }
+    });
     const btnMenu = document.getElementById("btn-menu");
     if (btnMenu) btnMenu.onclick = () => {
       hideHex(); hideEvent(); cancelBattle();
@@ -1881,38 +1920,40 @@
       renderScenarioList();
     };
     for (let i = 1; i <= 3; i++) {
-      document.getElementById("btn-save" + i).onclick = () => saveSlot(i);
-      document.getElementById("btn-load" + i).onclick = () => loadSlot(i);
+      on("btn-save" + i, () => saveSlot(i));
+      on("btn-load" + i, () => loadSlot(i));
     }
-    document.getElementById("btn-battle-report").onclick = () => confirmBattle("report");
-    document.getElementById("btn-battle-hex").onclick = () => confirmBattle("hex");
-    document.getElementById("btn-battle-cancel").onclick = cancelBattle;
-    document.getElementById("btn-hex-end").onclick = hexEndTurn;
-    document.getElementById("btn-hex-flee").onclick = hexFlee;
+    on("btn-battle-report", () => confirmBattle("report"));
+    on("btn-battle-hex", () => confirmBattle("hex"));
+    on("btn-battle-cancel", cancelBattle);
+    on("btn-hex-end", hexEndTurn);
+    on("btn-hex-flee", hexFlee);
 
-    document.getElementById("btn-toggle-left").onclick = () => {
-      document.getElementById("left-panel").classList.toggle("mobile-hide");
-      document.getElementById("left-panel").classList.toggle("collapsed");
-    };
-    document.getElementById("btn-toggle-right").onclick = () => {
-      document.getElementById("right-panel").classList.toggle("mobile-hide");
-      document.getElementById("right-panel").classList.toggle("collapsed");
-    };
+    on("btn-toggle-left", () => {
+      const p = document.getElementById("left-panel");
+      if (p) { p.classList.toggle("mobile-hide"); p.classList.toggle("collapsed"); }
+    });
+    on("btn-toggle-right", () => {
+      const p = document.getElementById("right-panel");
+      if (p) { p.classList.toggle("mobile-hide"); p.classList.toggle("collapsed"); }
+    });
 
-    document.getElementById("mod-file").onchange = async (ev) => {
-      const file = ev.target.files && ev.target.files[0];
-      if (!file) return;
-      try {
-        const text = await file.text();
-        loadMod(JSON.parse(text));
-      } catch (e) { log("模组解析失败：" + e.message); }
-    };
-    document.getElementById("btn-mod-example").onclick = async () => {
+    const modFile = document.getElementById("mod-file");
+    if (modFile) {
+      modFile.onchange = async (ev) => {
+        const file = ev.target.files && ev.target.files[0];
+        if (!file) return;
+        try {
+          const text = await file.text();
+          loadMod(JSON.parse(text));
+        } catch (e) { log("模组解析失败：" + e.message); }
+      };
+    }
+    on("btn-mod-example", async () => {
       try {
         const r = await fetch("data/mods/example-mod.json");
         loadMod(await r.json());
       } catch (e) {
-        // fallback inline
         loadMod({
           id: "inline", name: "内置示例",
           events: [{
@@ -1925,7 +1966,7 @@
           }],
         });
       }
-    };
+    });
 
     // map pan zoom
     const canvas = document.getElementById("map");
@@ -2110,30 +2151,38 @@
   function renderScenarioList() {
     const list = document.getElementById("scenario-list");
     if (!list) return;
+    const pack = SCENARIOS && SCENARIOS.length ? SCENARIOS : BUILTIN_SCENARIOS;
     list.innerHTML = "";
-    for (const sc of SCENARIOS) {
+    if (!pack.length) {
+      list.innerHTML = "<p class='hint'>无可用剧本。请点「重新加载列表」。</p>";
+      return;
+    }
+    for (const sc of pack) {
       const card = document.createElement("button");
       card.type = "button";
       card.className = "scenario-card";
+      card.setAttribute("data-sc-id", sc.id);
       const name = window.EmberI18n ? EmberI18n.nameOf(sc) : sc.name_zh;
       const desc = window.EmberI18n ? EmberI18n.descOf(sc) : sc.desc_zh;
       card.innerHTML = `<h3>${name}</h3><p>${desc}</p>`;
-      card.onclick = () => {
-        EmberAudio && EmberAudio.ensure();
-        newGame({
-          scenarioId: sc.id,
-          mode: sc.mode || "magistrate",
-          tutorial: !!sc.tutorial,
-          flags: sc.flags || {},
-          seed: Date.now() & 0xffffffff,
-        });
-        state.mapView.scale = 0.85;
-        state.mapView.ox = 20;
-        state.mapView.oy = 10;
-        render();
-      };
+      card.onclick = () => startScenarioById(sc.id);
       list.appendChild(card);
     }
+    const err = document.getElementById("boot-error");
+    if (err) err.classList.add("hidden");
+  }
+
+  function showBootError(msg) {
+    const err = document.getElementById("boot-error");
+    if (!err) return;
+    err.textContent = msg;
+    err.classList.remove("hidden");
+  }
+
+  function on(id, fn) {
+    const el = document.getElementById(id);
+    if (el) el.onclick = fn;
+    return el;
   }
 
   function updateAudioButtons() {
@@ -2199,12 +2248,13 @@
     }
     try {
       const sr = await fetch("data/scenarios.json");
-      SCENARIOS = (await sr.json()).scenarios || [];
-    } catch {
-      SCENARIOS = [
-        { id: "tutorial", name_zh: "教程", name_en: "Tutorial", mode: "magistrate", tutorial: true, desc_zh: "引导", desc_en: "Guide" },
-        { id: "sandbox", name_zh: "沙盒", name_en: "Sandbox", mode: "magistrate", desc_zh: "自由", desc_en: "Free" },
-      ];
+      if (!sr.ok) throw new Error("scenarios HTTP " + sr.status);
+      const list = (await sr.json()).scenarios || [];
+      if (list.length) SCENARIOS = list;
+      else SCENARIOS = BUILTIN_SCENARIOS.slice();
+    } catch (e) {
+      SCENARIOS = BUILTIN_SCENARIOS.slice();
+      console.warn("scenarios fetch fallback", e);
     }
     try {
       const cr = await fetch("data/characters.json");
@@ -2217,16 +2267,28 @@
   }
 
   async function main() {
-    bind();
-    await loadData();
-    applyI18nUi();
-    showApp(false);
-    renderScenarioList();
-    updateAudioButtons();
+    try {
+      // 先保证选单可见，再绑事件/拉数据
+      showApp(false);
+      renderScenarioList();
+      bind();
+      await loadData();
+      applyI18nUi();
+      showApp(false);
+      renderScenarioList();
+      updateAudioButtons();
+    } catch (e) {
+      console.error(e);
+      showBootError("初始化异常：" + (e && e.message ? e.message : String(e)) + " — 仍可点上方备用剧本。");
+      showApp(false);
+      try { renderScenarioList(); } catch (_) {}
+      try { bind(); } catch (_) {}
+    }
   }
 
-  // Extend bind - call original patterns by patching at end of bind function
-  // We'll append handlers after bind definition via search
-
-  main();
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", main);
+  } else {
+    main();
+  }
 })();
