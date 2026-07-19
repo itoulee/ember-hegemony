@@ -2,12 +2,14 @@ class_name ReportBattleResolver
 extends BattleResolver
 ## v1 快速战报解析器
 
-const RESOLVER_ID := "report"
+
+func resolver_id() -> String:
+	return "report"
 
 
 func resolve(context: BattleContext, rng: RngService) -> BattleResult:
 	var result := BattleResult.new()
-	result.resolver_id = RESOLVER_ID
+	result.resolver_id = resolver_id()
 	result.location_node_id = context.location_node_id
 	result.attacker_faction_id = context.attacker_faction_id
 	result.defender_faction_id = context.defender_faction_id

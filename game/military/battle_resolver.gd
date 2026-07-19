@@ -2,7 +2,9 @@ class_name BattleResolver
 extends RefCounted
 ## 战斗解析接口基类（GDScript 无 interface，用约定 + 虚方法）
 
-const RESOLVER_ID := "base"
+
+func resolver_id() -> String:
+	return "base"
 
 
 func resolve(_context: BattleContext, _rng: RngService) -> BattleResult:

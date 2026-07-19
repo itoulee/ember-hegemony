@@ -3,7 +3,9 @@ extends BattleResolver
 ## 同步战棋解析：双方 AI 自动打完（供无 UI / 测试）
 ## 玩家交互战棋走 scenes/hex_battle.tscn + HexBattleBoard
 
-const RESOLVER_ID := "hex_tactics_auto"
+
+func resolver_id() -> String:
+	return "hex_tactics_auto"
 
 
 func resolve(context: BattleContext, rng: RngService) -> BattleResult:
@@ -20,10 +22,10 @@ func resolve(context: BattleContext, rng: RngService) -> BattleResult:
 	if board.result == null:
 		var report := ReportBattleResolver.new()
 		var r := report.resolve(context, rng)
-		r.resolver_id = RESOLVER_ID
+		r.resolver_id = resolver_id()
 		r.log_lines.insert(0, "【战棋自动】超时，回退战报")
 		return r
-	board.result.resolver_id = RESOLVER_ID
+	board.result.resolver_id = resolver_id()
 	return board.result
 
 
