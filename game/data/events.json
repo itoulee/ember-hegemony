@@ -1,0 +1,196 @@
+{
+  "events": [
+    {
+      "id": "relay_ping",
+      "title": "中继残响",
+      "weight": 12,
+      "once": false,
+      "min_month": 1,
+      "conditions": [],
+      "text": "传感器捕获到断裂中继的无主信标。技术官建议立刻解码，也可能是诱饵。",
+      "choices": [
+        {
+          "id": "decode",
+          "text": "解码信标（+情报向信用）",
+          "effects": [
+            { "type": "add_credits", "value": 600 },
+            { "type": "log", "text": "解码成功，售出残缺星历数据。" }
+          ]
+        },
+        {
+          "id": "ignore",
+          "text": "忽略",
+          "effects": [
+            { "type": "log", "text": "你关闭了信道。虚空重新安静。" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ortholite_vein",
+      "title": "正交石细脉",
+      "weight": 8,
+      "once": false,
+      "min_month": 2,
+      "conditions": [
+        { "type": "player_credits_gte", "value": 2000 }
+      ],
+      "text": "无主岩方向传回高纯度正交石光谱。开采需要垫资，也可能空手而归。",
+      "choices": [
+        {
+          "id": "invest",
+          "text": "垫资开采（-1500，高概率回报）",
+          "effects": [
+            { "type": "add_credits", "value": -1500 },
+            { "type": "random_credits", "min": 0, "max": 4500 },
+            { "type": "log", "text": "开采作业结束，账本已更新。" }
+          ]
+        },
+        {
+          "id": "pass",
+          "text": "放弃矿权",
+          "effects": [
+            { "type": "log", "text": "矿权被其他航阀捷足先登。" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "deserter_cell",
+      "title": "逃兵通讯",
+      "weight": 7,
+      "once": false,
+      "min_month": 1,
+      "conditions": [
+        { "type": "player_manpower_lte", "value": 140 }
+      ],
+      "text": "一小队冷环逃兵请求庇护，愿并入你的编制。收留会激怒冷环合议。",
+      "choices": [
+        {
+          "id": "accept",
+          "text": "收编（+兵力，冷环敌意）",
+          "effects": [
+            { "type": "add_manpower", "value": 18 },
+            { "type": "add_relation", "faction": "fac_cold", "value": -12 },
+            { "type": "log", "text": "逃兵宣誓效力余烬航阀。" }
+          ]
+        },
+        {
+          "id": "reject",
+          "text": "拒绝并驱逐",
+          "effects": [
+            { "type": "add_relation", "faction": "fac_cold", "value": 4 },
+            { "type": "log", "text": "你将他们逐出航道，冷环情报网记下这一笔。" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "freeport_tariff",
+      "title": "自由港关税提案",
+      "weight": 6,
+      "once": true,
+      "min_month": 3,
+      "conditions": [
+        { "type": "not_married_to", "actor": "act_mira" }
+      ],
+      "text": "自由港盟提议临时降税通道，换取你对中继残骸的共同巡逻承诺。",
+      "choices": [
+        {
+          "id": "agree",
+          "text": "同意（关系+，当月小额入账）",
+          "effects": [
+            { "type": "add_relation", "faction": "fac_free", "value": 15 },
+            { "type": "add_credits", "value": 900 },
+            { "type": "log", "text": "关税通道开通一个财政月。" }
+          ]
+        },
+        {
+          "id": "hard",
+          "text": "强硬要价",
+          "effects": [
+            { "type": "add_relation", "faction": "fac_free", "value": -8 },
+            { "type": "add_credits", "value": 1600 },
+            { "type": "log", "text": "你榨取了短期利益，港盟记仇。" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "marriage_dividend",
+      "title": "联署红利",
+      "weight": 10,
+      "once": false,
+      "min_month": 1,
+      "conditions": [
+        { "type": "has_spouse" }
+      ],
+      "text": "联姻联署使一条次级走廊带宽提升，账房呈上分红结算。",
+      "choices": [
+        {
+          "id": "take",
+          "text": "收取红利",
+          "effects": [
+            { "type": "add_credits", "value": 1200 },
+            { "type": "log", "text": "联署走廊本月分红入账。" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "supply_glitch",
+      "title": "补给协议抖动",
+      "weight": 9,
+      "once": false,
+      "min_month": 1,
+      "conditions": [],
+      "text": "后勤 AI 报告配额抖动：可以强行校准（耗资），或接受轻微兵力折损。",
+      "choices": [
+        {
+          "id": "fix",
+          "text": "校准（-800 信用）",
+          "effects": [
+            { "type": "add_credits", "value": -800 },
+            { "type": "log", "text": "协议栈已校准。" }
+          ]
+        },
+        {
+          "id": "absorb",
+          "text": "吞下损耗（-8 兵力）",
+          "effects": [
+            { "type": "add_manpower", "value": -8 },
+            { "type": "log", "text": "若干舰只因备件短缺推迟出航。" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "claim_rumor",
+      "title": "无主岩流言",
+      "weight": 5,
+      "once": false,
+      "min_month": 2,
+      "conditions": [
+        { "type": "node_owner", "node": "n8", "faction": "" }
+      ],
+      "text": "无主岩仍未被登记。参谋建议立刻投下主权信标，或继续观望。",
+      "choices": [
+        {
+          "id": "beacon",
+          "text": "投下信标（若你邻接则尝试占有）",
+          "effects": [
+            { "type": "try_claim_node", "node": "n8" },
+            { "type": "log", "text": "主权信标程序已执行。" }
+          ]
+        },
+        {
+          "id": "wait",
+          "text": "观望",
+          "effects": [
+            { "type": "log", "text": "你选择等待更好的窗口。" }
+          ]
+        }
+      ]
+    }
+  ]
+}

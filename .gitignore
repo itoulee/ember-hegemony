@@ -1,0 +1,14 @@
+# Godot 4
+game/.godot/
+game/**/*.translation
+*.tmp
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp

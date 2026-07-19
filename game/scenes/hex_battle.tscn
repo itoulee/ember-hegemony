@@ -1,0 +1,70 @@
+[gd_scene load_steps=3 format=3 uid="uid://ember_hex_battle"]
+
+[ext_resource type="Script" path="res://ui/hex_battle_ui.gd" id="1_hex"]
+[ext_resource type="Script" path="res://ui/hex_board_draw.gd" id="2_draw"]
+
+[node name="HexBattle" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_hex")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.06, 0.08, 0.12, 1)
+
+[node name="Root" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = 12.0
+offset_right = -12.0
+offset_bottom = -12.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 8
+
+[node name="InfoLabel" type="Label" parent="Root"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "六角战棋"
+
+[node name="BoardDraw" type="Control" parent="Root"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 380)
+layout_mode = 2
+size_flags_vertical = 3
+script = ExtResource("2_draw")
+
+[node name="Buttons" type="HBoxContainer" parent="Root"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="BtnEnd" type="Button" parent="Root/Buttons"]
+layout_mode = 2
+text = "结束己方回合"
+
+[node name="BtnFlee" type="Button" parent="Root/Buttons"]
+layout_mode = 2
+text = "撤退（判负）"
+
+[node name="LogLabel" type="RichTextLabel" parent="Root"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 140)
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 12
+scroll_following = true
+
+[connection signal="pressed" from="Root/Buttons/BtnEnd" to="." method="_on_end_turn_pressed"]
+[connection signal="pressed" from="Root/Buttons/BtnFlee" to="." method="_on_flee_pressed"]

@@ -1,0 +1,183 @@
+[gd_scene load_steps=3 format=3 uid="uid://ember_main_scene"]
+
+[ext_resource type="Script" path="res://ui/main_ui.gd" id="1_main"]
+[ext_resource type="Script" path="res://ui/map_draw.gd" id="2_map"]
+
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_main")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.08, 0.1, 0.14, 1)
+
+[node name="Root" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 8
+
+[node name="LeftPanel" type="VBoxContainer" parent="Root"]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Title" type="Label" parent="Root/LeftPanel"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "星域制霸：余烬"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="Root/LeftPanel"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.7, 0.8, 1)
+theme_override_font_sizes/font_size = 12
+text = "Phase 0.5 · AI/事件/战棋 · Godot 4"
+horizontal_alignment = 1
+
+[node name="StatusLabel" type="Label" parent="Root/LeftPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "状态"
+
+[node name="SelectedLabel" type="Label" parent="Root/LeftPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "选中"
+
+[node name="Actions" type="VBoxContainer" parent="Root/LeftPanel"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="BtnMove" type="Button" parent="Root/LeftPanel/Actions"]
+layout_mode = 2
+text = "航行至选中节点 (1AP)"
+
+[node name="BtnAttack" type="Button" parent="Root/LeftPanel/Actions"]
+layout_mode = 2
+text = "进攻选中敌星 (1AP)"
+
+[node name="BtnClaim" type="Button" parent="Root/LeftPanel/Actions"]
+layout_mode = 2
+text = "登记无主节点 (1AP)"
+
+[node name="BtnMarriage" type="Button" parent="Root/LeftPanel/Actions"]
+layout_mode = 2
+text = "政治联姻·自由港 (1AP)"
+
+[node name="BtnEndTurn" type="Button" parent="Root/LeftPanel/Actions"]
+layout_mode = 2
+text = "结束回合 (AI+事件)"
+
+[node name="IdentityRow" type="HBoxContainer" parent="Root/LeftPanel/Actions"]
+layout_mode = 2
+
+[node name="BtnMag" type="Button" parent="Root/LeftPanel/Actions/IdentityRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "身份:执政官"
+
+[node name="BtnOff" type="Button" parent="Root/LeftPanel/Actions/IdentityRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "身份:航官"
+
+[node name="ResolverRow" type="HBoxContainer" parent="Root/LeftPanel/Actions"]
+layout_mode = 2
+
+[node name="BtnRep" type="Button" parent="Root/LeftPanel/Actions/ResolverRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "战报解析"
+
+[node name="BtnHex" type="Button" parent="Root/LeftPanel/Actions/ResolverRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "六角战棋"
+
+[node name="BtnNew" type="Button" parent="Root/LeftPanel/Actions"]
+layout_mode = 2
+text = "新周目"
+
+[node name="Hint" type="Label" parent="Root/LeftPanel"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.55, 0.6, 0.65, 1)
+theme_override_font_sizes/font_size = 11
+autowrap_mode = 3
+text = "点击星图选节点。结束回合触发 AI 与事件。选「六角战棋」后进攻进入战场。黄点=你。"
+
+[node name="Center" type="VBoxContainer" parent="Root"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="MapDraw" type="Control" parent="Root/Center"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("2_map")
+
+[node name="EventBox" type="VBoxContainer" parent="Root/Center"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="EventTitle" type="Label" parent="Root/Center/EventBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "事件"
+
+[node name="EventText" type="Label" parent="Root/Center/EventBox"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 3
+text = "描述"
+
+[node name="EventChoices" type="VBoxContainer" parent="Root/Center/EventBox"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="RightPanel" type="VBoxContainer" parent="Root"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+
+[node name="LogTitle" type="Label" parent="Root/RightPanel"]
+layout_mode = 2
+text = "航路日志"
+
+[node name="LogLabel" type="RichTextLabel" parent="Root/RightPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/normal_font_size = 12
+bbcode_enabled = false
+scroll_following = true
+
+[connection signal="pressed" from="Root/LeftPanel/Actions/BtnMove" to="." method="_on_move_pressed"]
+[connection signal="pressed" from="Root/LeftPanel/Actions/BtnAttack" to="." method="_on_attack_pressed"]
+[connection signal="pressed" from="Root/LeftPanel/Actions/BtnClaim" to="." method="_on_claim_pressed"]
+[connection signal="pressed" from="Root/LeftPanel/Actions/BtnMarriage" to="." method="_on_marriage_pressed"]
+[connection signal="pressed" from="Root/LeftPanel/Actions/BtnEndTurn" to="." method="_on_end_turn_pressed"]
+[connection signal="pressed" from="Root/LeftPanel/Actions/IdentityRow/BtnMag" to="." method="_on_identity_magistrate"]
+[connection signal="pressed" from="Root/LeftPanel/Actions/IdentityRow/BtnOff" to="." method="_on_identity_officer"]
+[connection signal="pressed" from="Root/LeftPanel/Actions/ResolverRow/BtnRep" to="." method="_on_resolver_report"]
+[connection signal="pressed" from="Root/LeftPanel/Actions/ResolverRow/BtnHex" to="." method="_on_resolver_hex"]
+[connection signal="pressed" from="Root/LeftPanel/Actions/BtnNew" to="." method="_on_new_game_pressed"]
