@@ -1,0 +1,18 @@
+{
+  "id": "example_extra_events",
+  "name": "示例模组：额外事件",
+  "version": "1.0",
+  "events": [
+    {
+      "id": "mod_coffee",
+      "title": "【模组】咖啡因危机",
+      "weight": 4,
+      "cooldown": 10,
+      "text": "全舰咖啡机协议崩溃。工程师要求紧急拨款。",
+      "choices": [
+        {"id": "a", "text": "拨款-200", "effects": [{"type": "credits", "v": -200}, {"type": "manpower", "v": 2}]},
+        {"id": "b", "text": "改喝茶", "effects": [{"type": "log", "t": "士气略降，但省钱了。"}, {"type": "manpower", "v": -1}]}
+      ]
+    }
+  ]
+}

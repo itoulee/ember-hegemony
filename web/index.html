@@ -2,44 +2,125 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>星域制霸：余烬 — 在线试玩</title>
-  <meta name="description" content="开源硬科幻星域策略 SLG 网页试玩。Godot 原型同设计，浏览器即开即玩。" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+  <title>星域制霸：余烬 — P0/P1 试玩</title>
+  <meta name="description" content="开源硬科幻星域策略 SLG。存档、教程、科技、外交、政变、36 星图。" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div id="app">
     <header class="top">
-      <div>
-        <h1>星域制霸：余烬</h1>
-        <p class="sub">网页试玩 · 硬科幻星域 SLG · <a href="https://github.com/itoulee/ember-hegemony" target="_blank" rel="noopener">GitHub</a></p>
+      <div class="brand">
+        <button type="button" id="btn-toggle-left" class="icon-btn" title="面板">☰</button>
+        <div>
+          <h1>星域制霸：余烬</h1>
+          <p class="sub">P0+P1 网页试玩 · <a href="https://github.com/itoulee/ember-hegemony" target="_blank" rel="noopener">GitHub</a></p>
+        </div>
       </div>
+      <div id="tutorial-bar" class="tutorial-bar hidden"></div>
       <div id="status" class="status"></div>
     </header>
+
     <div class="main">
-      <aside class="left">
+      <aside id="left-panel" class="left">
         <div id="selected" class="panel"></div>
-        <div class="actions">
-          <button type="button" id="btn-move">航行 (1AP)</button>
-          <button type="button" id="btn-attack">进攻 (1AP)</button>
-          <button type="button" id="btn-claim">登记无主 (1AP)</button>
-          <button type="button" id="btn-marry">联姻·自由港 (1AP)</button>
-          <button type="button" id="btn-end" class="primary">结束回合 (AI+事件)</button>
-          <button type="button" id="btn-hex-toggle">战斗：战报</button>
-          <button type="button" id="btn-new">新周目</button>
+
+        <div class="tabs">
+          <button type="button" class="tab active" data-tab="act">行动</button>
+          <button type="button" class="tab" data-tab="dip">外交</button>
+          <button type="button" class="tab" data-tab="tech">科技</button>
+          <button type="button" class="tab" data-tab="id">身份</button>
+          <button type="button" class="tab" data-tab="sys">系统</button>
         </div>
-        <p class="hint">点星图选节点。黄点=你。结束回合会触发 AI 与随机事件。</p>
+
+        <div id="tab-act" class="tab-pane active">
+          <div class="actions">
+            <button type="button" id="btn-move" data-tut="move">航行 (1AP)</button>
+            <button type="button" id="btn-attack" data-tut="attack">进攻 (1AP)</button>
+            <button type="button" id="btn-claim" data-tut="claim">登记无主 (1AP)</button>
+            <button type="button" id="btn-raid" class="hidden">劫掠邻星 (1AP)</button>
+            <button type="button" id="btn-end" class="primary" data-tut="end">结束回合</button>
+          </div>
+        </div>
+
+        <div id="tab-dip" class="tab-pane">
+          <div class="actions">
+            <label class="field">目标势力
+              <select id="dip-target"></select>
+            </label>
+            <button type="button" id="btn-ally">缔结同盟 (1AP)</button>
+            <button type="button" id="btn-break">废除同盟 (1AP)</button>
+            <button type="button" id="btn-vassal">接受/索取从属 (1AP)</button>
+            <button type="button" id="btn-tribute">索贡 (1AP)</button>
+            <button type="button" id="btn-marry">政治联姻 (1AP)</button>
+            <button type="button" id="btn-joint">合研条约 (1AP)</button>
+          </div>
+        </div>
+
+        <div id="tab-tech" class="tab-pane">
+          <div id="tech-panel" class="tech-panel"></div>
+        </div>
+
+        <div id="tab-id" class="tab-pane">
+          <div class="actions">
+            <p class="hint" id="identity-hint"></p>
+            <button type="button" id="btn-join-officer">申请入仕 (流民)</button>
+            <button type="button" id="btn-go-raider">叛逃为掠航者</button>
+            <button type="button" id="btn-found">掠航建国</button>
+            <button type="button" id="btn-coup-prep">政变筹备 (+势力)</button>
+            <button type="button" id="btn-coup-start">发动政变</button>
+            <button type="button" id="btn-escape">越狱/脱逃</button>
+          </div>
+        </div>
+
+        <div id="tab-sys" class="tab-pane">
+          <div class="actions">
+            <button type="button" id="btn-tut">开始/重开教程</button>
+            <button type="button" id="btn-sandbox">沙盒新周目</button>
+            <div class="save-row">
+              <button type="button" id="btn-save1">存档1</button>
+              <button type="button" id="btn-load1">读档1</button>
+            </div>
+            <div class="save-row">
+              <button type="button" id="btn-save2">存档2</button>
+              <button type="button" id="btn-load2">读档2</button>
+            </div>
+            <div class="save-row">
+              <button type="button" id="btn-save3">存档3</button>
+              <button type="button" id="btn-load3">读档3</button>
+            </div>
+            <label class="field">加载模组 JSON
+              <input type="file" id="mod-file" accept="application/json,.json" />
+            </label>
+            <button type="button" id="btn-mod-example">加载示例模组</button>
+            <p class="hint" id="save-meta"></p>
+          </div>
+        </div>
+
+        <p class="hint" id="hint-main">点星图选节点。双指/滚轮缩放，拖拽平移。</p>
       </aside>
+
       <section class="center">
-        <canvas id="map" width="720" height="520"></canvas>
+        <div class="map-wrap" id="map-wrap">
+          <canvas id="map" width="900" height="640"></canvas>
+        </div>
+        <div id="battle-choice" class="modal hidden">
+          <h3>选择交战方式</h3>
+          <p id="battle-choice-text"></p>
+          <div class="actions row">
+            <button type="button" id="btn-battle-report">自动战报</button>
+            <button type="button" id="btn-battle-hex">六角战棋</button>
+            <button type="button" id="btn-battle-cancel">取消</button>
+          </div>
+        </div>
         <div id="event-box" class="event-box hidden">
           <h3 id="event-title"></h3>
           <p id="event-text"></p>
           <div id="event-choices"></div>
         </div>
         <div id="hex-box" class="hex-box hidden">
-          <h3>六角战棋</h3>
-          <canvas id="hex" width="640" height="360"></canvas>
+          <h3>六角战棋 <span id="hex-hint" class="muted"></span></h3>
+          <canvas id="hex" width="640" height="380"></canvas>
           <div class="hex-actions">
             <button type="button" id="btn-hex-end">结束己方回合</button>
             <button type="button" id="btn-hex-flee">撤退</button>
@@ -47,8 +128,12 @@
           <pre id="hex-log"></pre>
         </div>
       </section>
-      <aside class="right">
-        <h3>航路日志</h3>
+
+      <aside id="right-panel" class="right">
+        <div class="right-head">
+          <h3>航路日志</h3>
+          <button type="button" id="btn-toggle-right" class="icon-btn">≡</button>
+        </div>
         <pre id="log"></pre>
       </aside>
     </div>

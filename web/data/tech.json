@@ -1,0 +1,44 @@
+{
+  "branches": [
+    {
+      "id": "hull",
+      "name": "舰体",
+      "levels": [
+        {"id": "hull1", "name": "加强骨架", "cost": 800, "months": 2, "bonus": {"manpowerMult": 1.05}},
+        {"id": "hull2", "name": "反应堆升级", "cost": 1400, "months": 3, "bonus": {"manpowerMult": 1.1}},
+        {"id": "hull3", "name": "重装甲", "cost": 2200, "months": 3, "bonus": {"defenseBonus": 0.08}},
+        {"id": "hull4", "name": "旗舰框架", "cost": 3500, "months": 4, "bonus": {"manpowerMult": 1.18}}
+      ]
+    },
+    {
+      "id": "weapon",
+      "name": "武装",
+      "levels": [
+        {"id": "wpn1", "name": "聚焦炮", "cost": 900, "months": 2, "bonus": {"atkMult": 1.06}},
+        {"id": "wpn2", "name": "导弹库", "cost": 1500, "months": 3, "bonus": {"atkMult": 1.12}},
+        {"id": "wpn3", "name": "电子战套件", "cost": 2300, "months": 3, "bonus": {"atkMult": 1.16}},
+        {"id": "wpn4", "name": "轨道杀伤", "cost": 3600, "months": 4, "bonus": {"atkMult": 1.22}}
+      ]
+    },
+    {
+      "id": "ground",
+      "name": "登舰/陆战",
+      "levels": [
+        {"id": "g1", "name": "快反陆战队", "cost": 700, "months": 2, "bonus": {"claimBonus": 0.1}},
+        {"id": "g2", "name": "镇压力场", "cost": 1300, "months": 2, "bonus": {"garrisonBonus": 0.1}},
+        {"id": "g3", "name": "轨道投放", "cost": 2100, "months": 3, "bonus": {"claimBonus": 0.2}},
+        {"id": "g4", "name": "行星管制", "cost": 3200, "months": 4, "bonus": {"garrisonBonus": 0.2}}
+      ]
+    },
+    {
+      "id": "admin",
+      "name": "政体后勤",
+      "levels": [
+        {"id": "a1", "name": "税务协议", "cost": 800, "months": 2, "bonus": {"incomeMult": 1.08}},
+        {"id": "a2", "name": "医疗舱", "cost": 1200, "months": 2, "bonus": {"apBonus": 0}},
+        {"id": "a3", "name": "情报网", "cost": 2000, "months": 3, "bonus": {"intelGain": 5}},
+        {"id": "a4", "name": "行政容量", "cost": 3000, "months": 4, "bonus": {"incomeMult": 1.15, "legitimacy": 5}}
+      ]
+    }
+  ]
+}
