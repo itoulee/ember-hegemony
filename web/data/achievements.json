@@ -1,0 +1,20 @@
+{
+  "achievements": [
+    {"id": "first_move", "name_zh": "起航", "name_en": "Underway", "desc_zh": "完成一次航行", "desc_en": "Complete a move"},
+    {"id": "first_claim", "name_zh": "信标落下", "name_en": "Beacon Dropped", "desc_zh": "登记一颗无主星", "desc_en": "Claim an empty node"},
+    {"id": "first_win", "name_zh": "首胜", "name_en": "First Victory", "desc_zh": "赢得一场战斗", "desc_en": "Win a battle"},
+    {"id": "first_hex", "name_zh": "棋手", "name_en": "Tactician", "desc_zh": "完成一场六角战棋", "desc_en": "Finish a hex battle"},
+    {"id": "married", "name_zh": "联署", "name_en": "Countersign", "desc_zh": "完成政治联姻", "desc_en": "Complete a marriage"},
+    {"id": "allied", "name_zh": "同盟", "name_en": "Alliance", "desc_zh": "缔结同盟", "desc_en": "Form an alliance"},
+    {"id": "tech1", "name_zh": "点亮节点", "name_en": "Tech Spark", "desc_zh": "完成任意科技", "desc_en": "Finish any tech"},
+    {"id": "tech_branch", "name_zh": "一门精通", "name_en": "Branch Master", "desc_zh": "完成一条科技线全部 4 阶", "desc_en": "Complete a full tech branch"},
+    {"id": "coup_ok", "name_zh": "黄袍", "name_en": "Purple Robe", "desc_zh": "政变成功", "desc_en": "Succeed in a coup"},
+    {"id": "found_nation", "name_zh": "黑旗建国", "name_en": "Black Founding", "desc_zh": "掠航者建国", "desc_en": "Found a nation as raider"},
+    {"id": "ten_nodes", "name_zh": "十星领主", "name_en": "Ten Stars", "desc_zh": "同时控制 ≥10 节点", "desc_en": "Control ≥10 nodes"},
+    {"id": "hegemony", "name_zh": "主环制霸", "name_en": "Ring Lord", "desc_zh": "达成制霸胜利", "desc_en": "Win hegemony"},
+    {"id": "tutorial_done", "name_zh": "结业", "name_en": "Graduate", "desc_zh": "完成教程", "desc_en": "Finish tutorial"},
+    {"id": "mod_loaded", "name_zh": "模组客", "name_en": "Modder", "desc_zh": "加载任意模组", "desc_en": "Load a mod"},
+    {"id": "prison_break", "name_zh": "越狱", "name_en": "Breakout", "desc_zh": "成功越狱", "desc_en": "Escape prison"},
+    {"id": "month_12", "name_zh": "一年航程", "name_en": "Year One", "desc_zh": "存活到第 12 星月", "desc_en": "Reach month 12"}
+  ]
+}

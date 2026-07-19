@@ -3,80 +3,104 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>星域制霸：余烬 — P0/P1 试玩</title>
-  <meta name="description" content="开源硬科幻星域策略 SLG。存档、教程、科技、外交、政变、36 星图。" />
+  <title>星域制霸：余烬 — P2</title>
+  <meta name="description" content="多剧本、成就图鉴、音效、角色、中英切换的开源星域 SLG。" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div id="app">
+  <div id="boot" class="boot">
+    <div class="boot-card">
+      <h1 id="boot-title">星域制霸：余烬</h1>
+      <p id="boot-sub" class="muted">P2 · 选择剧本开始</p>
+      <div id="scenario-list" class="scenario-list"></div>
+      <div class="boot-row">
+        <button type="button" id="boot-lang">中文 / EN</button>
+        <button type="button" id="boot-audio">音效:开</button>
+        <button type="button" id="boot-bgm">BGM:关</button>
+      </div>
+      <p class="hint"><a href="https://github.com/itoulee/ember-hegemony" target="_blank" rel="noopener">GitHub</a></p>
+    </div>
+  </div>
+
+  <div id="app" class="hidden">
     <header class="top">
       <div class="brand">
-        <button type="button" id="btn-toggle-left" class="icon-btn" title="面板">☰</button>
+        <button type="button" id="btn-toggle-left" class="icon-btn">☰</button>
         <div>
-          <h1>星域制霸：余烬</h1>
-          <p class="sub">P0+P1 网页试玩 · <a href="https://github.com/itoulee/ember-hegemony" target="_blank" rel="noopener">GitHub</a></p>
+          <h1 id="ui-title">星域制霸：余烬</h1>
+          <p class="sub" id="ui-sub">P2 网页试玩 · <a href="https://github.com/itoulee/ember-hegemony" target="_blank" rel="noopener">GitHub</a></p>
         </div>
       </div>
       <div id="tutorial-bar" class="tutorial-bar hidden"></div>
+      <div id="scenario-banner" class="scenario-banner hidden"></div>
       <div id="status" class="status"></div>
     </header>
 
     <div class="main">
       <aside id="left-panel" class="left">
         <div id="selected" class="panel"></div>
-
         <div class="tabs">
-          <button type="button" class="tab active" data-tab="act">行动</button>
-          <button type="button" class="tab" data-tab="dip">外交</button>
-          <button type="button" class="tab" data-tab="tech">科技</button>
-          <button type="button" class="tab" data-tab="id">身份</button>
-          <button type="button" class="tab" data-tab="sys">系统</button>
+          <button type="button" class="tab active" data-tab="act" data-i18n="tab_act">行动</button>
+          <button type="button" class="tab" data-tab="dip" data-i18n="tab_dip">外交</button>
+          <button type="button" class="tab" data-tab="tech" data-i18n="tab_tech">科技</button>
+          <button type="button" class="tab" data-tab="id" data-i18n="tab_id">身份</button>
+          <button type="button" class="tab" data-tab="meta" data-i18n="tab_meta">图鉴</button>
+          <button type="button" class="tab" data-tab="sys" data-i18n="tab_sys">系统</button>
         </div>
 
         <div id="tab-act" class="tab-pane active">
           <div class="actions">
-            <button type="button" id="btn-move" data-tut="move">航行 (1AP)</button>
-            <button type="button" id="btn-attack" data-tut="attack">进攻 (1AP)</button>
-            <button type="button" id="btn-claim" data-tut="claim">登记无主 (1AP)</button>
-            <button type="button" id="btn-raid" class="hidden">劫掠邻星 (1AP)</button>
-            <button type="button" id="btn-end" class="primary" data-tut="end">结束回合</button>
+            <button type="button" id="btn-move" data-i18n="move">航行 (1AP)</button>
+            <button type="button" id="btn-attack" data-i18n="attack">进攻 (1AP)</button>
+            <button type="button" id="btn-claim" data-i18n="claim">登记无主 (1AP)</button>
+            <button type="button" id="btn-raid" class="hidden" data-i18n="raid">劫掠邻星 (1AP)</button>
+            <button type="button" id="btn-end" class="primary" data-i18n="end">结束回合</button>
           </div>
         </div>
 
         <div id="tab-dip" class="tab-pane">
           <div class="actions">
-            <label class="field">目标势力
-              <select id="dip-target"></select>
-            </label>
-            <button type="button" id="btn-ally">缔结同盟 (1AP)</button>
-            <button type="button" id="btn-break">废除同盟 (1AP)</button>
-            <button type="button" id="btn-vassal">接受/索取从属 (1AP)</button>
-            <button type="button" id="btn-tribute">索贡 (1AP)</button>
-            <button type="button" id="btn-marry">政治联姻 (1AP)</button>
-            <button type="button" id="btn-joint">合研条约 (1AP)</button>
+            <label class="field">目标势力<select id="dip-target"></select></label>
+            <button type="button" id="btn-ally" data-i18n="ally">缔结同盟 (1AP)</button>
+            <button type="button" id="btn-break" data-i18n="break">废除同盟 (1AP)</button>
+            <button type="button" id="btn-vassal" data-i18n="vassal">从属 (1AP)</button>
+            <button type="button" id="btn-tribute" data-i18n="tribute">索贡 (1AP)</button>
+            <button type="button" id="btn-marry" data-i18n="marry">政治联姻 (1AP)</button>
+            <button type="button" id="btn-joint" data-i18n="joint">合研条约 (1AP)</button>
           </div>
         </div>
 
-        <div id="tab-tech" class="tab-pane">
-          <div id="tech-panel" class="tech-panel"></div>
-        </div>
+        <div id="tab-tech" class="tab-pane"><div id="tech-panel" class="tech-panel"></div></div>
 
         <div id="tab-id" class="tab-pane">
           <div class="actions">
             <p class="hint" id="identity-hint"></p>
-            <button type="button" id="btn-join-officer">申请入仕 (流民)</button>
-            <button type="button" id="btn-go-raider">叛逃为掠航者</button>
+            <button type="button" id="btn-join-officer">申请入仕</button>
+            <button type="button" id="btn-go-raider">叛逃掠航</button>
             <button type="button" id="btn-found">掠航建国</button>
-            <button type="button" id="btn-coup-prep">政变筹备 (+势力)</button>
+            <button type="button" id="btn-coup-prep">政变筹备</button>
             <button type="button" id="btn-coup-start">发动政变</button>
-            <button type="button" id="btn-escape">越狱/脱逃</button>
+            <button type="button" id="btn-escape">越狱</button>
           </div>
+        </div>
+
+        <div id="tab-meta" class="tab-pane">
+          <div class="meta-subtabs">
+            <button type="button" class="meta-tab active" data-meta="ach">成就</button>
+            <button type="button" class="meta-tab" data-meta="char">人物</button>
+            <button type="button" class="meta-tab" data-meta="codex">图鉴</button>
+          </div>
+          <div id="meta-ach" class="meta-pane"></div>
+          <div id="meta-char" class="meta-pane hidden"></div>
+          <div id="meta-codex" class="meta-pane hidden"></div>
         </div>
 
         <div id="tab-sys" class="tab-pane">
           <div class="actions">
-            <button type="button" id="btn-tut">开始/重开教程</button>
-            <button type="button" id="btn-sandbox">沙盒新周目</button>
+            <button type="button" id="btn-menu">返回剧本选单</button>
+            <button type="button" id="btn-tut">教程</button>
+            <button type="button" id="btn-sandbox">快速沙盒</button>
+            <button type="button" id="btn-hex-sandbox" data-i18n="hex_sandbox">战棋沙盘</button>
             <div class="save-row">
               <button type="button" id="btn-save1">存档1</button>
               <button type="button" id="btn-load1">读档1</button>
@@ -89,21 +113,21 @@
               <button type="button" id="btn-save3">存档3</button>
               <button type="button" id="btn-load3">读档3</button>
             </div>
-            <label class="field">加载模组 JSON
-              <input type="file" id="mod-file" accept="application/json,.json" />
-            </label>
+            <div class="save-row">
+              <button type="button" id="btn-lang">中/EN</button>
+              <button type="button" id="btn-sfx">音效</button>
+            </div>
+            <button type="button" id="btn-bgm">BGM</button>
+            <label class="field">模组 JSON<input type="file" id="mod-file" accept="application/json,.json" /></label>
             <button type="button" id="btn-mod-example">加载示例模组</button>
             <p class="hint" id="save-meta"></p>
           </div>
         </div>
-
-        <p class="hint" id="hint-main">点星图选节点。双指/滚轮缩放，拖拽平移。</p>
+        <p class="hint" id="hint-main">点星图选节点。滚轮缩放，拖拽平移。</p>
       </aside>
 
       <section class="center">
-        <div class="map-wrap" id="map-wrap">
-          <canvas id="map" width="900" height="640"></canvas>
-        </div>
+        <div class="map-wrap" id="map-wrap"><canvas id="map" width="900" height="640"></canvas></div>
         <div id="battle-choice" class="modal hidden">
           <h3>选择交战方式</h3>
           <p id="battle-choice-text"></p>
@@ -127,6 +151,12 @@
           </div>
           <pre id="hex-log"></pre>
         </div>
+        <div id="victory-box" class="modal victory hidden">
+          <h3 id="victory-title">胜利</h3>
+          <p id="victory-text"></p>
+          <button type="button" id="btn-victory-ok">确定</button>
+        </div>
+        <div id="toast" class="toast hidden"></div>
       </section>
 
       <aside id="right-panel" class="right">
@@ -138,6 +168,9 @@
       </aside>
     </div>
   </div>
+
+  <script src="i18n.js"></script>
+  <script src="audio.js"></script>
   <script src="game.js"></script>
 </body>
 </html>

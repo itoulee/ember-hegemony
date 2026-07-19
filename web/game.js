@@ -6,11 +6,18 @@
   "use strict";
 
   const SAVE_PREFIX = "ember_hegemony_slot_";
-  const VERSION = "1.1.0-p0p1";
+  const ACH_KEY = "ember_hegemony_achievements";
+  const CODEX_KEY = "ember_hegemony_codex";
+  const VERSION = "2.0.0-p2";
 
   let EVENT_DEFS = [];
   let TECH_DEFS = { branches: [] };
   let MOD_EVENTS = [];
+  let SCENARIOS = [];
+  let CHARACTERS = [];
+  let ACH_DEFS = [];
+  let unlockedAch = {};
+  let codex = { nodes: {}, factions: {}, chars: {}, techs: {} };
 
   const TUTORIAL_STEPS = [
     { id: "move", text: "教程①：点击邻星「灰轨一号/正交矿带」等，再点「航行」。", need: "move" },
@@ -44,7 +51,67 @@
     pendingBattle: null,
     hex: null,
     mapView: { scale: 1, ox: 0, oy: 0 },
+    scenarioId: "sandbox",
+    scenarioFlags: {},
+    hegemonyStreak: 0,
+    metChars: {},
+    hexWins: 0,
   };
+
+  function sfx(n) {
+    try { if (window.EmberAudio) EmberAudio.sfx(n); } catch (_) {}
+  }
+  function t(k) {
+    try { return window.EmberI18n ? EmberI18n.t(k) : k; } catch (_) { return k; }
+  }
+  function loadMeta() {
+    try { unlockedAch = JSON.parse(localStorage.getItem(ACH_KEY) || "{}") || {}; } catch (_) { unlockedAch = {}; }
+    try { codex = Object.assign({ nodes: {}, factions: {}, chars: {}, techs: {} }, JSON.parse(localStorage.getItem(CODEX_KEY) || "{}")); } catch (_) {}
+  }
+  function saveMeta() {
+    try {
+      localStorage.setItem(ACH_KEY, JSON.stringify(unlockedAch));
+      localStorage.setItem(CODEX_KEY, JSON.stringify(codex));
+    } catch (_) {}
+  }
+  function unlockAchieve(id) {
+    if (unlockedAch[id]) return;
+    unlockedAch[id] = { at: Date.now(), month: state.month };
+    saveMeta();
+    const def = ACH_DEFS.find((a) => a.id === id);
+    const name = def ? (window.EmberI18n ? EmberI18n.nameOf(def) : def.name_zh) : id;
+    toast((window.EmberI18n && EmberI18n.getLang() === "en" ? "Achievement: " : "成就解锁：") + name);
+    sfx("achieve");
+    log("★ " + name);
+    renderMeta();
+  }
+  function toast(msg) {
+    const el = document.getElementById("toast");
+    if (!el) return;
+    el.textContent = msg;
+    el.classList.remove("hidden");
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => el.classList.add("hidden"), 2800);
+  }
+  function codexNode(id) {
+    if (!id || !node(id)) return;
+    codex.nodes[id] = true;
+    saveMeta();
+  }
+  function codexFac(id) {
+    if (id) { codex.factions[id] = true; saveMeta(); }
+  }
+  function codexChar(id) {
+    if (id) { codex.chars[id] = true; state.metChars[id] = true; saveMeta(); }
+  }
+  function meetFactionLeaders() {
+    for (const ch of CHARACTERS) {
+      if (ch.faction === "player") { codexChar(ch.id); continue; }
+      if (ch.faction && fac(ch.faction)) codexFac(ch.faction);
+      // unlock character when player borders or shares relation path
+      if (ch.faction === state.player.factionId) codexChar(ch.id);
+    }
+  }
 
   /* ---------- RNG ---------- */
   function seedRng(s) {
@@ -298,7 +365,13 @@
     state.maxAp = 3;
     state.log = [];
     state.mapView = { scale: 1, ox: 0, oy: 0 };
+    state.scenarioId = opts.scenarioId || "sandbox";
+    state.scenarioFlags = Object.assign({}, opts.flags || {});
+    state.hegemonyStreak = 0;
+    state.hexWins = 0;
+    state.metChars = {};
     buildWorld(opts.mode || "magistrate");
+    applyScenarioFlags(state.scenarioFlags);
     if (opts.tutorial) {
       state.tutorial = { step: 0, done: {} };
       showTutorial();
@@ -307,10 +380,51 @@
       state.tutorial = null;
       hideTutorial();
     }
-    log(`新周目 v${VERSION} 种子=${seed}`);
+    const sc = SCENARIOS.find((s) => s.id === state.scenarioId);
+    const scName = sc ? (window.EmberI18n ? EmberI18n.nameOf(sc) : sc.name_zh) : state.scenarioId;
+    const ban = document.getElementById("scenario-banner");
+    if (ban) {
+      ban.classList.remove("hidden");
+      ban.textContent = scName;
+    }
+    log(`新周目 v${VERSION} 剧本=${scName} 种子=${seed}`);
+    meetFactionLeaders();
+    codexNode(state.player.loc);
+    showApp(true);
     refreshDipSelect();
     renderTech();
+    renderMeta();
+    applyI18nUi();
     render();
+    sfx("click");
+  }
+
+  function applyScenarioFlags(flags) {
+    if (!flags) return;
+    if (flags.weakStart) {
+      const pf = playerFac();
+      pf.manpower = 55;
+      pf.credits = 5000;
+      // keep only capital + one neighbor
+      for (const n of Object.values(state.nodes)) {
+        if (n.owner === pf.id && n.id !== pf.capital && n.id !== "n1") n.owner = "";
+      }
+      const c = node(pf.capital || "n0");
+      if (c) c.garrison = 35;
+      log("剧本修正：小国中兴 — 国力薄弱。");
+    }
+    if (flags.boostCoup) {
+      state.player.merit = 35;
+      state.player.factionPower = 25;
+      log("剧本修正：北阙夜 — 已有部分派系根基。");
+    }
+  }
+
+  function showApp(on) {
+    const boot = document.getElementById("boot");
+    const app = document.getElementById("app");
+    if (boot) boot.classList.toggle("hidden", !!on);
+    if (app) app.classList.toggle("hidden", !on);
   }
 
   /* ---------- AP / actions ---------- */
@@ -341,6 +455,7 @@
       log("教程完成！可自由游玩或读档。");
       state.tutorial = null;
       hideTutorial();
+      unlockAchieve("tutorial_done");
     } else showTutorial();
   }
   function showTutorial() {
@@ -371,6 +486,15 @@
     state.player.loc = id;
     state.selected = id;
     log(`航行至 ${dest.name}。`);
+    codexNode(id);
+    unlockAchieve("first_move");
+    sfx("move");
+    // meet nearby faction leaders
+    if (dest.owner) {
+      codexFac(dest.owner);
+      const ch = CHARACTERS.find((c) => c.faction === dest.owner);
+      if (ch) codexChar(ch.id);
+    }
     tutAdvance("move");
     render();
   }
@@ -391,6 +515,10 @@
     n.garrison = Math.max(15, playerFac().manpower * (0.12 + bonus));
     if (!playerFac().capital) playerFac().capital = n.id;
     log(`登记节点：${n.name}`);
+    codexNode(n.id);
+    unlockAchieve("first_claim");
+    checkNodeCountAchieve();
+    sfx("claim");
     tutAdvance("claim");
     render();
   }
@@ -489,14 +617,23 @@
       if (isPlayerFac(atkId)) {
         state.player.merit = (state.player.merit || 0) + 8;
         log(`占领 ${n.name}。功勋+8`);
+        unlockAchieve("first_win");
+        checkNodeCountAchieve();
+        sfx("win");
       } else log(`${af.name} 占领 ${n.name}`);
     } else if (isPlayerFac(atkId)) {
       log("进攻失败。");
+      sfx("lose");
       if (state.player.identity === "航官" && chance(0.15)) {
         state.player.prison = 2;
         log("你因战败被扣查（监禁 2 月）。");
       }
     }
+  }
+
+  function checkNodeCountAchieve() {
+    const c = Object.values(state.nodes).filter((n) => n.owner === state.player.factionId).length;
+    if (c >= 10) unlockAchieve("ten_nodes");
   }
 
   /* ---------- Hex with terrain + ranged ---------- */
@@ -728,18 +865,39 @@
 
   function checkHexEnd() {
     const h = state.hex;
+    if (!h) return false;
     const atkA = h.units.filter((x) => x.team === 0 && x.hp > 0);
     const defA = h.units.filter((x) => x.team === 1 && x.hp > 0);
     if (defA.length && atkA.length) return false;
     h.finished = true;
     const won = !defA.length && atkA.length;
+    if (h.sandbox) {
+      h.log.push(won ? "沙盘：攻方演习胜利" : "沙盘：守方演习胜利");
+      if (won) {
+        state.hexWins = (state.hexWins || 0) + 1;
+        unlockAchieve("first_hex");
+        sfx("win");
+      } else sfx("lose");
+      drawHex();
+      setTimeout(() => { hideHex(); render(); }, 600);
+      return true;
+    }
     const atkLoss = h.units.filter((x) => x.team === 0).reduce((s, x) => s + (x.max - Math.max(0, x.hp)), 0);
     const defLoss = h.units.filter((x) => x.team === 1).reduce((s, x) => s + (x.max - Math.max(0, x.hp)), 0);
     const n = node(h.nodeId);
+    if (!n || !fac(h.defOwner)) {
+      h.log.push(won ? "战棋结束" : "战棋结束");
+      setTimeout(() => { hideHex(); render(); }, 500);
+      return true;
+    }
     applyBattle({
       won, atkLoss, defLoss,
       lines: h.log.concat([won ? "战棋胜利" : "战棋失败"]),
     }, n, state.player.factionId, h.defOwner);
+    if (won) {
+      state.hexWins = (state.hexWins || 0) + 1;
+      unlockAchieve("first_hex");
+    }
     tutAdvance("attack");
     setTimeout(() => { hideHex(); render(); }, 500);
     return true;
@@ -772,6 +930,9 @@
     fac(t).allies.push(state.player.factionId);
     addRel(state.player.factionId, t, 15);
     log(`与 ${fac(t).name} 缔结同盟。`);
+    unlockAchieve("allied");
+    codexFac(t);
+    sfx("click");
     render();
   }
 
@@ -836,6 +997,10 @@
       fac(t).allies.push(state.player.factionId);
     }
     log(`政治联姻：与 ${fac(t).name}（关系+30，同盟）。`);
+    unlockAchieve("married");
+    const ch = CHARACTERS.find((c) => c.faction === t);
+    if (ch) codexChar(ch.id);
+    sfx("claim");
     render();
   }
 
@@ -883,8 +1048,22 @@
     if (q.left <= 0) {
       state.player.techDone[q.id] = true;
       log(`研究完成：${q.name}`);
+      codex.techs[q.id] = true;
+      saveMeta();
+      unlockAchieve("tech1");
+      checkTechBranchAchieve();
       if (q.id === "a4") state.player.legitimacy += 5;
       state.player.techQueue = null;
+      sfx("event");
+    }
+  }
+
+  function checkTechBranchAchieve() {
+    for (const br of TECH_DEFS.branches || []) {
+      if (br.levels.every((lv) => state.player.techDone[lv.id])) {
+        unlockAchieve("tech_branch");
+        return;
+      }
     }
   }
 
@@ -984,6 +1163,8 @@
     playerFac().capital = owned[0].id;
     playerFac().name = "黑旗航阀";
     log("建国成功：掠航者→执政官。");
+    unlockAchieve("found_nation");
+    sfx("win");
     render();
   }
 
@@ -1025,6 +1206,8 @@
       state.player.rank = 9;
       state.player.legitimacy = 35;
       log("政变成功！你成为执政官。");
+      unlockAchieve("coup_ok");
+      sfx("win");
     } else {
       state.player.prison = 3;
       state.player.factionPower = 0;
@@ -1040,10 +1223,12 @@
     if (!spendAp(1)) return;
     if (chance(0.45 + state.player.intel / 200)) {
       state.player.prison = 0;
+      unlockAchieve("prison_break");
       if (chance(0.3)) {
         state.player.identity = "流民";
         log("越狱成功，但失去官身成为流民。");
       } else log("越狱成功。");
+      sfx("win");
     } else {
       state.player.prison += 1;
       log("越狱失败，刑期+1。");
@@ -1173,6 +1358,7 @@
     state.pendingEvent = pick;
     state.eventCd[pick.id] = state.month;
     log(`【事件】${pick.title}`);
+    sfx("event");
     showEvent(pick);
     tutAdvance("event");
   }
@@ -1312,10 +1498,41 @@
     else state.ap = 2;
 
     log(`结束回合 → 星月 ${state.month}`);
+    if (state.month >= 12) unlockAchieve("month_12");
     tutAdvance("end");
+    checkHegemonyWin();
     rollEvent();
+    sfx("turn");
     renderTech();
+    renderMeta();
     render();
+  }
+
+  function checkHegemonyWin() {
+    if (!state.scenarioFlags.winHegemony) return;
+    const total = Object.keys(state.nodes).length;
+    const owned = Object.values(state.nodes).filter((n) => n.owner === state.player.factionId).length;
+    if (owned / total >= 0.8) {
+      state.hegemonyStreak = (state.hegemonyStreak || 0) + 1;
+      log(`制霸进度：控制 ${(100 * owned / total).toFixed(0)}% · 连续 ${state.hegemonyStreak}/3 月`);
+      if (state.hegemonyStreak >= 3) {
+        unlockAchieve("hegemony");
+        showVictory(window.EmberI18n && EmberI18n.getLang() === "en"
+          ? "You hold the main ring. Hegemony achieved."
+          : "你控制了主航道环。制霸胜利！");
+      }
+    } else {
+      state.hegemonyStreak = 0;
+    }
+  }
+
+  function showVictory(text) {
+    const box = document.getElementById("victory-box");
+    if (!box) return;
+    document.getElementById("victory-title").textContent = t("victory");
+    document.getElementById("victory-text").textContent = text;
+    box.classList.remove("hidden");
+    sfx("win");
   }
 
   /* ---------- Save / Load ---------- */
@@ -1337,6 +1554,11 @@
       log: state.log.slice(-80),
       selected: state.selected,
       tutorial: state.tutorial,
+      scenarioId: state.scenarioId,
+      scenarioFlags: state.scenarioFlags,
+      hegemonyStreak: state.hegemonyStreak,
+      metChars: state.metChars,
+      hexWins: state.hexWins,
     };
   }
 
@@ -1358,6 +1580,11 @@
       log: data.log || [],
       selected: data.selected,
       tutorial: data.tutorial,
+      scenarioId: data.scenarioId || "sandbox",
+      scenarioFlags: data.scenarioFlags || {},
+      hegemonyStreak: data.hegemonyStreak || 0,
+      metChars: data.metChars || {},
+      hexWins: data.hexWins || 0,
       pendingEvent: null,
       hex: null,
       pendingBattle: null,
@@ -1365,9 +1592,17 @@
     hideEvent();
     hideHex();
     cancelBattle();
+    showApp(true);
     if (state.tutorial) showTutorial(); else hideTutorial();
+    const ban = document.getElementById("scenario-banner");
+    if (ban) {
+      const sc = SCENARIOS.find((s) => s.id === state.scenarioId);
+      ban.classList.remove("hidden");
+      ban.textContent = sc ? (window.EmberI18n ? EmberI18n.nameOf(sc) : sc.name_zh) : state.scenarioId;
+    }
     refreshDipSelect();
     renderTech();
+    renderMeta();
     const el = document.getElementById("log");
     el.textContent = state.log.join("\n");
     log("读档完成。");
@@ -1545,6 +1780,20 @@
         tab.classList.add("active");
         document.getElementById("tab-" + tab.dataset.tab).classList.add("active");
         if (tab.dataset.tab === "tech") renderTech();
+        if (tab.dataset.tab === "meta") renderMeta();
+        sfx("click");
+      };
+    });
+
+    document.querySelectorAll(".meta-tab").forEach((tab) => {
+      tab.onclick = () => {
+        document.querySelectorAll(".meta-tab").forEach((t) => t.classList.remove("active"));
+        tab.classList.add("active");
+        ["ach", "char", "codex"].forEach((id) => {
+          const el = document.getElementById("meta-" + id);
+          if (el) el.classList.toggle("hidden", tab.dataset.meta !== id);
+        });
+        renderMeta();
       };
     });
 
@@ -1565,14 +1814,71 @@
     document.getElementById("btn-coup-prep").onclick = coupPrep;
     document.getElementById("btn-coup-start").onclick = coupStart;
     document.getElementById("btn-escape").onclick = escapePrison;
-    document.getElementById("btn-tut").onclick = () => newGame({ tutorial: true, mode: "magistrate", seed: 20260719 });
+    document.getElementById("btn-tut").onclick = () => newGame({
+      tutorial: true, mode: "magistrate", scenarioId: "tutorial", seed: 20260719,
+    });
     document.getElementById("btn-sandbox").onclick = () => {
-      const modes = ["magistrate", "officer", "civilian", "raider"];
-      const m = modes[randi(0, 3)];
-      // pick via prompt-like cycle: magistrate default, shift: hold identity buttons - use select
-      const pick = window.prompt("开局身份：1执政官 2航官 3流民 4掠航者", "1");
+      const pick = window.prompt("1执政官 2航官 3流民 4掠航者", "1");
       const map = { 1: "magistrate", 2: "officer", 3: "civilian", 4: "raider" };
-      newGame({ mode: map[pick] || "magistrate" });
+      newGame({ mode: map[pick] || "magistrate", scenarioId: "sandbox" });
+    };
+    const btnMenu = document.getElementById("btn-menu");
+    if (btnMenu) btnMenu.onclick = () => {
+      hideHex(); hideEvent(); cancelBattle();
+      showApp(false);
+      renderScenarioList();
+      sfx("click");
+    };
+    const btnHexSand = document.getElementById("btn-hex-sandbox");
+    if (btnHexSand) btnHexSand.onclick = openHexSandbox;
+    const btnLang = document.getElementById("btn-lang");
+    if (btnLang) btnLang.onclick = () => {
+      if (!window.EmberI18n) return;
+      EmberI18n.setLang(EmberI18n.getLang() === "en" ? "zh" : "en");
+      applyI18nUi();
+      renderMeta();
+      render();
+      sfx("click");
+    };
+    const btnSfx = document.getElementById("btn-sfx");
+    if (btnSfx) btnSfx.onclick = () => {
+      if (!window.EmberAudio) return;
+      EmberAudio.setEnabled(!EmberAudio.isEnabled());
+      updateAudioButtons();
+    };
+    const btnBgm = document.getElementById("btn-bgm");
+    if (btnBgm) btnBgm.onclick = () => {
+      if (!window.EmberAudio) return;
+      EmberAudio.ensure();
+      EmberAudio.setBgm(!EmberAudio.isBgm());
+      if (EmberAudio.isBgm()) EmberAudio.startBgm();
+      updateAudioButtons();
+    };
+    const bootLang = document.getElementById("boot-lang");
+    if (bootLang) bootLang.onclick = () => {
+      if (!window.EmberI18n) return;
+      EmberI18n.setLang(EmberI18n.getLang() === "en" ? "zh" : "en");
+      applyI18nUi();
+    };
+    const bootAudio = document.getElementById("boot-audio");
+    if (bootAudio) bootAudio.onclick = () => {
+      if (!window.EmberAudio) return;
+      EmberAudio.setEnabled(!EmberAudio.isEnabled());
+      updateAudioButtons();
+    };
+    const bootBgm = document.getElementById("boot-bgm");
+    if (bootBgm) bootBgm.onclick = () => {
+      if (!window.EmberAudio) return;
+      EmberAudio.ensure();
+      EmberAudio.setBgm(!EmberAudio.isBgm());
+      if (EmberAudio.isBgm()) EmberAudio.startBgm();
+      updateAudioButtons();
+    };
+    const btnVic = document.getElementById("btn-victory-ok");
+    if (btnVic) btnVic.onclick = () => {
+      document.getElementById("victory-box").classList.add("hidden");
+      showApp(false);
+      renderScenarioList();
     };
     for (let i = 1; i <= 3; i++) {
       document.getElementById("btn-save" + i).onclick = () => saveSlot(i);
@@ -1692,9 +1998,187 @@
     const evs = mod.events || [];
     MOD_EVENTS = MOD_EVENTS.concat(evs);
     log(`已加载模组：${mod.name || mod.id || "未命名"}（+${evs.length} 事件）`);
+    unlockAchieve("mod_loaded");
+  }
+
+  function drawPortrait(canvas, ch) {
+    if (!canvas || !ch) return;
+    const ctx = canvas.getContext("2d");
+    const w = canvas.width = 56;
+    const h = canvas.height = 56;
+    const seed = ch.seed || 1;
+    const hue = ch.hue == null ? 200 : ch.hue;
+    ctx.fillStyle = `hsl(${hue}, 25%, 12%)`;
+    ctx.fillRect(0, 0, w, h);
+    // stars
+    for (let i = 0; i < 12; i++) {
+      const x = (seed * 17 + i * 13) % w;
+      const y = (seed * 31 + i * 19) % h;
+      ctx.fillStyle = `hsla(${hue}, 40%, 70%, 0.35)`;
+      ctx.fillRect(x, y, 1, 1);
+    }
+    // head
+    ctx.beginPath();
+    ctx.arc(28, 24, 12, 0, Math.PI * 2);
+    ctx.fillStyle = `hsl(${hue}, 35%, ${38 + (seed % 10)}%)`;
+    ctx.fill();
+    // shoulders
+    ctx.beginPath();
+    ctx.ellipse(28, 48, 18, 12, 0, Math.PI, 0);
+    ctx.fillStyle = `hsl(${(hue + 40) % 360}, 40%, 28%)`;
+    ctx.fill();
+    // visor line
+    ctx.strokeStyle = `hsl(${hue}, 70%, 60%)`;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(18, 24);
+    ctx.lineTo(38, 24);
+    ctx.stroke();
+  }
+
+  function renderMeta() {
+    const achEl = document.getElementById("meta-ach");
+    const charEl = document.getElementById("meta-char");
+    const codexEl = document.getElementById("meta-codex");
+    if (!achEl) return;
+    const en = window.EmberI18n && EmberI18n.getLang() === "en";
+    achEl.innerHTML = ACH_DEFS.map((a) => {
+      const ok = !!unlockedAch[a.id];
+      const name = en ? (a.name_en || a.name_zh) : (a.name_zh || a.name_en);
+      const desc = en ? (a.desc_en || a.desc_zh) : (a.desc_zh || a.desc_en);
+      return `<div class="ach-item ${ok ? "unlocked" : "locked"}"><strong>${ok ? "✓ " : "○ "}${name}</strong><br/><span class="muted">${desc}</span></div>`;
+    }).join("") || "<p class='hint'>…</p>";
+
+    if (charEl) {
+      charEl.innerHTML = "";
+      for (const ch of CHARACTERS) {
+        const known = codex.chars[ch.id] || ch.faction === "player";
+        const card = document.createElement("div");
+        card.className = "char-card";
+        const cv = document.createElement("canvas");
+        cv.width = 56; cv.height = 56;
+        if (known) drawPortrait(cv, ch);
+        else {
+          const c = cv.getContext("2d");
+          c.fillStyle = "#1a1a1a"; c.fillRect(0, 0, 56, 56);
+          c.fillStyle = "#666"; c.font = "20px sans-serif"; c.fillText("?", 22, 34);
+        }
+        const info = document.createElement("div");
+        const name = known ? (en ? ch.name_en : ch.name_zh) : (en ? "Unknown" : "未知");
+        const role = known ? (en ? ch.role_en : ch.role_zh) : "???";
+        const bio = known ? (en ? ch.bio_en : ch.bio_zh) : (en ? "Meet them in play." : "在游玩中遭遇后解锁。");
+        info.innerHTML = `<h4>${name}</h4><div class="muted">${role}</div><div>${bio}</div>`;
+        card.appendChild(cv);
+        card.appendChild(info);
+        charEl.appendChild(card);
+      }
+    }
+
+    if (codexEl) {
+      const nc = Object.keys(codex.nodes || {}).length;
+      const fc = Object.keys(codex.factions || {}).length;
+      const tc = Object.keys(codex.techs || {}).length;
+      const ac = Object.keys(unlockedAch).length;
+      codexEl.innerHTML = `
+        <div class="codex-item">${en ? "Nodes visited" : "造访节点"}: ${nc} / 36</div>
+        <div class="codex-item">${en ? "Factions" : "势力"}: ${fc}</div>
+        <div class="codex-item">${en ? "Techs logged" : "科技记录"}: ${tc}</div>
+        <div class="codex-item">${en ? "Achievements" : "成就"}: ${ac} / ${ACH_DEFS.length}</div>
+        <div class="codex-item">${en ? "Hex wins (run)" : "本局战棋胜"}: ${state.hexWins || 0}</div>
+        <div class="codex-item muted">${en ? "Codex persists across runs." : "图鉴跨周目保留。"}</div>`;
+    }
+  }
+
+  function applyI18nUi() {
+    if (!window.EmberI18n) return;
+    document.querySelectorAll("[data-i18n]").forEach((el) => {
+      const k = el.getAttribute("data-i18n");
+      if (k) el.textContent = EmberI18n.t(k);
+    });
+    const title = document.getElementById("ui-title");
+    const bootTitle = document.getElementById("boot-title");
+    if (title) title.textContent = EmberI18n.t("title");
+    if (bootTitle) bootTitle.textContent = EmberI18n.t("title");
+    const sub = document.getElementById("boot-sub");
+    if (sub) sub.textContent = EmberI18n.getLang() === "en" ? "P2 · Choose a scenario" : "P2 · 选择剧本开始";
+    const uiSub = document.getElementById("ui-sub");
+    if (uiSub) uiSub.innerHTML = EmberI18n.t("subtitle") + ' · <a href="https://github.com/itoulee/ember-hegemony" target="_blank" rel="noopener">GitHub</a>';
+    renderScenarioList();
+    updateAudioButtons();
+  }
+
+  function renderScenarioList() {
+    const list = document.getElementById("scenario-list");
+    if (!list) return;
+    list.innerHTML = "";
+    for (const sc of SCENARIOS) {
+      const card = document.createElement("button");
+      card.type = "button";
+      card.className = "scenario-card";
+      const name = window.EmberI18n ? EmberI18n.nameOf(sc) : sc.name_zh;
+      const desc = window.EmberI18n ? EmberI18n.descOf(sc) : sc.desc_zh;
+      card.innerHTML = `<h3>${name}</h3><p>${desc}</p>`;
+      card.onclick = () => {
+        EmberAudio && EmberAudio.ensure();
+        newGame({
+          scenarioId: sc.id,
+          mode: sc.mode || "magistrate",
+          tutorial: !!sc.tutorial,
+          flags: sc.flags || {},
+          seed: Date.now() & 0xffffffff,
+        });
+        state.mapView.scale = 0.85;
+        state.mapView.ox = 20;
+        state.mapView.oy = 10;
+        render();
+      };
+      list.appendChild(card);
+    }
+  }
+
+  function updateAudioButtons() {
+    const a = window.EmberAudio;
+    if (!a) return;
+    const sfxBtn = document.getElementById("btn-sfx");
+    const bgmBtn = document.getElementById("btn-bgm");
+    const bootA = document.getElementById("boot-audio");
+    const bootB = document.getElementById("boot-bgm");
+    const on = a.isEnabled();
+    const bgm = a.isBgm();
+    if (sfxBtn) sfxBtn.textContent = (window.EmberI18n && EmberI18n.getLang() === "en" ? "SFX:" : "音效:") + (on ? "ON" : "OFF");
+    if (bgmBtn) bgmBtn.textContent = "BGM:" + (bgm ? "ON" : "OFF");
+    if (bootA) bootA.textContent = (window.EmberI18n && EmberI18n.getLang() === "en" ? "SFX:" : "音效:") + (on ? "ON" : "OFF");
+    if (bootB) bootB.textContent = "BGM:" + (bgm ? "ON" : "OFF");
+  }
+
+  function openHexSandbox() {
+    if (!state.rngState) seedRng(Date.now() & 0xffffffff);
+    if (!state.player || !Object.keys(state.nodes).length) {
+      buildWorld("magistrate");
+    }
+    const fake = {
+      id: "sandbox", name: "沙盘", terrain: chance(0.5) ? "nebula" : "fort",
+      owner: "fac_cold", garrison: 50, defense: 1,
+    };
+    // ensure cold exists
+    if (!fac("fac_cold")) {
+      state.factions.fac_cold = {
+        id: "fac_cold", name: "冷环", color: "#3d8bfd", ai: true,
+        credits: 1, manpower: 1, rel: {}, allies: [], vassals: [], overlord: null, capital: null,
+      };
+    }
+    startHex(fake, 100, 90);
+    if (state.hex) {
+      state.hex.sandbox = true;
+      state.hex.log.push("沙盘模式：胜负不写回星图。练地形与射程。");
+      document.getElementById("hex-hint").textContent = "沙盘 · 不改战略层";
+    }
+    showApp(true);
+    sfx("click");
   }
 
   async function loadData() {
+    loadMeta();
     try {
       const er = await fetch("data/events.json");
       const ej = await er.json();
@@ -1706,7 +2190,6 @@
           { id: "b", text: "忽略", effects: [] },
         ] },
       ];
-      log("事件表 fetch 失败，使用内置少量事件。");
     }
     try {
       const tr = await fetch("data/tech.json");
@@ -1714,18 +2197,36 @@
     } catch {
       TECH_DEFS = { branches: [] };
     }
+    try {
+      const sr = await fetch("data/scenarios.json");
+      SCENARIOS = (await sr.json()).scenarios || [];
+    } catch {
+      SCENARIOS = [
+        { id: "tutorial", name_zh: "教程", name_en: "Tutorial", mode: "magistrate", tutorial: true, desc_zh: "引导", desc_en: "Guide" },
+        { id: "sandbox", name_zh: "沙盒", name_en: "Sandbox", mode: "magistrate", desc_zh: "自由", desc_en: "Free" },
+      ];
+    }
+    try {
+      const cr = await fetch("data/characters.json");
+      CHARACTERS = (await cr.json()).characters || [];
+    } catch { CHARACTERS = []; }
+    try {
+      const ar = await fetch("data/achievements.json");
+      ACH_DEFS = (await ar.json()).achievements || [];
+    } catch { ACH_DEFS = []; }
   }
 
   async function main() {
     bind();
     await loadData();
-    newGame({ tutorial: true, mode: "magistrate", seed: 20260719 });
-    // auto-fit map
-    state.mapView.scale = 0.85;
-    state.mapView.ox = 20;
-    state.mapView.oy = 10;
-    render();
+    applyI18nUi();
+    showApp(false);
+    renderScenarioList();
+    updateAudioButtons();
   }
+
+  // Extend bind - call original patterns by patching at end of bind function
+  // We'll append handlers after bind definition via search
 
   main();
 })();

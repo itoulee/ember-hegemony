@@ -73,6 +73,51 @@ button.hidden { display: none; }
 .hex-actions { display: flex; gap: 8px; margin: 8px 0; flex-wrap: wrap; }
 .muted { color: var(--muted); font-weight: normal; font-size: 0.8rem; }
 
+/* P2 */
+.boot {
+  min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  padding: 16px; background: radial-gradient(ellipse at 30% 20%, #1a2438 0%, var(--bg) 55%);
+}
+.boot-card {
+  width: min(520px, 100%); background: var(--panel); border: 1px solid var(--line);
+  border-radius: 14px; padding: 20px; box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+}
+.boot-card h1 { margin: 0 0 6px; font-size: 1.4rem; }
+.scenario-list { display: flex; flex-direction: column; gap: 8px; margin: 14px 0; max-height: 50vh; overflow: auto; }
+.scenario-card {
+  text-align: left; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line);
+  background: var(--btn); cursor: pointer;
+}
+.scenario-card:hover { border-color: var(--accent); background: var(--btn-hover); }
+.scenario-card h3 { margin: 0 0 4px; font-size: 0.95rem; color: var(--accent); }
+.scenario-card p { margin: 0; font-size: 0.78rem; color: var(--muted); line-height: 1.35; }
+.boot-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.scenario-banner {
+  flex: 1 1 160px; font-size: 0.8rem; padding: 6px 10px; border-radius: 8px;
+  background: rgba(61,139,253,0.12); border: 1px solid var(--cold); color: #9ec5ff;
+}
+.scenario-banner.hidden { display: none; }
+.meta-subtabs { display: flex; gap: 4px; margin-bottom: 8px; }
+.meta-tab { flex: 1; font-size: 0.75rem; padding: 6px; text-align: center; }
+.meta-tab.active { border-color: var(--accent); color: var(--accent); }
+.meta-pane { font-size: 0.78rem; line-height: 1.4; max-height: 50vh; overflow: auto; }
+.ach-item, .char-card, .codex-item {
+  border: 1px solid var(--line); border-radius: 8px; padding: 8px; margin-bottom: 6px; background: rgba(0,0,0,0.15);
+}
+.ach-item.locked { opacity: 0.45; }
+.ach-item.unlocked { border-color: var(--ok); }
+.char-card { display: grid; grid-template-columns: 56px 1fr; gap: 8px; align-items: start; }
+.char-card canvas { border-radius: 8px; background: #0d131c; }
+.char-card h4 { margin: 0 0 2px; font-size: 0.85rem; }
+.toast {
+  position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%);
+  background: rgba(20,30,40,0.95); border: 1px solid var(--accent); color: #ffe0a8;
+  padding: 10px 16px; border-radius: 10px; font-size: 0.9rem; z-index: 20;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+.victory { border-color: var(--ok); text-align: center; }
+.victory h3 { color: var(--ok); }
+
 @media (max-width: 900px) {
   .main { grid-template-columns: 1fr; }
   .left, .right { max-height: none; }

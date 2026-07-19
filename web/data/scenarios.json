@@ -1,0 +1,65 @@
+{
+  "scenarios": [
+    {
+      "id": "tutorial",
+      "name_zh": "教程：余烬港一百天",
+      "name_en": "Tutorial: Hundred Days",
+      "mode": "magistrate",
+      "tutorial": true,
+      "desc_zh": "强制引导：航行、占星、结束回合、交战、事件。",
+      "desc_en": "Guided: move, claim, end turn, battle, event."
+    },
+    {
+      "id": "sandbox",
+      "name_zh": "沙盒：无主星域",
+      "name_en": "Sandbox: Free Sector",
+      "mode": "magistrate",
+      "desc_zh": "标准开局，自由目标。制霸可选。",
+      "desc_en": "Standard start, free goals."
+    },
+    {
+      "id": "weak",
+      "name_zh": "剧本：小国中兴",
+      "name_en": "Scenario: Weak Revival",
+      "mode": "magistrate",
+      "desc_zh": "余烬仅剩两星、低兵力，需合纵连横。",
+      "desc_en": "Only two stars and low manpower.",
+      "flags": { "weakStart": true }
+    },
+    {
+      "id": "coup",
+      "name_zh": "剧本：北阙夜（政变）",
+      "name_en": "Scenario: Coup Night",
+      "mode": "officer",
+      "desc_zh": "以航官开局，目标黄袍加身。",
+      "desc_en": "Start as officer; stage a coup.",
+      "flags": { "boostCoup": true }
+    },
+    {
+      "id": "raider",
+      "name_zh": "剧本：黑旗十年",
+      "name_en": "Scenario: Black Flag Decade",
+      "mode": "raider",
+      "desc_zh": "掠航者开局，占星建国称帝。",
+      "desc_en": "Raider start: seize, found, rule.",
+      "flags": {}
+    },
+    {
+      "id": "civilian",
+      "name_zh": "剧本：布衣卿相",
+      "name_en": "Scenario: Commoner Path",
+      "mode": "civilian",
+      "desc_zh": "流民起步，入仕或叛逃皆可。",
+      "desc_en": "Start as civilian; join or rebel."
+    },
+    {
+      "id": "hegemony",
+      "name_zh": "剧本：制霸主环",
+      "name_en": "Scenario: Ring Hegemony",
+      "mode": "magistrate",
+      "desc_zh": "控制 ≥80% 节点并维持 3 星月即胜利。",
+      "desc_en": "Hold ≥80% nodes for 3 months to win.",
+      "flags": { "winHegemony": true }
+    }
+  ]
+}

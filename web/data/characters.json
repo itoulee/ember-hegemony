@@ -1,0 +1,112 @@
+{
+  "characters": [
+    {
+      "id": "vorn",
+      "name_zh": "沃恩执政",
+      "name_en": "Chancellor Vorn",
+      "faction": "fac_cold",
+      "role_zh": "冷环合议执政",
+      "role_en": "Cold Ring leader",
+      "bio_zh": "信奉秩序与带宽配额。视余烬为不稳定热源。",
+      "bio_en": "Believes in order and bandwidth quotas.",
+      "hue": 210,
+      "seed": 11
+    },
+    {
+      "id": "mira",
+      "name_zh": "米拉港主",
+      "name_en": "Portmaster Mira",
+      "faction": "fac_free",
+      "role_zh": "自由港盟主事",
+      "role_en": "Free Port chair",
+      "bio_zh": "精于关税与联姻外交，从不白送航道权。",
+      "bio_en": "Tariffs and marriage diplomacy.",
+      "hue": 140,
+      "seed": 22
+    },
+    {
+      "id": "kess",
+      "name_zh": "凯斯铁幕",
+      "name_en": "Kess of Iron",
+      "faction": "fac_iron",
+      "role_zh": "铁幕船团司令",
+      "role_en": "Iron Curtain admiral",
+      "bio_zh": "舰队即法律。对海盗格杀勿论。",
+      "bio_en": "Fleet is law. No mercy for raiders.",
+      "hue": 290,
+      "seed": 33
+    },
+    {
+      "id": "sarn",
+      "name_zh": "萨恩尘母",
+      "name_en": "Dust-Mother Sarn",
+      "faction": "fac_dust",
+      "role_zh": "尘带公社长老",
+      "role_en": "Dust Belt elder",
+      "bio_zh": "资源共有，仇恨公司国的专利锁。",
+      "bio_en": "Commons over patents.",
+      "hue": 35,
+      "seed": 44
+    },
+    {
+      "id": "lira",
+      "name_zh": "莉菈虚声",
+      "name_en": "Lira the Echo",
+      "faction": "fac_void",
+      "role_zh": "虚空教团司仪",
+      "role_en": "Void Choir cantor",
+      "bio_zh": "解读失效 AI 遗言，认为制霸是另一种断裂。",
+      "bio_en": "Reads dead AI liturgy.",
+      "hue": 180,
+      "seed": 55
+    },
+    {
+      "id": "helio",
+      "name_zh": "赫利俄董事",
+      "name_en": "Director Helio",
+      "faction": "fac_corp",
+      "role_zh": "赫利俄斯公司董事",
+      "role_en": "Helios Corp director",
+      "bio_zh": "一切皆可证券化，包括你的正统性。",
+      "bio_en": "Everything is securitized.",
+      "hue": 50,
+      "seed": 66
+    },
+    {
+      "id": "lia",
+      "name_zh": "莉娅·科塔",
+      "name_en": "Lia Kota",
+      "faction": "fac_ember",
+      "role_zh": "余烬人事官",
+      "role_en": "Ember personnel officer",
+      "bio_zh": "忠诚可被购买，但她更贵。",
+      "bio_en": "Loyalty has a price—hers is high.",
+      "hue": 20,
+      "seed": 77
+    },
+    {
+      "id": "rex",
+      "name_zh": "雷克斯残刀",
+      "name_en": "Rex the Shard",
+      "faction": "fac_raider",
+      "role_zh": "黑旗老船员",
+      "role_en": "Black Flag veteran",
+      "bio_zh": "教你如何在无主岩活过第一个月。",
+      "bio_en": "How to survive month one.",
+      "hue": 0,
+      "seed": 88
+    },
+    {
+      "id": "player_echo",
+      "name_zh": "你（航行者）",
+      "name_en": "You (Navigator)",
+      "faction": "player",
+      "role_zh": "玩家角色",
+      "role_en": "Player",
+      "bio_zh": "第二重建期的变量。历史尚未写定。",
+      "bio_en": "A variable of the Second Rebuild.",
+      "hue": 25,
+      "seed": 1
+    }
+  ]
+}
