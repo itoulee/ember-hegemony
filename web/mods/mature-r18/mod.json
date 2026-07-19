@@ -1,32 +1,438 @@
 {
-  "id": "mature-r18-skeleton",
-  "name": "R18 接口骨架（无露骨正文）",
-  "version": "0.1.0",
+  "id": "mature-r18",
+  "name": "余烬·夜航（成人向）",
+  "version": "1.0.0",
   "requiresAge": 18,
   "rating": "r18",
-  "description": "仅为分级过滤、年龄门与事件钩子预留。默认不含任何露骨性描写。社区可在此结构上扩展独立内容包。",
-  "disclaimer": "启用前须确认已满 18 岁。禁止未成年相关内容。",
+  "description": "成年角色之间的情欲、联姻之夜、俘虏私刑与后宫事件。仅限 18+。不含未成年人。",
+  "disclaimer": "虚构成人内容。禁止向未成年人传播。",
+  "relationships": {
+    "enabled": true,
+    "levels": ["stranger", "acquaintance", "trusted", "bonded", "intimate", "lover"]
+  },
   "events": [
     {
-      "id": "r18_hook_placeholder",
-      "title": "【R18接口】内容槽位（占位）",
-      "weight": 0,
-      "cooldown": 99,
+      "id": "r18_wedding_night",
+      "title": "【成人】联姻之夜",
+      "weight": 14,
+      "cooldown": 4,
       "rating": "r18",
-      "minMonth": 999,
-      "text": "此事件权重为 0 且 minMonth 极高，正常游玩不会出现。用于验证 R18 过滤与模组加载链路。真正成人向正文请放在独立私有包中，勿提交到默认公开仓库。",
+      "needSpouse": true,
+      "minMonth": 1,
+      "text": "航道密钥联署仪式结束。对方在旗舰寝舱等你：制服解到一半，呼吸已经乱了。今晚可以只谈正统——也可以把正统按在床垫上。",
       "choices": [
         {
-          "id": "ack",
-          "text": "知道了（无效果）",
-          "effects": [{ "type": "log", "t": "R18 接口包已挂载；主包仍为全年龄叙事。" }]
+          "id": "gentle",
+          "text": "温柔地进入（好感↑ 正统+）",
+          "effects": [
+            { "type": "intimacy", "v": 2 },
+            { "type": "legitimacy", "v": 4 },
+            { "type": "log", "t": "你们做得缓慢而彻底。对方把你的名字嵌进喘息里。" }
+          ]
+        },
+        {
+          "id": "rough",
+          "text": "强势占有（情欲↑ 关系波动）",
+          "effects": [
+            { "type": "intimacy", "v": 3 },
+            { "type": "relSpouse", "v": -5 },
+            { "type": "credits", "v": -200 },
+            { "type": "log", "t": "舱壁震出闷响。事后对方眼角发红，却把腿仍缠在你腰上。" }
+          ]
+        },
+        {
+          "id": "deny",
+          "text": "只谈条约，拒绝 entangle",
+          "effects": [
+            { "type": "legitimacy", "v": 2 },
+            { "type": "intimacy", "v": -1 },
+            { "type": "log", "t": "对方沉默着穿回制服。政治仍在，温度冷了。" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r18_lia_office",
+      "title": "【成人】人事官的加班",
+      "weight": 11,
+      "cooldown": 5,
+      "rating": "r18",
+      "minMonth": 2,
+      "text": "莉娅·科塔把忠诚审查表推到一边，反锁旗舰会议室。她跨坐上会议桌，裙摆擦过你的大腿：「审查你，或者……你审查我。」",
+      "choices": [
+        {
+          "id": "desk",
+          "text": "就在桌上（情欲↑ 功勋暗示）",
+          "effects": [
+            { "type": "intimacyChar", "char": "lia", "v": 3 },
+            { "type": "merit", "v": 3 },
+            { "type": "log", "t": "表格被揉皱。她咬着你的肩压低声音，生怕通讯频道误开。" }
+          ]
+        },
+        {
+          "id": "after",
+          "text": "带回寝舱细做",
+          "effects": [
+            { "type": "intimacyChar", "char": "lia", "v": 4 },
+            { "type": "credits", "v": -300 },
+            { "type": "log", "t": "一整夜。她学会用你的军衔当情趣称呼。" }
+          ]
+        },
+        {
+          "id": "work",
+          "text": "专注公务",
+          "effects": [
+            { "type": "intel", "v": 5 },
+            { "type": "log", "t": "她整理好衣服，眼底有一瞬失落。" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r18_mira_bath",
+      "title": "【成人】自由港蒸汽",
+      "weight": 10,
+      "cooldown": 5,
+      "rating": "r18",
+      "minMonth": 2,
+      "text": "米拉港主以「关税密谈」邀你进入私汤。水雾里她只围一条浴巾，湿发贴在锁骨：「港口抽成可以谈——你的手先别停。」",
+      "choices": [
+        {
+          "id": "steam",
+          "text": "在池中缠绵",
+          "effects": [
+            { "type": "intimacyChar", "char": "mira", "v": 3 },
+            { "type": "relNeutral", "v": 8 },
+            { "type": "credits", "v": 400 },
+            { "type": "log", "t": "水声盖过喘息。谈妥的不只是关税。" }
+          ]
+        },
+        {
+          "id": "edge",
+          "text": "边缘挑逗后离开（钓她）",
+          "effects": [
+            { "type": "intimacyChar", "char": "mira", "v": 2 },
+            { "type": "influence", "v": 6 },
+            { "type": "log", "t": "她骂你骗子，却把通讯频段留给你单独加密。" }
+          ]
+        },
+        {
+          "id": "business",
+          "text": "只谈生意",
+          "effects": [
+            { "type": "credits", "v": 900 },
+            { "type": "log", "t": "她披上外袍，语气恢复港主的锋利。" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r18_captive_night",
+      "title": "【成人】俘虏审讯室",
+      "weight": 9,
+      "cooldown": 6,
+      "rating": "r18",
+      "minMonth": 3,
+      "text": "刚俘获的敌方联络官被铐在审讯椅上。灯光打在她起伏的胸口。条例允许「非常规施压」——你知道那意味着什么。",
+      "choices": [
+        {
+          "id": "seduce",
+          "text": "用欲望换情报（双方合意表演）",
+          "effects": [
+            { "type": "intel", "v": 12 },
+            { "type": "intimacy", "v": 1 },
+            { "type": "legitimacy", "v": -3 },
+            { "type": "log", "t": "她最后自己解开一截束带。情报与呻吟一起交出来。" }
+          ]
+        },
+        {
+          "id": "trade",
+          "text": "正经换俘，不碰",
+          "effects": [
+            { "type": "credits", "v": 1200 },
+            { "type": "relWorst", "v": 6 },
+            { "type": "log", "t": "外交渠道走完。审讯室重新安静。" }
+          ]
+        },
+        {
+          "id": "hard",
+          "text": "冷酷审讯（无性，伤士气）",
+          "effects": [
+            { "type": "intel", "v": 8 },
+            { "type": "manpower", "v": -4 },
+            { "type": "legitimacy", "v": -2 },
+            { "type": "log", "t": "你守住了底线，也守住了冷汗。" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r18_harem_schedule",
+      "title": "【成人】后舱排班",
+      "weight": 8,
+      "cooldown": 4,
+      "rating": "r18",
+      "minMonth": 4,
+      "needIntimacy": 3,
+      "text": "旗舰生活区传来争执：谁今晚进你的寝舱。你的「亲密对象」们要求排班——或者一起。",
+      "choices": [
+        {
+          "id": "one",
+          "text": "只召最深的那位",
+          "effects": [
+            { "type": "intimacy", "v": 2 },
+            { "type": "legitimacy", "v": 1 },
+            { "type": "log", "t": "单人夜。你们把彼此做到腿软，谁也不提别人的名字。" }
+          ]
+        },
+        {
+          "id": "share",
+          "text": "同床共枕（混乱↑ 情欲↑↑）",
+          "effects": [
+            { "type": "intimacy", "v": 4 },
+            { "type": "credits", "v": -500 },
+            { "type": "legitimacy", "v": -4 },
+            { "type": "log", "t": "舱内空气灼热。第二天参谋假装没看见吻痕。" }
+          ]
+        },
+        {
+          "id": "ban",
+          "text": "禁止后舱争风",
+          "effects": [
+            { "type": "legitimacy", "v": 5 },
+            { "type": "intimacy", "v": -1 },
+            { "type": "log", "t": "命令生效。欲望被按进制度里，仍在夜里发烫。" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r18_void_rite",
+      "title": "【成人】虚空司仪的仪式",
+      "weight": 7,
+      "cooldown": 7,
+      "rating": "r18",
+      "minMonth": 3,
+      "text": "莉菈虚声以「读取你的协议栈」为由，把你按进无重力小礼拜堂。她的法衣敞开，肌肤贴着冷金属：「让身体先认罪。」",
+      "choices": [
+        {
+          "id": "rite",
+          "text": "完成她的仪式",
+          "effects": [
+            { "type": "intimacyChar", "char": "lira", "v": 3 },
+            { "type": "intel", "v": 6 },
+            { "type": "log", "t": "失重中的交合像坠落。她在你耳边诵读失效 AI 的情诗。" }
+          ]
+        },
+        {
+          "id": "reject",
+          "text": "拒绝邪典",
+          "effects": [
+            { "type": "legitimacy", "v": 3 },
+            { "type": "relWorst", "v": -4 },
+            { "type": "log", "t": "她笑着穿上衣袍：你会回来的。" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r18_raider_plunder",
+      "title": "【成人】黑旗战利品",
+      "weight": 9,
+      "cooldown": 5,
+      "rating": "r18",
+      "needIdentity": "掠航者",
+      "minMonth": 1,
+      "text": "劫掠得手。货舱里除了正交石，还有自愿留下的「战利品」——成年船员，眼神毫不躲闪：「胜者有权。」",
+      "choices": [
+        {
+          "id": "take",
+          "text": "接受自愿的一夜",
+          "effects": [
+            { "type": "intimacy", "v": 2 },
+            { "type": "manpower", "v": 2 },
+            { "type": "log", "t": "铁架床咯吱作响。黎明对方索要一份船员编制。" }
+          ]
+        },
+        {
+          "id": "pay",
+          "text": "付钱送走，不碰",
+          "effects": [
+            { "type": "credits", "v": -400 },
+            { "type": "legitimacy", "v": 2 },
+            { "type": "log", "t": "你守住了某种自己的规矩。" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r18_officer_secret",
+      "title": "【成人】航官的秘密通讯",
+      "weight": 10,
+      "cooldown": 4,
+      "rating": "r18",
+      "needIdentity": "航官",
+      "minMonth": 2,
+      "text": "加密频道里是一段私密影像：同僚在淋浴间的雾气。附言：「政变需要盟友……也需要你今晚来。」",
+      "choices": [
+        {
+          "id": "go",
+          "text": "赴约（派系力↑ 情欲↑）",
+          "effects": [
+            { "type": "factionPower", "v": 8 },
+            { "type": "intimacy", "v": 2 },
+            { "type": "log", "t": "水声与低喘混在一起。事后对方把一张署名票塞进你掌心。" }
+          ]
+        },
+        {
+          "id": "record",
+          "text": "存证威胁（黑料）",
+          "effects": [
+            { "type": "intel", "v": 10 },
+            { "type": "factionPower", "v": 4 },
+            { "type": "legitimacy", "v": -5 },
+            { "type": "log", "t": "你选择权力而非体温。频道那头沉默很久。" }
+          ]
+        },
+        {
+          "id": "ignore",
+          "text": "删除并举报",
+          "effects": [
+            { "type": "merit", "v": 5 },
+            { "type": "log", "t": "正统路线。你的床依旧冷。" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r18_anniversary",
+      "title": "【成人】密钥周年",
+      "weight": 8,
+      "cooldown": 6,
+      "rating": "r18",
+      "needSpouse": true,
+      "needIntimacy": 2,
+      "minMonth": 3,
+      "text": "联姻满若干星月。对方穿上初夜那套制服改款，把你按进指挥椅：「今晚席位只有一个。」",
+      "choices": [
+        {
+          "id": "chair",
+          "text": "在指挥椅上做",
+          "effects": [
+            { "type": "intimacy", "v": 3 },
+            { "type": "legitimacy", "v": 2 },
+            { "type": "log", "t": " thruster 指示灯乱闪。你们把周年刻进肌肉记忆。" }
+          ]
+        },
+        {
+          "id": "gift",
+          "text": "送正交石首饰后温存",
+          "effects": [
+            { "type": "credits", "v": -1500 },
+            { "type": "intimacy", "v": 4 },
+            { "type": "relSpouse", "v": 10 },
+            { "type": "log", "t": "礼物与皮肤同样滚烫。" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r18_jealousy",
+      "title": "【成人】争宠",
+      "weight": 9,
+      "cooldown": 5,
+      "rating": "r18",
+      "needIntimacy": 4,
+      "minMonth": 3,
+      "text": "两位亲密对象在走廊对峙。一个扯开领口露出你留下的痕迹，另一个冷笑：「今晚看谁先叫出声。」",
+      "choices": [
+        {
+          "id": "both",
+          "text": "拉双方回舱（高风险高欲望）",
+          "effects": [
+            { "type": "intimacy", "v": 5 },
+            { "type": "manpower", "v": -3 },
+            { "type": "log", "t": "直到黎明通讯官都不敢敲舱门。" }
+          ]
+        },
+        {
+          "id": "pick",
+          "text": "只带走一人",
+          "effects": [
+            { "type": "intimacy", "v": 2 },
+            { "type": "relSpouse", "v": -3 },
+            { "type": "log", "t": "被留下的那位摔上门。床上的人却更用力。" }
+          ]
+        },
+        {
+          "id": "none",
+          "text": "今夜独自执勤",
+          "effects": [
+            { "type": "legitimacy", "v": 4 },
+            { "type": "intel", "v": 4 },
+            { "type": "log", "t": "欲望退潮。星图重新清晰。" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r18_corp_contract",
+      "title": "【成人】公司附加条款",
+      "weight": 7,
+      "cooldown": 6,
+      "rating": "r18",
+      "minMonth": 2,
+      "text": "赫利俄董事把全息合同滑到你面前。末页跳出私密条款：一次「高管释放」，换取科研折扣。对方已解开袖扣。",
+      "choices": [
+        {
+          "id": "sign",
+          "text": "签署并以身体履约",
+          "effects": [
+            { "type": "intimacyChar", "char": "helio", "v": 2 },
+            { "type": "techProgress", "v": 1 },
+            { "type": "credits", "v": -800 },
+            { "type": "log", "t": "合同章与咬痕一起盖下。折扣是真的。" }
+          ]
+        },
+        {
+          "id": "cash",
+          "text": "改现金交易",
+          "effects": [
+            { "type": "credits", "v": -2500 },
+            { "type": "techProgress", "v": 1 },
+            { "type": "log", "t": "对方耸肩：也可以。" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r18_dust_festival",
+      "title": "【成人】尘带狂欢",
+      "weight": 6,
+      "cooldown": 8,
+      "rating": "r18",
+      "minMonth": 3,
+      "text": "尘带公社的丰收夜不忌讳身体。萨恩尘母递来烈酒，人群起舞，有人拉你的手探进衣摆：「外人也可以共享。」",
+      "choices": [
+        {
+          "id": "join",
+          "text": "加入共有之夜",
+          "effects": [
+            { "type": "intimacyChar", "char": "sarn", "v": 3 },
+            { "type": "manpower", "v": 6 },
+            { "type": "legitimacy", "v": -2 },
+            { "type": "log", "t": "沙尘与汗。你被当成受欢迎的变量。" }
+          ]
+        },
+        {
+          "id": "watch",
+          "text": "只旁观饮酒",
+          "effects": [
+            { "type": "influence", "v": 5 },
+            { "type": "log", "t": "你保持边界，仍被敬了三杯。" }
+          ]
         }
       ]
     }
-  ],
-  "relationships": {
-    "enabled": true,
-    "levels": ["stranger", "acquaintance", "trusted", "bonded", "intimate"],
-    "note": "intimate 仅在 R18 启用时解锁事件钩子；主包只使用前四级。"
-  }
+  ]
 }

@@ -165,6 +165,16 @@ button.hidden { display: none; }
 .modal {
   position: relative; z-index: 40;
 }
+.intimacy-panel { margin-top: 10px; border-top: 1px dashed var(--line); padding-top: 8px; }
+.intimacy-list { display: flex; flex-direction: column; gap: 4px; max-height: 220px; overflow: auto; }
+.intimacy-list button { font-size: 0.78rem; padding: 6px 8px; }
+.intimacy-list button:disabled { opacity: 0.4; }
+
+/* 移动端日志更矮，给罗盘空间 */
+@media (max-width: 900px) {
+  .goal-compass { margin: 0 8px 6px; }
+  #log { height: 22vh; }
+}
 
 @media (max-width: 900px) {
   .main { grid-template-columns: 1fr; }

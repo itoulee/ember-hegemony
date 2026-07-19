@@ -8,7 +8,7 @@
   const SAVE_PREFIX = "ember_hegemony_slot_";
   const ACH_KEY = "ember_hegemony_achievements";
   const CODEX_KEY = "ember_hegemony_codex";
-  const VERSION = "2.1.0-goal-r18api";
+  const VERSION = "2.2.0-adult";
   const MATURE_KEY = "ember_mature_enabled";
 
   let EVENT_DEFS = [];
@@ -89,7 +89,27 @@
     matureEnabled: false,
     maturePackLoaded: false,
     relationshipHooks: null,
+    /** charId -> intimacy level 0-10 */
+    bonds: {},
+    globalIntimacy: 0,
+    harem: [],
   };
+
+  function bondOf(charId) {
+    return state.bonds[charId] || 0;
+  }
+  function addBond(charId, v) {
+    if (!charId) return;
+    state.bonds[charId] = clamp((state.bonds[charId] || 0) + v, 0, 10);
+    if (state.bonds[charId] >= 3 && state.harem.indexOf(charId) < 0) {
+      state.harem.push(charId);
+    }
+  }
+  function maxBond() {
+    let m = state.globalIntimacy || 0;
+    for (const k of Object.keys(state.bonds)) m = Math.max(m, state.bonds[k] || 0);
+    return m;
+  }
 
   function isMatureEnabled() {
     return !!state.matureEnabled;
@@ -171,15 +191,20 @@
   function chance(p) { return rand() < p; }
   function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
 
+  let _logRaf = 0;
   function log(msg) {
     const line = `[星月${state.month}] ${msg}`;
     state.log.push(line);
-    if (state.log.length > 300) state.log.splice(0, state.log.length - 300);
-    const el = document.getElementById("log");
-    if (el) {
-      el.textContent = state.log.join("\n");
-      el.scrollTop = el.scrollHeight;
-    }
+    if (state.log.length > 200) state.log.splice(0, state.log.length - 200);
+    if (_logRaf) return;
+    _logRaf = requestAnimationFrame(() => {
+      _logRaf = 0;
+      const el = document.getElementById("log");
+      if (el) {
+        el.textContent = state.log.join("\n");
+        el.scrollTop = el.scrollHeight;
+      }
+    });
   }
 
   function fac(id) { return state.factions[id]; }
@@ -415,6 +440,9 @@
     state.hexWins = 0;
     state.metChars = {};
     state.victoryClaimed = false;
+    state.bonds = {};
+    state.globalIntimacy = 0;
+    state.harem = [];
     buildWorld(opts.mode || "magistrate");
     applyScenarioFlags(state.scenarioFlags);
     if (opts.tutorial) {
@@ -1050,9 +1078,71 @@
     log(`政治联姻：与 ${fac(t).name}（关系+30，同盟）。`);
     unlockAchieve("married");
     const ch = CHARACTERS.find((c) => c.faction === t);
-    if (ch) codexChar(ch.id);
+    if (ch) {
+      codexChar(ch.id);
+      addBond(ch.id, isMatureEnabled() ? 2 : 1);
+    }
+    state.globalIntimacy = Math.max(state.globalIntimacy, isMatureEnabled() ? 2 : 1);
+    if (isMatureEnabled()) {
+      log("【成人】联姻开启亲密线：可在身份页「召见/共度」推进关系。");
+    }
     sfx("claim");
     render();
+  }
+
+  function intimateWith(charId) {
+    if (!isMatureEnabled()) {
+      log("需启用成人内容（系统页）。");
+      openAgeGate(() => {
+        loadMatureSkeletonPack().then(() => intimateWith(charId));
+      });
+      return;
+    }
+    if (state.player.prison > 0) { log("监禁中无法召见。"); return; }
+    if (!spendAp(1)) return;
+    const ch = CHARACTERS.find((c) => c.id === charId);
+    const name = ch ? ch.name_zh : charId;
+    addBond(charId, 1 + randi(0, 1));
+    state.globalIntimacy = Math.max(state.globalIntimacy, bondOf(charId));
+    playerFac().credits = Math.max(0, playerFac().credits - 150);
+    const lv = bondOf(charId);
+    const scenes = [
+      `${name} 把你按在舱门上深吻，手指解开你的束带。`,
+      `你们在半暗的灯下做到腿软，通讯器被故意静音。`,
+      `${name} 骑在你身上喘息，要你今晚只叫自己的名字。`,
+      `事后你们分享一支烟与航道图，体温还没退。`,
+    ];
+    log(`【成人·召见】${scenes[randi(0, scenes.length - 1)]}（亲密 ${lv}/10）`);
+    if (lv >= 5) state.player.legitimacy = (state.player.legitimacy || 0) + 1;
+    sfx("claim");
+    renderIntimacyPanel();
+    render();
+  }
+
+  function renderIntimacyPanel() {
+    const el = document.getElementById("intimacy-panel");
+    if (!el) return;
+    if (!isMatureEnabled()) {
+      el.innerHTML = "<p class='hint'>启用成人内容后可召见角色、触发情欲事件。</p>";
+      return;
+    }
+    const list = CHARACTERS.filter((c) => c.faction !== "player" && c.id !== "player_echo");
+    el.innerHTML = "<p class='hint'>亲密对象（点击召见，1AP）· 全局亲密度 " + (state.globalIntimacy || 0) + "</p>";
+    const wrap = document.createElement("div");
+    wrap.className = "intimacy-list";
+    for (const ch of list) {
+      const known = codex.chars[ch.id] || bondOf(ch.id) > 0 || ch.faction === state.player.spouseFac;
+      const b = document.createElement("button");
+      b.type = "button";
+      const lv = bondOf(ch.id);
+      b.textContent = known
+        ? `${ch.name_zh} · 亲密${lv}/10${lv >= 3 ? " ♥" : ""}`
+        : `??? · 未结识`;
+      b.disabled = !known;
+      if (known) b.onclick = () => intimateWith(ch.id);
+      wrap.appendChild(b);
+    }
+    el.appendChild(wrap);
   }
 
   function jointResearch() {
@@ -1391,10 +1481,8 @@
   }
 
   function rollEvent() {
-    if (chance(0.4)) return;
-    if (state.player.prison > 0 && chance(0.5)) {
-      // force prison event chance
-    }
+    // 基线约 50% 出事件；成人模式提高到约 62%
+    if (!chance(isMatureEnabled() ? 0.62 : 0.5)) return;
     const pool = allEvents().filter((e) => {
       if (!eventAllowed(e)) return false;
       if (e.weight === 0) return false;
@@ -1404,16 +1492,25 @@
       if (e.needIdentity && state.player.identity !== e.needIdentity) return false;
       if (e.needPrison && state.player.prison <= 0) return false;
       if (e.needTech && !Object.keys(state.player.techDone || {}).length) return false;
+      if (e.needIntimacy && maxBond() < (e.needIntimacy || 0)) return false;
       const cd = e.cooldown || e.cooldown_months || 0;
       const last = state.eventCd[e.id] || -999;
       if (state.month - last < cd) return false;
       return true;
     });
     if (!pool.length) return;
-    let total = pool.reduce((s, e) => s + (e.weight || 1), 0);
-    let r = rand() * total, pick = pool[0];
+    // 成人事件加权
+    let total = 0;
     for (const e of pool) {
-      r -= e.weight || 1;
+      let w = e.weight || 1;
+      if (isMatureEnabled() && (e.rating === "r18" || (e.title || "").indexOf("成人") >= 0)) w *= 1.35;
+      total += w;
+      e._w = w;
+    }
+    let r = rand() * total;
+    let pick = pool[0];
+    for (const e of pool) {
+      r -= e._w || e.weight || 1;
       if (r <= 0) { pick = e; break; }
     }
     state.pendingEvent = pick;
@@ -1516,6 +1613,24 @@
         if (state.player.prison > 0) { state.player.prison = 0; log("你逃出监禁。"); }
         break;
       case "tryFound": foundNation(true); break;
+      case "intimacy":
+        state.globalIntimacy = clamp((state.globalIntimacy || 0) + (eff.v || 0), 0, 10);
+        if (state.player.spouseFac) {
+          const ch = CHARACTERS.find((c) => c.faction === state.player.spouseFac);
+          if (ch) addBond(ch.id, eff.v || 0);
+        }
+        break;
+      case "intimacyChar":
+        addBond(eff.char, eff.v || 0);
+        state.globalIntimacy = Math.max(state.globalIntimacy || 0, bondOf(eff.char));
+        {
+          const ch = CHARACTERS.find((c) => c.id === eff.char);
+          if (ch) codexChar(ch.id);
+        }
+        break;
+      case "relSpouse":
+        if (state.player.spouseFac) addRel(state.player.factionId, state.player.spouseFac, eff.v || 0);
+        break;
       case "log": log(eff.t); break;
       default: break;
     }
@@ -1562,12 +1677,14 @@
     if (state.month >= 12) unlockAchieve("month_12");
     tutAdvance("end");
     checkHegemonyWin();
+    checkWeakMilestone();
     checkGenericGoals();
     rollEvent();
     sfx("turn");
     renderTech();
     renderMeta();
     renderGoalCompass();
+    renderIntimacyPanel();
     render();
   }
 
@@ -1775,10 +1892,14 @@
     }
     const hint = document.getElementById("goal-hint");
     if (hint) hint.textContent = model.hint || "";
-    // 弱国中兴：达到 25% 给一次胜利提示
-    if ((state.scenarioId === "weak" || state.scenarioFlags.weakStart) && nodeControlRatio() >= 0.25 && !state.victoryClaimed) {
-      tryVictory("default", en ? "Weak Revival milestone: 25% sector held." : "中兴里程碑：已控制 25% 星域。");
-    }
+  }
+
+  function checkWeakMilestone() {
+    if (state.victoryClaimed) return;
+    if (!(state.scenarioId === "weak" || state.scenarioFlags.weakStart)) return;
+    if (nodeControlRatio() < 0.25) return;
+    const en = window.EmberI18n && EmberI18n.getLang() === "en";
+    tryVictory("default", en ? "Weak Revival milestone: 25% sector held." : "中兴里程碑：已控制 25% 星域。");
   }
 
   /* ---------- Save / Load ---------- */
@@ -1805,6 +1926,11 @@
       hegemonyStreak: state.hegemonyStreak,
       metChars: state.metChars,
       hexWins: state.hexWins,
+      bonds: state.bonds,
+      globalIntimacy: state.globalIntimacy,
+      harem: state.harem,
+      matureEnabled: state.matureEnabled,
+      maturePackLoaded: state.maturePackLoaded,
     };
   }
 
@@ -1831,6 +1957,11 @@
       hegemonyStreak: data.hegemonyStreak || 0,
       metChars: data.metChars || {},
       hexWins: data.hexWins || 0,
+      bonds: data.bonds || {},
+      globalIntimacy: data.globalIntimacy || 0,
+      harem: data.harem || [],
+      matureEnabled: !!data.matureEnabled || state.matureEnabled,
+      maturePackLoaded: !!data.maturePackLoaded,
       pendingEvent: null,
       hex: null,
       pendingBattle: null,
@@ -1839,6 +1970,7 @@
     hideHex();
     cancelBattle();
     showApp(true);
+    if (state.matureEnabled && !state.maturePackLoaded) loadMatureSkeletonPack();
     if (state.tutorial) showTutorial(); else hideTutorial();
     const ban = document.getElementById("scenario-banner");
     if (ban) {
@@ -1888,7 +2020,15 @@
   }
 
   /* ---------- Map draw / pan zoom ---------- */
+  let _mapRaf = 0;
   function drawMap() {
+    if (_mapRaf) return;
+    _mapRaf = requestAnimationFrame(() => {
+      _mapRaf = 0;
+      drawMapNow();
+    });
+  }
+  function drawMapNow() {
     const canvas = document.getElementById("map");
     const wrap = document.getElementById("map-wrap");
     if (!canvas || !wrap) return;
@@ -1940,7 +2080,7 @@
       ctx.fillStyle = "#e8eef5";
       ctx.font = `${12 / Math.sqrt(scale)}px sans-serif`;
       ctx.fillText(n.name, n.x - 20, n.y - 18);
-      if (state.player.loc === n.id) {
+      if (state.player && state.player.loc === n.id) {
         ctx.beginPath();
         ctx.arc(n.x, n.y, 5, 0, Math.PI * 2);
         ctx.fillStyle = "#ffe066";
@@ -2016,6 +2156,7 @@
     updateSaveMeta();
     renderGoalCompass();
     updateMatureUi();
+    renderIntimacyPanel();
     drawMap();
     if (state.hex) drawHex();
   }
@@ -2331,6 +2472,7 @@
       yes.onclick = () => {
         enableMature(true);
         cleanup();
+        // enableMature 会自动 load 包；仍执行回调
         if (onYes) onYes();
       };
     }
@@ -2341,20 +2483,24 @@
     state.matureEnabled = !!on;
     try { localStorage.setItem(MATURE_KEY, on ? "1" : "0"); } catch (_) {}
     updateMatureUi();
-    log(on ? "已启用 R18 内容接口（主包仍无露骨正文）。" : "已关闭 R18 内容接口。");
+    log(on ? "已启用成人内容（18+）。结束回合可能触发情欲事件；身份页可召见。" : "已关闭成人内容。");
+    if (on && !state.maturePackLoaded) {
+      loadMatureSkeletonPack();
+    }
+    renderIntimacyPanel();
   }
 
   function updateMatureUi() {
     const btn = document.getElementById("btn-mature");
     const st = document.getElementById("mature-status");
     const on = isMatureEnabled();
-    if (btn) btn.textContent = on ? "R18 内容包：开" : "R18 内容包：关";
+    if (btn) btn.textContent = on ? "成人内容：开" : "成人内容：关";
     if (st) {
       st.textContent = on
         ? (state.maturePackLoaded
-          ? "内容分级：R18 接口已挂载（占位事件，无露骨正文）。"
-          : "内容分级：已满 18 确认，可加载 R18 接口包。")
-        : "内容分级：全年龄主包。R18 仅接口骨架。";
+          ? "内容分级：18+ 已加载（联姻之夜/召见/后舱等）。仅限成年角色。"
+          : "内容分级：已确认 18+，正在/可加载成人包。")
+        : "内容分级：全年龄主包。可在系统页开启成人内容。";
     }
   }
 
@@ -2363,26 +2509,31 @@
       const r = await fetch("mods/mature-r18/mod.json");
       if (!r.ok) throw new Error("HTTP " + r.status);
       const mod = await r.json();
-      loadMod(mod);
+      loadMod(mod, { skipAgeCheck: isMatureEnabled() });
     } catch (e) {
-      // inline skeleton if fetch fails
+      console.warn("mature pack fetch", e);
+      // 极简内置回退（保证离线也能有成人事件）
       loadMod({
-        id: "mature-r18-skeleton",
-        name: "R18 接口骨架（内置回退）",
+        id: "mature-r18",
+        name: "余烬·夜航（内置）",
         requiresAge: 18,
         rating: "r18",
-        events: [{
-          id: "r18_hook_placeholder",
-          title: "【R18接口】内容槽位（占位）",
-          weight: 0,
-          cooldown: 99,
-          rating: "r18",
-          minMonth: 999,
-          text: "占位：验证过滤链路。无露骨正文。",
-          choices: [{ id: "ack", text: "知道了", effects: [{ type: "log", t: "R18 接口已挂载。" }] }],
-        }],
-        relationships: { enabled: true, levels: ["stranger", "acquaintance", "trusted", "bonded", "intimate"] },
-      });
+        events: [
+          {
+            id: "r18_inline_night",
+            title: "【成人】旗舰深夜",
+            weight: 12,
+            cooldown: 3,
+            rating: "r18",
+            text: "值班结束后有人敲你的舱门。成年船员站在门口，制服只扣了一半：「指令是……自愿的。」",
+            choices: [
+              { id: "yes", text: "拉进门", effects: [{ type: "intimacy", v: 2 }, { type: "log", t: "一整夜。通讯官学会装瞎。" }] },
+              { id: "no", text: "拒绝", effects: [{ type: "legitimacy", v: 2 }, { type: "log", t: "门关上了。" }] },
+            ],
+          },
+        ],
+        relationships: { enabled: true, levels: ["stranger", "acquaintance", "trusted", "bonded", "intimate", "lover"] },
+      }, { skipAgeCheck: true });
     }
   }
 
@@ -2612,7 +2763,6 @@
 
   async function main() {
     try {
-      // 先保证选单可见，再绑事件/拉数据
       showApp(false);
       renderScenarioList();
       bind();
@@ -2621,6 +2771,11 @@
       showApp(false);
       renderScenarioList();
       updateAudioButtons();
+      updateMatureUi();
+      // 若用户曾确认 18+，自动挂载成人包
+      if (state.matureEnabled) {
+        loadMatureSkeletonPack();
+      }
     } catch (e) {
       console.error(e);
       showBootError("初始化异常：" + (e && e.message ? e.message : String(e)) + " — 仍可点上方备用剧本。");

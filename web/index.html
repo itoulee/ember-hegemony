@@ -148,6 +148,7 @@
             <button type="button" id="btn-coup-prep">政变筹备</button>
             <button type="button" id="btn-coup-start">发动政变</button>
             <button type="button" id="btn-escape">越狱</button>
+            <div id="intimacy-panel" class="intimacy-panel"></div>
           </div>
         </div>
 
@@ -185,12 +186,12 @@
               <button type="button" id="btn-sfx">音效</button>
             </div>
             <button type="button" id="btn-bgm">BGM</button>
-            <button type="button" id="btn-mature">R18 内容包：关</button>
+            <button type="button" id="btn-mature">成人内容：关</button>
             <label class="field">模组 JSON<input type="file" id="mod-file" accept="application/json,.json" /></label>
             <button type="button" id="btn-mod-example">加载示例模组</button>
-            <button type="button" id="btn-mod-r18-skel">加载 R18 接口包（无露骨正文）</button>
+            <button type="button" id="btn-mod-r18-skel">重新加载成人内容包</button>
             <p class="hint" id="save-meta"></p>
-            <p class="hint" id="mature-status">内容分级：全年龄主包。R18 仅接口骨架。</p>
+            <p class="hint" id="mature-status">内容分级：全年龄主包。可开启 18+ 成人事件与召见。</p>
           </div>
         </div>
         <p class="hint" id="hint-main">点星图选节点。顶部「目标罗盘」显示胜利条件。系统→返回剧本选单。</p>
@@ -234,11 +235,11 @@
         <div id="age-gate" class="modal age-gate hidden">
           <h3>年龄确认 · Age Gate</h3>
           <p id="age-gate-text">
-            即将启用 <strong>R18 内容接口包</strong>。本仓库默认包<strong>不含露骨正文</strong>，仅提供分级过滤与模组钩子。
-            请确认你已年满 18 周岁。若未满 18 岁，请选择取消。
+            即将启用 <strong>成人向内容（18+）</strong>：包含情欲事件、联姻之夜、角色召见等虚构成人描写。
+            <br/>仅限成年角色；禁止向未成年人传播。请确认你已年满 18 周岁。
           </p>
           <div class="actions row">
-            <button type="button" id="btn-age-yes" class="primary">我已满 18 岁，启用接口</button>
+            <button type="button" id="btn-age-yes" class="primary">我已满 18 岁，启用成人内容</button>
             <button type="button" id="btn-age-no">取消</button>
           </div>
         </div>
@@ -255,9 +256,9 @@
     </div>
   </div>
 
-  <script src="i18n.js"></script>
-  <script src="audio.js"></script>
-  <script src="game.js"></script>
+  <script src="i18n.js?v=2.2"></script>
+  <script src="audio.js?v=2.2"></script>
+  <script src="game.js?v=2.2"></script>
   <noscript>
     <p style="padding:2rem;color:#fff;background:#111">需要启用 JavaScript 才能游玩。</p>
   </noscript>
