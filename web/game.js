@@ -8,7 +8,8 @@
   const SAVE_PREFIX = "ember_hegemony_slot_";
   const ACH_KEY = "ember_hegemony_achievements";
   const CODEX_KEY = "ember_hegemony_codex";
-  const VERSION = "2.0.0-p2";
+  const VERSION = "2.1.0-goal-r18api";
+  const MATURE_KEY = "ember_mature_enabled";
 
   let EVENT_DEFS = [];
   let TECH_DEFS = { branches: [] };
@@ -84,7 +85,21 @@
     hegemonyStreak: 0,
     metChars: {},
     hexWins: 0,
+    victoryClaimed: false,
+    matureEnabled: false,
+    maturePackLoaded: false,
+    relationshipHooks: null,
   };
+
+  function isMatureEnabled() {
+    return !!state.matureEnabled;
+  }
+
+  function eventAllowed(e) {
+    const r = (e && e.rating) || "all";
+    if (r === "r18" || r === "explicit") return isMatureEnabled();
+    return true;
+  }
 
   function sfx(n) {
     try { if (window.EmberAudio) EmberAudio.sfx(n); } catch (_) {}
@@ -95,6 +110,7 @@
   function loadMeta() {
     try { unlockedAch = JSON.parse(localStorage.getItem(ACH_KEY) || "{}") || {}; } catch (_) { unlockedAch = {}; }
     try { codex = Object.assign({ nodes: {}, factions: {}, chars: {}, techs: {} }, JSON.parse(localStorage.getItem(CODEX_KEY) || "{}")); } catch (_) {}
+    try { state.matureEnabled = localStorage.getItem(MATURE_KEY) === "1"; } catch (_) { state.matureEnabled = false; }
   }
   function saveMeta() {
     try {
@@ -398,6 +414,7 @@
     state.hegemonyStreak = 0;
     state.hexWins = 0;
     state.metChars = {};
+    state.victoryClaimed = false;
     buildWorld(opts.mode || "magistrate");
     applyScenarioFlags(state.scenarioFlags);
     if (opts.tutorial) {
@@ -422,6 +439,7 @@
     refreshDipSelect();
     renderTech();
     renderMeta();
+    renderGoalCompass();
     applyI18nUi();
     render();
     sfx("click");
@@ -484,7 +502,12 @@
       state.tutorial = null;
       hideTutorial();
       unlockAchieve("tutorial_done");
-    } else showTutorial();
+      tryVictory("tutorial", "教程结业。目标罗盘将切换为自由目标提示。");
+      renderGoalCompass();
+    } else {
+      showTutorial();
+      renderGoalCompass();
+    }
   }
   function showTutorial() {
     const el = document.getElementById("tutorial-bar");
@@ -1193,6 +1216,10 @@
     log("建国成功：掠航者→执政官。");
     unlockAchieve("found_nation");
     sfx("win");
+    if (state.scenarioId === "raider" || state.player._fromRaiderScenario) {
+      tryVictory("found", "黑旗建国成功。航阀法统已登记。");
+    }
+    renderGoalCompass();
     render();
   }
 
@@ -1236,6 +1263,10 @@
       log("政变成功！你成为执政官。");
       unlockAchieve("coup_ok");
       sfx("win");
+      if (state.scenarioId === "coup" || state.scenarioFlags.boostCoup) {
+        tryVictory("coup", "北阙夜落幕。你已黄袍加身。");
+      }
+      renderGoalCompass();
     } else {
       state.player.prison = 3;
       state.player.factionPower = 0;
@@ -1365,6 +1396,8 @@
       // force prison event chance
     }
     const pool = allEvents().filter((e) => {
+      if (!eventAllowed(e)) return false;
+      if (e.weight === 0) return false;
       if (e.minMonth && state.month < e.minMonth) return false;
       if (e.needSpouse && !state.player.spouse) return false;
       if (e.needAlly && !(playerFac().allies || []).length) return false;
@@ -1529,38 +1562,223 @@
     if (state.month >= 12) unlockAchieve("month_12");
     tutAdvance("end");
     checkHegemonyWin();
+    checkGenericGoals();
     rollEvent();
     sfx("turn");
     renderTech();
     renderMeta();
+    renderGoalCompass();
     render();
+  }
+
+  function ownedNodeCount() {
+    return Object.values(state.nodes).filter((n) => n.owner === state.player.factionId).length;
+  }
+
+  function nodeControlRatio() {
+    const total = Math.max(1, Object.keys(state.nodes).length);
+    return ownedNodeCount() / total;
   }
 
   function checkHegemonyWin() {
     if (!state.scenarioFlags.winHegemony) return;
-    const total = Object.keys(state.nodes).length;
-    const owned = Object.values(state.nodes).filter((n) => n.owner === state.player.factionId).length;
-    if (owned / total >= 0.8) {
+    const ratio = nodeControlRatio();
+    if (ratio >= 0.8) {
       state.hegemonyStreak = (state.hegemonyStreak || 0) + 1;
-      log(`制霸进度：控制 ${(100 * owned / total).toFixed(0)}% · 连续 ${state.hegemonyStreak}/3 月`);
+      log(`制霸进度：控制 ${(100 * ratio).toFixed(0)}% · 连续 ${state.hegemonyStreak}/3 月`);
       if (state.hegemonyStreak >= 3) {
         unlockAchieve("hegemony");
-        showVictory(window.EmberI18n && EmberI18n.getLang() === "en"
-          ? "You hold the main ring. Hegemony achieved."
-          : "你控制了主航道环。制霸胜利！");
+        tryVictory("hegemony", "你控制了主航道环并稳住局势。制霸胜利！");
       }
     } else {
       state.hegemonyStreak = 0;
     }
   }
 
-  function showVictory(text) {
+  function checkGenericGoals() {
+    // 沙盒/中兴：控制过半也可提示接近胜利（不自动胜）
+    renderGoalCompass();
+  }
+
+  function tryVictory(type, text) {
+    if (state.victoryClaimed) return;
+    state.victoryClaimed = true;
+    showVictory(text, type);
+  }
+
+  function showVictory(text, type) {
     const box = document.getElementById("victory-box");
     if (!box) return;
-    document.getElementById("victory-title").textContent = t("victory");
+    const en = window.EmberI18n && EmberI18n.getLang() === "en";
+    const titles = {
+      hegemony: en ? "Hegemony" : "制霸胜利",
+      coup: en ? "Coup Success" : "政变胜利",
+      found: en ? "Nation Founded" : "建国胜利",
+      tutorial: en ? "Tutorial Complete" : "教程完成",
+      default: en ? "Victory" : "胜利",
+    };
+    const badge = document.getElementById("victory-badge");
+    if (badge) badge.textContent = (type || "default").toUpperCase();
+    document.getElementById("victory-title").textContent = titles[type] || titles.default;
     document.getElementById("victory-text").textContent = text;
+    const stats = document.getElementById("victory-stats");
+    if (stats) {
+      const f = playerFac();
+      const owned = ownedNodeCount();
+      const total = Object.keys(state.nodes).length;
+      stats.innerHTML = [
+        `${en ? "Month" : "星月"}: ${state.month}`,
+        `${en ? "Identity" : "身份"}: ${state.player.identity}`,
+        `${en ? "Faction" : "势力"}: ${f ? f.name : "-"}`,
+        `${en ? "Nodes" : "控制节点"}: ${owned} / ${total} (${(100 * owned / Math.max(1, total)).toFixed(0)}%)`,
+        `${en ? "Credits / Manpower" : "信用 / 兵力"}: ${f ? f.credits : 0} / ${f ? f.manpower.toFixed(0) : 0}`,
+        `${en ? "Scenario" : "剧本"}: ${state.scenarioId}`,
+      ].join("<br/>");
+    }
     box.classList.remove("hidden");
     sfx("win");
+    renderGoalCompass();
+  }
+
+  /** 目标罗盘：当前剧本主目标 + 进度条 + 步骤 */
+  function getGoalModel() {
+    const en = window.EmberI18n && EmberI18n.getLang() === "en";
+    const id = state.scenarioId || "sandbox";
+    const flags = state.scenarioFlags || {};
+    const owned = ownedNodeCount();
+    const total = Math.max(1, Object.keys(state.nodes).length);
+    const ratio = owned / total;
+    const steps = [];
+    let primary = "";
+    let progress = 0;
+    let progressLabel = "";
+    let hint = "";
+
+    if (state.tutorial) {
+      const st = TUTORIAL_STEPS[state.tutorial.step];
+      primary = en ? "Complete the tutorial checklist" : "完成教程清单";
+      progress = state.tutorial.step / TUTORIAL_STEPS.length;
+      progressLabel = `${state.tutorial.step} / ${TUTORIAL_STEPS.length}`;
+      TUTORIAL_STEPS.forEach((s, i) => {
+        steps.push({
+          text: s.text.replace(/^教程[①-⑩]\s*：/, "").slice(0, 40),
+          done: i < state.tutorial.step,
+          current: i === state.tutorial.step,
+        });
+      });
+      hint = st ? st.text : "";
+    } else if (id === "hegemony" || flags.winHegemony) {
+      primary = en ? "Control ≥80% nodes for 3 months" : "控制 ≥80% 节点并维持 3 星月";
+      const controlPart = Math.min(1, ratio / 0.8) * 0.7;
+      const streakPart = Math.min(3, state.hegemonyStreak || 0) / 3 * 0.3;
+      progress = controlPart + (ratio >= 0.8 ? streakPart : 0);
+      progressLabel = en
+        ? `${(100 * ratio).toFixed(0)}% nodes · streak ${state.hegemonyStreak || 0}/3`
+        : `控制 ${(100 * ratio).toFixed(0)}% · 连续 ${state.hegemonyStreak || 0}/3 月`;
+      steps.push(
+        { text: en ? "Reach 80% control" : "达到 80% 控制", done: ratio >= 0.8, current: ratio < 0.8 },
+        { text: en ? "Hold 3 months" : "维持 3 星月", done: (state.hegemonyStreak || 0) >= 3, current: ratio >= 0.8 && (state.hegemonyStreak || 0) < 3 },
+      );
+      hint = en ? "End turns while holding the ring." : "达标后持续结束回合以累计连续月。";
+    } else if (id === "coup" || flags.boostCoup) {
+      primary = en ? "Stage a successful coup as officer" : "以航官完成政变并登基";
+      const merit = state.player.merit || 0;
+      const pow = state.player.factionPower || 0;
+      const timer = state.player.coupTimer || 0;
+      const isMag = state.player.identity === "执政官";
+      progress = isMag ? 1 : Math.min(0.95, (Math.min(merit, 30) / 30) * 0.35 + (Math.min(pow, 40) / 40) * 0.35 + (timer > 0 ? 0.2 : 0) + (timer === 0 && pow >= 40 && merit >= 30 ? 0.1 : 0));
+      progressLabel = en
+        ? `Merit ${merit}/30 · Faction ${pow}/40 · Timer ${timer || "-"}`
+        : `功勋 ${merit}/30 · 派系 ${pow}/40 · 倒计时 ${timer || "—"}`;
+      steps.push(
+        { text: en ? "Merit ≥30" : "功勋 ≥30", done: merit >= 30, current: merit < 30 },
+        { text: en ? "Faction power ≥40" : "派系力 ≥40", done: pow >= 40, current: merit >= 30 && pow < 40 },
+        { text: en ? "Start coup timer" : "发动政变倒计时", done: timer > 0 || isMag, current: merit >= 30 && pow >= 40 && timer === 0 && !isMag },
+        { text: en ? "Become magistrate" : "成为执政官", done: isMag, current: timer > 0 },
+      );
+      hint = en ? "Identity tab: prepare & launch coup." : "身份页：政变筹备 → 发动政变。";
+    } else if (id === "raider") {
+      primary = en ? "Seize a star and found a nation" : "占星并完成掠航建国";
+      const isMag = state.player.identity === "执政官";
+      const hasLand = owned >= 1;
+      progress = isMag ? 1 : (hasLand ? 0.55 : 0.15) + (state.player.identity === "掠航者" ? 0.1 : 0);
+      progressLabel = en ? `Nodes ${owned} · Identity ${state.player.identity}` : `节点 ${owned} · 身份 ${state.player.identity}`;
+      steps.push(
+        { text: en ? "Remain / become raider" : "保持掠航者身份", done: state.player.identity === "掠航者" || isMag, current: state.player.identity !== "掠航者" && !isMag },
+        { text: en ? "Control ≥1 node" : "控制 ≥1 节点", done: hasLand || isMag, current: state.player.identity === "掠航者" && !hasLand },
+        { text: en ? "Found nation" : "掠航建国", done: isMag, current: hasLand && !isMag },
+      );
+      hint = en ? "Claim empty stars, then Identity → Found." : "登记无主 → 身份页「掠航建国」。";
+    } else if (id === "civilian") {
+      primary = en ? "Join service or turn raider, then rise" : "入仕或叛逃，再谋上位";
+      const risen = state.player.identity === "执政官" || state.player.identity === "航官" || state.player.identity === "掠航者";
+      progress = state.player.identity === "执政官" ? 1 : risen ? 0.5 : 0.1;
+      progressLabel = en ? `Identity: ${state.player.identity}` : `身份：${state.player.identity}`;
+      steps.push(
+        { text: en ? "Leave pure civilian" : "脱离纯流民", done: risen, current: !risen },
+        { text: en ? "Optional: coup or found" : "可选：政变或建国", done: state.player.identity === "执政官", current: risen && state.player.identity !== "执政官" },
+      );
+      hint = en ? "Identity tab: join officer / go raider." : "身份页：申请入仕或叛逃掠航。";
+    } else if (id === "weak" || flags.weakStart) {
+      primary = en ? "Rebuild: hold ≥25% of the sector" : "中兴：控制星域 ≥25% 节点";
+      progress = Math.min(1, ratio / 0.25);
+      progressLabel = en ? `${owned}/${total} (${(100 * ratio).toFixed(0)}%)` : `${owned}/${total}（${(100 * ratio).toFixed(0)}%）`;
+      steps.push(
+        { text: en ? "Survive & grow economy" : "存活并发展经济", done: (playerFac().credits || 0) >= 8000, current: (playerFac().credits || 0) < 8000 },
+        { text: en ? "Control 25% nodes" : "控制 25% 节点", done: ratio >= 0.25, current: ratio < 0.25 },
+      );
+      hint = en ? "Ally Free Port, expand carefully." : "可联姻/结盟自由港，稳健扩张。";
+      if (ratio >= 0.25 && !state.victoryClaimed) {
+        // soft victory optional - only once when crossing
+      }
+    } else {
+      // sandbox / default
+      primary = en ? "Sandbox: set your own goal (suggested: 50% control)" : "沙盒：自定目标（建议控制 50% 节点）";
+      progress = Math.min(1, ratio / 0.5);
+      progressLabel = en ? `${owned}/${total} (${(100 * ratio).toFixed(0)}%)` : `${owned}/${total}（${(100 * ratio).toFixed(0)}%）`;
+      steps.push(
+        { text: en ? "Explore & fight" : "探索与交战", done: owned >= 3, current: owned < 3 },
+        { text: en ? "Suggested 50% control" : "建议控制 50%", done: ratio >= 0.5, current: owned >= 3 && ratio < 0.5 },
+      );
+      hint = en ? "No forced win. Use scenarios for clear victories." : "无强制胜利；制霸/政变等剧本有明确胜负。";
+    }
+
+    if (state.victoryClaimed) {
+      primary = en ? "Victory achieved — continue or return to menu" : "已达成胜利 — 可继续游玩或返回选单";
+      progress = 1;
+      progressLabel = en ? "Complete" : "已完成";
+    }
+
+    return { primary, progress: clamp(progress, 0, 1), progressLabel, steps, hint };
+  }
+
+  function renderGoalCompass() {
+    const box = document.getElementById("goal-compass");
+    if (!box || !state.player) return;
+    const en = window.EmberI18n && EmberI18n.getLang() === "en";
+    const model = getGoalModel();
+    const title = document.getElementById("goal-title");
+    if (title) title.textContent = en ? "Goal Compass" : "目标罗盘";
+    const primary = document.getElementById("goal-primary");
+    if (primary) primary.textContent = model.primary;
+    const bar = document.getElementById("goal-bar");
+    if (bar) bar.style.width = `${(model.progress * 100).toFixed(1)}%`;
+    const prog = document.getElementById("goal-progress");
+    if (prog) prog.textContent = (en ? "Progress: " : "进度：") + model.progressLabel;
+    const ul = document.getElementById("goal-steps");
+    if (ul) {
+      ul.innerHTML = model.steps.map((s) => {
+        const cls = s.done ? "done" : s.current ? "current" : "";
+        const mark = s.done ? "✓ " : s.current ? "→ " : "○ ";
+        return `<li class="${cls}">${mark}${s.text}</li>`;
+      }).join("");
+    }
+    const hint = document.getElementById("goal-hint");
+    if (hint) hint.textContent = model.hint || "";
+    // 弱国中兴：达到 25% 给一次胜利提示
+    if ((state.scenarioId === "weak" || state.scenarioFlags.weakStart) && nodeControlRatio() >= 0.25 && !state.victoryClaimed) {
+      tryVictory("default", en ? "Weak Revival milestone: 25% sector held." : "中兴里程碑：已控制 25% 星域。");
+    }
   }
 
   /* ---------- Save / Load ---------- */
@@ -1791,10 +2009,13 @@
 
     document.getElementById("identity-hint").textContent =
       `当前身份：${state.player.identity}。流民可入仕；航官可政变；掠航者可建国。`;
-    document.getElementById("btn-raid").classList.toggle("hidden", state.player.identity !== "掠航者");
+    const raidBtn = document.getElementById("btn-raid");
+    if (raidBtn) raidBtn.classList.toggle("hidden", state.player.identity !== "掠航者");
 
     refreshDipSelect();
     updateSaveMeta();
+    renderGoalCompass();
+    updateMatureUi();
     drawMap();
     if (state.hex) drawHex();
   }
@@ -1919,6 +2140,31 @@
       showApp(false);
       renderScenarioList();
     };
+    on("btn-victory-continue", () => {
+      const box = document.getElementById("victory-box");
+      if (box) box.classList.add("hidden");
+      // 允许继续游玩，不再重复弹同一胜利直到新条件
+      log("继续本周目。目标罗盘仍显示已完成。");
+      renderGoalCompass();
+    });
+    on("btn-goal-toggle", () => {
+      const g = document.getElementById("goal-compass");
+      if (g) g.classList.toggle("collapsed");
+    });
+    on("btn-mature", () => {
+      if (isMatureEnabled()) {
+        enableMature(false);
+      } else {
+        openAgeGate(() => {});
+      }
+    });
+    on("btn-mod-r18-skel", () => {
+      if (!isMatureEnabled()) {
+        openAgeGate(() => loadMatureSkeletonPack());
+      } else {
+        loadMatureSkeletonPack();
+      }
+    });
     for (let i = 1; i <= 3; i++) {
       on("btn-save" + i, () => saveSlot(i));
       on("btn-load" + i, () => loadSlot(i));
@@ -2034,12 +2280,110 @@
     window.addEventListener("resize", () => drawMap());
   }
 
-  function loadMod(mod) {
-    if (!mod) return;
-    const evs = mod.events || [];
-    MOD_EVENTS = MOD_EVENTS.concat(evs);
-    log(`已加载模组：${mod.name || mod.id || "未命名"}（+${evs.length} 事件）`);
+  function loadMod(mod, opts) {
+    if (!mod) return false;
+    opts = opts || {};
+    const requiresAge = mod.requiresAge || (mod.rating === "r18" ? 18 : 0);
+    if (requiresAge >= 18 && !isMatureEnabled() && !opts.skipAgeCheck) {
+      openAgeGate(() => loadMod(mod, { skipAgeCheck: true }));
+      return false;
+    }
+    const evs = (mod.events || []).filter((e) => {
+      // always register; roll filter uses eventAllowed
+      return true;
+    });
+    // replace same id events from previous load of this mod
+    if (mod.id) {
+      MOD_EVENTS = MOD_EVENTS.filter((e) => e._modId !== mod.id);
+    }
+    for (const e of evs) {
+      e._modId = mod.id || "mod";
+      MOD_EVENTS.push(e);
+    }
+    if (mod.relationships) state.relationshipHooks = mod.relationships;
+    if (mod.rating === "r18" || requiresAge >= 18) {
+      state.maturePackLoaded = true;
+      updateMatureUi();
+    }
+    log(`已加载模组：${mod.name || mod.id || "未命名"}（+${evs.length} 事件${mod.rating ? " · " + mod.rating : ""}）`);
     unlockAchieve("mod_loaded");
+    return true;
+  }
+
+  function openAgeGate(onYes) {
+    const gate = document.getElementById("age-gate");
+    if (!gate) {
+      if (window.confirm("确认已满 18 岁并启用 R18 接口？")) {
+        enableMature(true);
+        if (onYes) onYes();
+      }
+      return;
+    }
+    gate.classList.remove("hidden");
+    const yes = document.getElementById("btn-age-yes");
+    const no = document.getElementById("btn-age-no");
+    const cleanup = () => {
+      gate.classList.add("hidden");
+      if (yes) yes.onclick = null;
+      if (no) no.onclick = null;
+    };
+    if (yes) {
+      yes.onclick = () => {
+        enableMature(true);
+        cleanup();
+        if (onYes) onYes();
+      };
+    }
+    if (no) no.onclick = () => cleanup();
+  }
+
+  function enableMature(on) {
+    state.matureEnabled = !!on;
+    try { localStorage.setItem(MATURE_KEY, on ? "1" : "0"); } catch (_) {}
+    updateMatureUi();
+    log(on ? "已启用 R18 内容接口（主包仍无露骨正文）。" : "已关闭 R18 内容接口。");
+  }
+
+  function updateMatureUi() {
+    const btn = document.getElementById("btn-mature");
+    const st = document.getElementById("mature-status");
+    const on = isMatureEnabled();
+    if (btn) btn.textContent = on ? "R18 内容包：开" : "R18 内容包：关";
+    if (st) {
+      st.textContent = on
+        ? (state.maturePackLoaded
+          ? "内容分级：R18 接口已挂载（占位事件，无露骨正文）。"
+          : "内容分级：已满 18 确认，可加载 R18 接口包。")
+        : "内容分级：全年龄主包。R18 仅接口骨架。";
+    }
+  }
+
+  async function loadMatureSkeletonPack() {
+    try {
+      const r = await fetch("mods/mature-r18/mod.json");
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      const mod = await r.json();
+      loadMod(mod);
+    } catch (e) {
+      // inline skeleton if fetch fails
+      loadMod({
+        id: "mature-r18-skeleton",
+        name: "R18 接口骨架（内置回退）",
+        requiresAge: 18,
+        rating: "r18",
+        events: [{
+          id: "r18_hook_placeholder",
+          title: "【R18接口】内容槽位（占位）",
+          weight: 0,
+          cooldown: 99,
+          rating: "r18",
+          minMonth: 999,
+          text: "占位：验证过滤链路。无露骨正文。",
+          choices: [{ id: "ack", text: "知道了", effects: [{ type: "log", t: "R18 接口已挂载。" }] }],
+        }],
+        relationships: { enabled: true, levels: ["stranger", "acquaintance", "trusted", "bonded", "intimate"] },
+      });
+    }
   }
 
   function drawPortrait(canvas, ch) {

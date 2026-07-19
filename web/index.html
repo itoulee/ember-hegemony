@@ -89,6 +89,20 @@
       <div id="status" class="status"></div>
     </header>
 
+    <div id="goal-compass" class="goal-compass" aria-live="polite">
+      <div class="goal-head">
+        <strong id="goal-title">目标罗盘</strong>
+        <button type="button" id="btn-goal-toggle" class="icon-btn" title="折叠">−</button>
+      </div>
+      <div id="goal-body" class="goal-body">
+        <p id="goal-primary" class="goal-primary">—</p>
+        <div class="goal-bar-wrap"><div id="goal-bar" class="goal-bar" style="width:0%"></div></div>
+        <p id="goal-progress" class="goal-progress muted">进度 —</p>
+        <ul id="goal-steps" class="goal-steps"></ul>
+        <p id="goal-hint" class="hint"></p>
+      </div>
+    </div>
+
     <div class="main">
       <aside id="left-panel" class="left">
         <div id="selected" class="panel"></div>
@@ -171,12 +185,15 @@
               <button type="button" id="btn-sfx">音效</button>
             </div>
             <button type="button" id="btn-bgm">BGM</button>
+            <button type="button" id="btn-mature">R18 内容包：关</button>
             <label class="field">模组 JSON<input type="file" id="mod-file" accept="application/json,.json" /></label>
             <button type="button" id="btn-mod-example">加载示例模组</button>
+            <button type="button" id="btn-mod-r18-skel">加载 R18 接口包（无露骨正文）</button>
             <p class="hint" id="save-meta"></p>
+            <p class="hint" id="mature-status">内容分级：全年龄主包。R18 仅接口骨架。</p>
           </div>
         </div>
-        <p class="hint" id="hint-main">点星图选节点。滚轮缩放，拖拽平移。系统→返回剧本选单。</p>
+        <p class="hint" id="hint-main">点星图选节点。顶部「目标罗盘」显示胜利条件。系统→返回剧本选单。</p>
       </aside>
 
       <section class="center">
@@ -205,9 +222,25 @@
           <pre id="hex-log"></pre>
         </div>
         <div id="victory-box" class="modal victory hidden">
+          <div class="victory-badge" id="victory-badge">VICTORY</div>
           <h3 id="victory-title">胜利</h3>
           <p id="victory-text"></p>
-          <button type="button" id="btn-victory-ok">确定</button>
+          <div id="victory-stats" class="victory-stats"></div>
+          <div class="actions row victory-actions">
+            <button type="button" id="btn-victory-ok" class="primary">返回选单</button>
+            <button type="button" id="btn-victory-continue">继续本周目</button>
+          </div>
+        </div>
+        <div id="age-gate" class="modal age-gate hidden">
+          <h3>年龄确认 · Age Gate</h3>
+          <p id="age-gate-text">
+            即将启用 <strong>R18 内容接口包</strong>。本仓库默认包<strong>不含露骨正文</strong>，仅提供分级过滤与模组钩子。
+            请确认你已年满 18 周岁。若未满 18 岁，请选择取消。
+          </p>
+          <div class="actions row">
+            <button type="button" id="btn-age-yes" class="primary">我已满 18 岁，启用接口</button>
+            <button type="button" id="btn-age-no">取消</button>
+          </div>
         </div>
         <div id="toast" class="toast hidden"></div>
       </section>

@@ -1,0 +1,32 @@
+{
+  "id": "mature-r18-skeleton",
+  "name": "R18 接口骨架（无露骨正文）",
+  "version": "0.1.0",
+  "requiresAge": 18,
+  "rating": "r18",
+  "description": "仅为分级过滤、年龄门与事件钩子预留。默认不含任何露骨性描写。社区可在此结构上扩展独立内容包。",
+  "disclaimer": "启用前须确认已满 18 岁。禁止未成年相关内容。",
+  "events": [
+    {
+      "id": "r18_hook_placeholder",
+      "title": "【R18接口】内容槽位（占位）",
+      "weight": 0,
+      "cooldown": 99,
+      "rating": "r18",
+      "minMonth": 999,
+      "text": "此事件权重为 0 且 minMonth 极高，正常游玩不会出现。用于验证 R18 过滤与模组加载链路。真正成人向正文请放在独立私有包中，勿提交到默认公开仓库。",
+      "choices": [
+        {
+          "id": "ack",
+          "text": "知道了（无效果）",
+          "effects": [{ "type": "log", "t": "R18 接口包已挂载；主包仍为全年龄叙事。" }]
+        }
+      ]
+    }
+  ],
+  "relationships": {
+    "enabled": true,
+    "levels": ["stranger", "acquaintance", "trusted", "bonded", "intimate"],
+    "note": "intimate 仅在 R18 启用时解锁事件钩子；主包只使用前四级。"
+  }
+}
