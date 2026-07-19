@@ -14,6 +14,10 @@ concurrency:
   group: pages
   cancel-in-progress: true
 
+env:
+  GODOT_VERSION: "4.3"
+  GODOT_TAG: "4.3-stable"
+
 jobs:
   export:
     runs-on: ubuntu-latest
@@ -21,38 +25,70 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Godot
-        uses: chickensoft-games/setup-godot@v2.1.2
+      - name: Cache Godot
+        id: cache-godot
+        uses: actions/cache@v4
         with:
-          version: 4.3.0
-          use-dotnet: false
-          include-templates: true
+          path: |
+            ~/godot-install
+            ~/.local/share/godot/export_templates
+          key: godot-${{ env.GODOT_TAG }}-linux-web-templates-v1
+
+      - name: Install Godot + Web export templates
+        if: steps.cache-godot.outputs.cache-hit != 'true'
+        run: |
+          set -e
+          mkdir -p "$HOME/godot-install" "$HOME/.local/share/godot/export_templates"
+          cd /tmp
+          curl -fsSL -o godot.zip \
+            "https://github.com/godotengine/godot-builds/releases/download/${GODOT_TAG}/Godot_v${GODOT_TAG}_linux.x86_64.zip"
+          curl -fsSL -o templates.tpz \
+            "https://github.com/godotengine/godot-builds/releases/download/${GODOT_TAG}/Godot_v${GODOT_TAG}_export_templates.tpz"
+          unzip -o godot.zip -d "$HOME/godot-install"
+          # 模板目录名必须为 x.y.stable
+          mkdir -p /tmp/tpl
+          unzip -o templates.tpz -d /tmp/tpl
+          # tpz 内为 templates/*
+          TEMPLATE_DIR="$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable"
+          rm -rf "$TEMPLATE_DIR"
+          mkdir -p "$TEMPLATE_DIR"
+          if [ -d /tmp/tpl/templates ]; then
+            cp -r /tmp/tpl/templates/* "$TEMPLATE_DIR/"
+          else
+            cp -r /tmp/tpl/* "$TEMPLATE_DIR/"
+          fi
+          ls -la "$HOME/godot-install"
+          ls -la "$TEMPLATE_DIR" | head
+
+      - name: Add Godot to PATH
+        run: |
+          GODOT_BIN=$(find "$HOME/godot-install" -type f -name "Godot*" | head -n1)
+          echo "GODOT_BIN=$GODOT_BIN" >> "$GITHUB_ENV"
+          chmod +x "$GODOT_BIN"
+          echo "Using $GODOT_BIN"
+          "$GODOT_BIN" --version
 
       - name: Import project
         working-directory: game
         run: |
-          godot --headless --path . --import || true
-          # 再跑一次确保 .godot 生成
-          godot --headless --path . --quit-after 3 || true
+          "$GODOT_BIN" --headless --path . --import || true
+          "$GODOT_BIN" --headless --path . --quit-after 2 || true
 
-      - name: Export Web (no threads, GitHub Pages 友好)
+      - name: Check templates present
+        run: |
+          ls -la "$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable/" | head -30
+          test -f "$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable/web_nothreads_release.zip" \
+            || test -f "$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable/web_release.zip" \
+            || (echo "Missing web templates" && ls -la "$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable/" && exit 1)
+
+      - name: Export Web
         working-directory: game
         run: |
           mkdir -p ../build/web
-          # 失败时打印预设与脚本检查信息
-          godot --headless --path . --export-release "Web" ../build/web/index.html
+          "$GODOT_BIN" --headless --path . --export-release "Web" ../build/web/index.html
+          echo "--- build/web ---"
+          ls -la ../build/web
           test -f ../build/web/index.html
-          test -f ../build/web/index.wasm || test -f ../build/web/*.wasm || ls -la ../build/web
-
-      - name: Add play landing notes
-        run: |
-          cat > build/web/PLAY.txt << 'EOF'
-          星域制霸：余烬 — 网页试玩构建
-          仓库: https://github.com/itoulee/ember-hegemony
-          操作见页面内中文 UI 与 README。
-          EOF
-          # 确保有目录列表友好说明（GitHub Pages 直接开 index.html）
-          ls -la build/web
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
