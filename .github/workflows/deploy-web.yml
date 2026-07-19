@@ -1,0 +1,68 @@
+name: Deploy Web Play
+
+on:
+  push:
+    branches: [master, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Godot
+        uses: chickensoft-games/setup-godot@v2.1.2
+        with:
+          version: 4.3.0
+          use-dotnet: false
+          include-templates: true
+
+      - name: Import project
+        working-directory: game
+        run: |
+          godot --headless --path . --import || true
+          # 再跑一次确保 .godot 生成
+          godot --headless --path . --quit-after 3 || true
+
+      - name: Export Web (no threads, GitHub Pages 友好)
+        working-directory: game
+        run: |
+          mkdir -p ../build/web
+          godot --headless --path . --export-release "Web" ../build/web/index.html
+
+      - name: Add play landing notes
+        run: |
+          cat > build/web/PLAY.txt << 'EOF'
+          星域制霸：余烬 — 网页试玩构建
+          仓库: https://github.com/itoulee/ember-hegemony
+          操作见页面内中文 UI 与 README。
+          EOF
+          # 确保有目录列表友好说明（GitHub Pages 直接开 index.html）
+          ls -la build/web
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/web
+
+  deploy:
+    needs: export
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
