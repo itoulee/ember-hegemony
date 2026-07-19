@@ -8,8 +8,9 @@
   const SAVE_PREFIX = "ember_hegemony_slot_";
   const ACH_KEY = "ember_hegemony_achievements";
   const CODEX_KEY = "ember_hegemony_codex";
-  const VERSION = "2.2.0-adult";
+  const VERSION = "2.3.0-arcs";
   const MATURE_KEY = "ember_mature_enabled";
+  const CG_URL_KEY = "ember_cg_urls";
 
   let EVENT_DEFS = [];
   let TECH_DEFS = { branches: [] };
@@ -27,8 +28,11 @@
   let SCENARIOS = BUILTIN_SCENARIOS.slice();
   let CHARACTERS = [];
   let ACH_DEFS = [];
+  let STORY_ARCS = {};
+  let CG_SLOTS = [];
   let unlockedAch = {};
   let codex = { nodes: {}, factions: {}, chars: {}, techs: {} };
+  let cgUrls = {};
 
   function startScenarioById(id) {
     const sc = (SCENARIOS.length ? SCENARIOS : BUILTIN_SCENARIOS).find((s) => s.id === id) || BUILTIN_SCENARIOS[1];
@@ -93,6 +97,12 @@
     bonds: {},
     globalIntimacy: 0,
     harem: [],
+    /** arcId -> step index completed (0 = none) */
+    arcProgress: {},
+    storyFlags: {},
+    unlockedCgs: {},
+    haremFav: "",
+    haremSchedule: {},
   };
 
   function bondOf(charId) {
@@ -131,11 +141,13 @@
     try { unlockedAch = JSON.parse(localStorage.getItem(ACH_KEY) || "{}") || {}; } catch (_) { unlockedAch = {}; }
     try { codex = Object.assign({ nodes: {}, factions: {}, chars: {}, techs: {} }, JSON.parse(localStorage.getItem(CODEX_KEY) || "{}")); } catch (_) {}
     try { state.matureEnabled = localStorage.getItem(MATURE_KEY) === "1"; } catch (_) { state.matureEnabled = false; }
+    try { cgUrls = JSON.parse(localStorage.getItem(CG_URL_KEY) || "{}") || {}; } catch (_) { cgUrls = {}; }
   }
   function saveMeta() {
     try {
       localStorage.setItem(ACH_KEY, JSON.stringify(unlockedAch));
       localStorage.setItem(CODEX_KEY, JSON.stringify(codex));
+      localStorage.setItem(CG_URL_KEY, JSON.stringify(cgUrls));
     } catch (_) {}
   }
   function unlockAchieve(id) {
@@ -443,6 +455,11 @@
     state.bonds = {};
     state.globalIntimacy = 0;
     state.harem = [];
+    state.arcProgress = {};
+    state.storyFlags = {};
+    state.unlockedCgs = { generic_night: true };
+    state.haremFav = "";
+    state.haremSchedule = {};
     buildWorld(opts.mode || "magistrate");
     applyScenarioFlags(state.scenarioFlags);
     if (opts.tutorial) {
@@ -468,6 +485,9 @@
     renderTech();
     renderMeta();
     renderGoalCompass();
+    renderArcPanel();
+    renderHaremPanel();
+    renderCgPanel();
     applyI18nUi();
     render();
     sfx("click");
@@ -1115,7 +1135,10 @@
     log(`【成人·召见】${scenes[randi(0, scenes.length - 1)]}（亲密 ${lv}/10）`);
     if (lv >= 5) state.player.legitimacy = (state.player.legitimacy || 0) + 1;
     sfx("claim");
+    if (bondOf(charId) >= 3) unlockCg("generic_night");
     renderIntimacyPanel();
+    renderHaremPanel();
+    renderArcPanel();
     render();
   }
 
@@ -1143,6 +1166,271 @@
       wrap.appendChild(b);
     }
     el.appendChild(wrap);
+  }
+
+  /* ---------- 角色线 / CG / 后宫 ---------- */
+  function arcStep(arcId) {
+    return state.arcProgress[arcId] || 0;
+  }
+  function bumpArc(arcId, v) {
+    state.arcProgress[arcId] = (state.arcProgress[arcId] || 0) + (v || 1);
+    renderArcPanel();
+    renderHaremPanel();
+  }
+  function unlockCg(slotId) {
+    if (!slotId) return;
+    state.unlockedCgs[slotId] = true;
+    toast("CG 解锁：" + slotId);
+    renderCgPanel();
+  }
+  function cgThumbUrl(slot) {
+    if (cgUrls[slot.id]) return cgUrls[slot.id];
+    // 程序占位：渐变 data URI 由 canvas 生成
+    return placeholderCgDataUrl(slot);
+  }
+  function placeholderCgDataUrl(slot) {
+    const c = document.createElement("canvas");
+    c.width = 320; c.height = 200;
+    const ctx = c.getContext("2d");
+    const hue = slot.char === "lia" ? 20 : slot.char === "mira" ? 150 : 220;
+    const g = ctx.createLinearGradient(0, 0, 320, 200);
+    g.addColorStop(0, `hsl(${hue},40%,18%)`);
+    g.addColorStop(1, `hsl(${(hue + 40) % 360},35%,10%)`);
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, 320, 200);
+    ctx.fillStyle = "rgba(255,255,255,0.85)";
+    ctx.font = "16px sans-serif";
+    ctx.fillText(slot.title_zh || slot.id, 16, 36);
+    ctx.font = "11px sans-serif";
+    ctx.fillStyle = "rgba(200,210,220,0.7)";
+    ctx.fillText("CG 占位 · 可粘贴自定义 URL", 16, 58);
+    ctx.strokeStyle = `hsl(${hue},60%,50%)`;
+    ctx.strokeRect(12, 80, 120, 100);
+    ctx.beginPath();
+    ctx.arc(72, 120, 28, 0, Math.PI * 2);
+    ctx.stroke();
+    return c.toDataURL("image/png");
+  }
+
+  function getAvailableArcEvent(arcId) {
+    const arc = STORY_ARCS[arcId];
+    if (!arc) return null;
+    const done = arcStep(arcId);
+    const step = arc.steps[done];
+    if (!step) return null;
+    if ((step.needBond || 0) > bondOf(arc.charId)) return null;
+    if ((step.needArc || 0) > done) return null;
+    return step;
+  }
+
+  function playArcStep(arcId) {
+    const arc = STORY_ARCS[arcId];
+    const step = getAvailableArcEvent(arcId);
+    if (!step) {
+      log("该角色线暂无新节（提高亲密或推进前置）。");
+      return;
+    }
+    if (step.id && step.id.indexOf("_he") >= 0 && !isMatureEnabled() && step.rating === "r18") {
+      // HE can be all-age for some - our HE is fine without mature for emotional
+    }
+    // 以事件 UI 展示
+    const ev = {
+      id: step.id,
+      title: "【角色线】" + step.title,
+      text: step.text,
+      choices: step.choices,
+      rating: "all",
+    };
+    state.pendingEvent = ev;
+    showEvent(ev);
+    sfx("event");
+  }
+
+  function renderArcPanel() {
+    const el = document.getElementById("arc-panel");
+    if (!el) return;
+    el.innerHTML = "<p class='hint'>角色线：莉娅 / 米拉（亲密达标后可推进）</p>";
+    for (const arcId of ["lia", "mira"]) {
+      const arc = STORY_ARCS[arcId];
+      if (!arc) continue;
+      const done = arcStep(arcId);
+      const total = (arc.steps || []).length;
+      const he = !!state.storyFlags["he_" + arcId];
+      const card = document.createElement("div");
+      card.className = "arc-card";
+      card.innerHTML = `<h4>${arc.name_zh} ${he ? "★HE" : ""} · ${done}/${total}</h4>`;
+      const ul = document.createElement("ul");
+      ul.className = "steps";
+      (arc.steps || []).forEach((s, i) => {
+        const li = document.createElement("li");
+        li.className = i < done ? "done" : "";
+        li.textContent = (i < done ? "✓ " : i === done ? "→ " : "○ ") + s.title;
+        ul.appendChild(li);
+      });
+      card.appendChild(ul);
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.textContent = he ? "已完结 HE" : (getAvailableArcEvent(arcId) ? "推进本段（事件）" : "条件未满足");
+      btn.disabled = he || !getAvailableArcEvent(arcId);
+      btn.onclick = () => playArcStep(arcId);
+      card.appendChild(btn);
+      el.appendChild(card);
+    }
+  }
+
+  function renderHaremPanel() {
+    const el = document.getElementById("harem-panel");
+    if (!el) return;
+    if (!isMatureEnabled()) {
+      el.innerHTML = "<p class='hint'>开启成人内容后，亲密度≥3 的角色进入后宫名册。</p>";
+      return;
+    }
+    // sync harem from bonds
+    for (const ch of CHARACTERS) {
+      if (ch.faction === "player") continue;
+      if (bondOf(ch.id) >= 3 && state.harem.indexOf(ch.id) < 0) state.harem.push(ch.id);
+    }
+    if (!state.harem.length) {
+      el.innerHTML = "<p class='hint'>名册为空。联姻、事件或召见提升亲密至 3。</p>";
+      return;
+    }
+    el.innerHTML = `<p class='hint'>后宫管理 · ${state.harem.length} 人 · 收藏：${state.haremFav ? (CHARACTERS.find((c) => c.id === state.haremFav) || {}).name_zh || state.haremFav : "无"}</p>`;
+    for (const id of state.harem) {
+      const ch = CHARACTERS.find((c) => c.id === id) || { id, name_zh: id };
+      const card = document.createElement("div");
+      card.className = "harem-card";
+      const fav = state.haremFav === id ? " <span class='fav-star'>★</span>" : "";
+      const night = state.haremSchedule[id] || "—";
+      card.innerHTML = `<h4>${ch.name_zh || id}${fav}</h4>
+        <div class="muted">亲密 ${bondOf(id)}/10 · 排班：${night}</div>`;
+      const row = document.createElement("div");
+      row.className = "row-btns";
+      const b1 = document.createElement("button");
+      b1.type = "button"; b1.textContent = "召见 (1AP)";
+      b1.onclick = () => intimateWith(id);
+      const b2 = document.createElement("button");
+      b2.type = "button"; b2.textContent = "设为收藏";
+      b2.onclick = () => { state.haremFav = id; log(`${ch.name_zh} 设为收藏。`); renderHaremPanel(); };
+      const b3 = document.createElement("button");
+      b3.type = "button"; b3.textContent = "排今晚";
+      b3.onclick = () => {
+        state.haremSchedule[id] = "星月" + state.month + " 夜";
+        unlockCg("harem_lounge");
+        log(`排班：${ch.name_zh} → 今晚。`);
+        renderHaremPanel();
+      };
+      const b4 = document.createElement("button");
+      b4.type = "button"; b4.textContent = "移出名册";
+      b4.onclick = () => {
+        state.harem = state.harem.filter((x) => x !== id);
+        if (state.haremFav === id) state.haremFav = "";
+        renderHaremPanel();
+      };
+      row.appendChild(b1); row.appendChild(b2); row.appendChild(b3); row.appendChild(b4);
+      card.appendChild(row);
+      el.appendChild(card);
+    }
+  }
+
+  function renderCgPanel() {
+    const el = document.getElementById("cg-panel");
+    if (!el) return;
+    if (!CG_SLOTS.length) {
+      el.innerHTML = "<p class='hint'>CG 槽位表未加载。</p>";
+      return;
+    }
+    el.innerHTML = "<p class='hint'>解锁后可粘贴图片 URL（图床）或使用程序占位图。成人槽需开启 18+ 才显示缩略内容。</p>";
+    const grid = document.createElement("div");
+    grid.className = "cg-grid";
+    for (const slot of CG_SLOTS) {
+      const unlocked = !!state.unlockedCgs[slot.id];
+      const needMature = slot.rating === "r18" && !isMatureEnabled();
+      const card = document.createElement("div");
+      card.className = "cg-card" + (unlocked ? "" : " cg-locked");
+      const title = slot.title_zh || slot.id;
+      card.innerHTML = `<h4>${unlocked ? "" : "🔒 "}${title}</h4>`;
+      if (unlocked && !needMature) {
+        const img = document.createElement("img");
+        img.className = "cg-thumb";
+        img.alt = title;
+        img.src = cgThumbUrl(slot);
+        card.appendChild(img);
+        const input = document.createElement("input");
+        input.type = "url";
+        input.placeholder = "https://... 自定义图片 URL";
+        input.value = cgUrls[slot.id] || "";
+        const actions = document.createElement("div");
+        actions.className = "cg-actions";
+        const save = document.createElement("button");
+        save.type = "button";
+        save.textContent = "保存 URL";
+        save.onclick = () => {
+          const v = input.value.trim();
+          if (v) cgUrls[slot.id] = v;
+          else delete cgUrls[slot.id];
+          saveMeta();
+          renderCgPanel();
+          log("CG URL 已保存：" + slot.id);
+        };
+        const reset = document.createElement("button");
+        reset.type = "button";
+        reset.textContent = "恢复占位";
+        reset.onclick = () => {
+          delete cgUrls[slot.id];
+          saveMeta();
+          renderCgPanel();
+        };
+        actions.appendChild(save);
+        actions.appendChild(reset);
+        card.appendChild(input);
+        card.appendChild(actions);
+      } else if (needMature) {
+        const p = document.createElement("p");
+        p.className = "hint";
+        p.textContent = "成人 CG：请先开启成人内容。";
+        card.appendChild(p);
+      } else {
+        const p = document.createElement("p");
+        p.className = "hint";
+        p.textContent = "未解锁。推进角色线或后宫排班可获得。";
+        card.appendChild(p);
+      }
+      grid.appendChild(card);
+    }
+    el.appendChild(grid);
+  }
+
+  function exportSave() {
+    if (!state.player) {
+      log("无进行中的周目可导出。");
+      return;
+    }
+    const blob = new Blob([JSON.stringify(serialize(), null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    const name = `ember-save-m${state.month}-${Date.now()}.json`;
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    log("已导出存档：" + name);
+    sfx("click");
+  }
+
+  function importSaveFile(file) {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const data = JSON.parse(reader.result);
+        applySave(data);
+        toast("存档已导入");
+        log("导入存档成功。");
+      } catch (e) {
+        log("导入失败：" + e.message);
+        showBootError("导入失败：" + e.message);
+      }
+    };
+    reader.readAsText(file);
   }
 
   function jointResearch() {
@@ -1631,6 +1919,22 @@
       case "relSpouse":
         if (state.player.spouseFac) addRel(state.player.factionId, state.player.spouseFac, eff.v || 0);
         break;
+      case "rel":
+        if (eff.f) addRel(state.player.factionId, eff.f, eff.v || 0);
+        break;
+      case "arcProgress":
+        bumpArc(eff.arc, eff.v || 1);
+        break;
+      case "setFlag":
+        state.storyFlags[eff.flag] = eff.v;
+        if (String(eff.flag).indexOf("he_") === 0) {
+          unlockAchieve("he_ending");
+          toast("HE：" + eff.flag);
+        }
+        break;
+      case "unlockCg":
+        unlockCg(eff.slot);
+        break;
       case "log": log(eff.t); break;
       default: break;
     }
@@ -1931,6 +2235,12 @@
       harem: state.harem,
       matureEnabled: state.matureEnabled,
       maturePackLoaded: state.maturePackLoaded,
+      arcProgress: state.arcProgress,
+      storyFlags: state.storyFlags,
+      unlockedCgs: state.unlockedCgs,
+      haremFav: state.haremFav,
+      haremSchedule: state.haremSchedule,
+      harem: state.harem,
     };
   }
 
@@ -1962,6 +2272,12 @@
       harem: data.harem || [],
       matureEnabled: !!data.matureEnabled || state.matureEnabled,
       maturePackLoaded: !!data.maturePackLoaded,
+      arcProgress: data.arcProgress || {},
+      storyFlags: data.storyFlags || {},
+      unlockedCgs: data.unlockedCgs || { generic_night: true },
+      haremFav: data.haremFav || "",
+      haremSchedule: data.haremSchedule || {},
+      harem: data.harem || [],
       pendingEvent: null,
       hex: null,
       pendingBattle: null,
@@ -1971,6 +2287,9 @@
     cancelBattle();
     showApp(true);
     if (state.matureEnabled && !state.maturePackLoaded) loadMatureSkeletonPack();
+    renderArcPanel();
+    renderHaremPanel();
+    renderCgPanel();
     if (state.tutorial) showTutorial(); else hideTutorial();
     const ban = document.getElementById("scenario-banner");
     if (ban) {
@@ -2157,6 +2476,9 @@
     renderGoalCompass();
     updateMatureUi();
     renderIntimacyPanel();
+    renderArcPanel();
+    renderHaremPanel();
+    renderCgPanel();
     drawMap();
     if (state.hex) drawHex();
   }
@@ -2171,6 +2493,9 @@
         document.getElementById("tab-" + tab.dataset.tab).classList.add("active");
         if (tab.dataset.tab === "tech") renderTech();
         if (tab.dataset.tab === "meta") renderMeta();
+        if (tab.dataset.tab === "harem") renderHaremPanel();
+        if (tab.dataset.tab === "cg") renderCgPanel();
+        if (tab.dataset.tab === "id") { renderIntimacyPanel(); renderArcPanel(); }
         sfx("click");
       };
     });
@@ -2309,6 +2634,19 @@
     for (let i = 1; i <= 3; i++) {
       on("btn-save" + i, () => saveSlot(i));
       on("btn-load" + i, () => loadSlot(i));
+    }
+    on("btn-export", exportSave);
+    on("btn-import", () => {
+      const inp = document.getElementById("import-file");
+      if (inp) inp.click();
+    });
+    const importFile = document.getElementById("import-file");
+    if (importFile) {
+      importFile.onchange = (ev) => {
+        const f = ev.target.files && ev.target.files[0];
+        if (f) importSaveFile(f);
+        importFile.value = "";
+      };
     }
     on("btn-battle-report", () => confirmBattle("report"));
     on("btn-battle-hex", () => confirmBattle("hex"));
@@ -2759,6 +3097,24 @@
       const ar = await fetch("data/achievements.json");
       ACH_DEFS = (await ar.json()).achievements || [];
     } catch { ACH_DEFS = []; }
+    try {
+      const sr = await fetch("data/story-arcs.json");
+      STORY_ARCS = (await sr.json()).arcs || {};
+    } catch { STORY_ARCS = {}; }
+    try {
+      const cr = await fetch("data/cg-slots.json");
+      CG_SLOTS = (await cr.json()).slots || [];
+    } catch { CG_SLOTS = []; }
+    // 内置成就：HE
+    if (!ACH_DEFS.find((a) => a.id === "he_ending")) {
+      ACH_DEFS.push({
+        id: "he_ending",
+        name_zh: "终约",
+        name_en: "True End Bond",
+        desc_zh: "完成任意角色 HE",
+        desc_en: "Complete any character HE",
+      });
+    }
   }
 
   async function main() {

@@ -170,6 +170,30 @@ button.hidden { display: none; }
 .intimacy-list button { font-size: 0.78rem; padding: 6px 8px; }
 .intimacy-list button:disabled { opacity: 0.4; }
 
+.arc-panel, .harem-panel, .cg-panel { font-size: 0.8rem; }
+.arc-card, .harem-card, .cg-card {
+  border: 1px solid var(--line); border-radius: 8px; padding: 8px; margin-bottom: 8px;
+  background: rgba(0,0,0,0.18);
+}
+.arc-card h4, .harem-card h4, .cg-card h4 { margin: 0 0 4px; font-size: 0.88rem; color: var(--accent); }
+.arc-card .steps { margin: 4px 0; padding-left: 1rem; color: var(--muted); }
+.arc-card .steps li.done { color: var(--ok); }
+.harem-card .row-btns { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.harem-card .row-btns button { flex: 1 1 40%; font-size: 0.72rem; padding: 5px; }
+.cg-grid { display: grid; grid-template-columns: 1fr; gap: 8px; }
+.cg-thumb {
+  width: 100%; aspect-ratio: 16/10; object-fit: cover; border-radius: 6px;
+  background: #0d131c; border: 1px solid var(--line);
+}
+.cg-locked { opacity: 0.45; filter: grayscale(0.8); }
+.cg-card input[type=url] {
+  width: 100%; margin-top: 4px; background: var(--bg); color: var(--text);
+  border: 1px solid var(--line); border-radius: 6px; padding: 5px; font-size: 0.75rem;
+}
+.cg-card .cg-actions { display: flex; gap: 4px; margin-top: 4px; }
+.cg-card .cg-actions button { flex: 1; font-size: 0.72rem; padding: 5px; }
+.fav-star { color: #f0a030; }
+
 /* 移动端日志更矮，给罗盘空间 */
 @media (max-width: 900px) {
   .goal-compass { margin: 0 8px 6px; }

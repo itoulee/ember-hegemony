@@ -111,6 +111,8 @@
           <button type="button" class="tab" data-tab="dip" data-i18n="tab_dip">外交</button>
           <button type="button" class="tab" data-tab="tech" data-i18n="tab_tech">科技</button>
           <button type="button" class="tab" data-tab="id" data-i18n="tab_id">身份</button>
+          <button type="button" class="tab" data-tab="harem">后宫</button>
+          <button type="button" class="tab" data-tab="cg">CG</button>
           <button type="button" class="tab" data-tab="meta" data-i18n="tab_meta">图鉴</button>
           <button type="button" class="tab" data-tab="sys" data-i18n="tab_sys">系统</button>
         </div>
@@ -149,6 +151,19 @@
             <button type="button" id="btn-coup-start">发动政变</button>
             <button type="button" id="btn-escape">越狱</button>
             <div id="intimacy-panel" class="intimacy-panel"></div>
+            <div id="arc-panel" class="arc-panel"></div>
+          </div>
+        </div>
+
+        <div id="tab-harem" class="tab-pane">
+          <div id="harem-panel" class="harem-panel">
+            <p class="hint">启用成人内容并提升亲密度后，角色会进入后宫名册。</p>
+          </div>
+        </div>
+
+        <div id="tab-cg" class="tab-pane">
+          <div id="cg-panel" class="cg-panel">
+            <p class="hint">CG 槽位：解锁后可粘贴图片 URL 或使用程序占位图。</p>
           </div>
         </div>
 
@@ -181,6 +196,11 @@
               <button type="button" id="btn-save3">存档3</button>
               <button type="button" id="btn-load3">读档3</button>
             </div>
+            <div class="save-row">
+              <button type="button" id="btn-export">导出存档</button>
+              <button type="button" id="btn-import">导入存档</button>
+            </div>
+            <input type="file" id="import-file" accept="application/json,.json" class="hidden" />
             <div class="save-row">
               <button type="button" id="btn-lang">中/EN</button>
               <button type="button" id="btn-sfx">音效</button>
@@ -256,9 +276,9 @@
     </div>
   </div>
 
-  <script src="i18n.js?v=2.2"></script>
-  <script src="audio.js?v=2.2"></script>
-  <script src="game.js?v=2.2"></script>
+  <script src="i18n.js?v=2.3"></script>
+  <script src="audio.js?v=2.3"></script>
+  <script src="game.js?v=2.3"></script>
   <noscript>
     <p style="padding:2rem;color:#fff;background:#111">需要启用 JavaScript 才能游玩。</p>
   </noscript>

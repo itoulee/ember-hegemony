@@ -1,0 +1,12 @@
+{
+  "slots": [
+    { "id": "lia_rain", "title_zh": "莉娅·密钥室", "title_en": "Lia · Key Room", "char": "lia", "rating": "r18", "defaultPrompt": "soft sci-fi, adult woman officer, rain on glass, intimate, no minors" },
+    { "id": "lia_key", "title_zh": "莉娅·锁骨密钥", "title_en": "Lia · Collarbone Key", "char": "lia", "rating": "r18", "defaultPrompt": "key pendant, intimate portrait, adult" },
+    { "id": "lia_he", "title_zh": "莉娅·HE", "title_en": "Lia HE", "char": "lia", "rating": "all", "defaultPrompt": "happy ending, couple silhouette, star window" },
+    { "id": "mira_steam", "title_zh": "米拉·蒸汽", "title_en": "Mira · Steam", "char": "mira", "rating": "r18", "defaultPrompt": "steam bath, adult woman, soft light" },
+    { "id": "mira_storm", "title_zh": "米拉·风暴港", "title_en": "Mira · Storm Port", "char": "mira", "rating": "all", "defaultPrompt": "port battle, determined woman captain" },
+    { "id": "mira_he", "title_zh": "米拉·HE", "title_en": "Mira HE", "char": "mira", "rating": "all", "defaultPrompt": "harbor lights, vow, couple" },
+    { "id": "generic_night", "title_zh": "旗舰深夜", "title_en": "Flagship Night", "char": null, "rating": "r18", "defaultPrompt": "starship cabin night, intimate mood" },
+    { "id": "harem_lounge", "title_zh": "后舱休息室", "title_en": "Harem Lounge", "char": null, "rating": "r18", "defaultPrompt": "lounge, multiple silhouettes, tasteful" }
+  ]
+}

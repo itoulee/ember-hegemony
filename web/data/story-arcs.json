@@ -1,0 +1,110 @@
+{
+  "arcs": {
+    "lia": {
+      "id": "lia",
+      "name_zh": "莉娅·科塔",
+      "name_en": "Lia Kota",
+      "charId": "lia",
+      "he_title_zh": "人事官的终约",
+      "he_title_en": "Officer's Final Contract",
+      "steps": [
+        {
+          "id": "lia_1",
+          "needBond": 0,
+          "title": "加班灯",
+          "text": "莉娅把审查表推到你面前，指尖却在桌沿摩挲：「长官，忠诚可以买——但我想先确认你的体温。」",
+          "choices": [
+            { "id": "a", "text": "握住她的手", "effects": [{ "type": "arcProgress", "arc": "lia", "v": 1 }, { "type": "intimacyChar", "char": "lia", "v": 1 }, { "type": "log", "t": "她耳根发红，却没抽回手。" }] },
+            { "id": "b", "text": "只谈公务", "effects": [{ "type": "merit", "v": 2 }, { "type": "log", "t": "她收回手，职业面具重新戴上。" }] }
+          ]
+        },
+        {
+          "id": "lia_2",
+          "needBond": 2,
+          "needArc": 1,
+          "title": "密钥室的雨",
+          "text": "冷却管凝出水珠。莉娅反锁门，把你按在机柜上：「监控我关了。别用军衔叫我。」",
+          "choices": [
+            { "id": "a", "text": "按她的规矩", "effects": [{ "type": "arcProgress", "arc": "lia", "v": 1 }, { "type": "intimacyChar", "char": "lia", "v": 2 }, { "type": "unlockCg", "slot": "lia_rain" }, { "type": "log", "t": "机柜嗡鸣盖过喘息。事后她把一枚私用密钥塞进你掌心。" }] },
+            { "id": "b", "text": "提醒风险", "effects": [{ "type": "intel", "v": 4 }, { "type": "intimacyChar", "char": "lia", "v": 1 }, { "type": "log", "t": "她咬唇点头，仍把额头抵在你肩上。" }] }
+          ]
+        },
+        {
+          "id": "lia_3",
+          "needBond": 4,
+          "needArc": 2,
+          "title": "人事档案外的名字",
+          "text": "她把你的档案投在全息屏上，却在备注栏手写：可托付。『如果你登基，我不要职位——要舱门钥匙。』",
+          "choices": [
+            { "id": "a", "text": "给她钥匙与名分", "effects": [{ "type": "arcProgress", "arc": "lia", "v": 1 }, { "type": "intimacyChar", "char": "lia", "v": 2 }, { "type": "legitimacy", "v": 3 }, { "type": "unlockCg", "slot": "lia_key" }, { "type": "log", "t": "她把钥匙吊在锁骨间，像一枚私印。" }] },
+            { "id": "b", "text": "只给权限不加名分", "effects": [{ "type": "arcProgress", "arc": "lia", "v": 1 }, { "type": "factionPower", "v": 5 }, { "type": "log", "t": "她苦笑：权谋者的温柔总缺一口。" }] }
+          ]
+        },
+        {
+          "id": "lia_he",
+          "needBond": 6,
+          "needArc": 3,
+          "title": "HE·人事官的终约",
+          "text": "战事间歇。莉娅穿着便服（你几乎认不出），在观测窗前等你：『别再把我写进可替换栏。把我写进你的结局。』",
+          "choices": [
+            { "id": "he", "text": "承诺终约（HE）", "effects": [{ "type": "arcProgress", "arc": "lia", "v": 1 }, { "type": "setFlag", "flag": "he_lia", "v": true }, { "type": "intimacyChar", "char": "lia", "v": 3 }, { "type": "unlockCg", "slot": "lia_he" }, { "type": "legitimacy", "v": 5 }, { "type": "log", "t": "【HE】莉娅的线完结。她成为你不可替换的锚点。" }] },
+            { "id": "delay", "text": "还不是时候", "effects": [{ "type": "intimacyChar", "char": "lia", "v": 1 }, { "type": "log", "t": "她点头，眼底却有雨。线未断，只是停在门槛。" }] }
+          ]
+        }
+      ]
+    },
+    "mira": {
+      "id": "mira",
+      "name_zh": "米拉港主",
+      "name_en": "Portmaster Mira",
+      "charId": "mira",
+      "he_title_zh": "自由港的潮汐誓",
+      "he_title_en": "Tide Oath of Free Port",
+      "steps": [
+        {
+          "id": "mira_1",
+          "needBond": 0,
+          "title": "关税以外的账",
+          "text": "米拉把账单推过来，指尖却在你腕侧画圈：『港口抽成可以谈。你的视线——现在已经超支了。』",
+          "choices": [
+            { "id": "a", "text": "承认在看她", "effects": [{ "type": "arcProgress", "arc": "mira", "v": 1 }, { "type": "intimacyChar", "char": "mira", "v": 1 }, { "type": "log", "t": "她笑出声：诚实的客人有折扣。" }] },
+            { "id": "b", "text": "把话题拉回关税", "effects": [{ "type": "credits", "v": 300 }, { "type": "log", "t": "她立刻切换港主模式，锋利而专业。" }] }
+          ]
+        },
+        {
+          "id": "mira_2",
+          "needBond": 2,
+          "needArc": 1,
+          "title": "私汤密谈",
+          "text": "蒸汽里她只围浴巾：『密钥联署要诚意。身体也算诚意的一种——你选。』",
+          "choices": [
+            { "id": "a", "text": "留下过夜", "effects": [{ "type": "arcProgress", "arc": "mira", "v": 1 }, { "type": "intimacyChar", "char": "mira", "v": 2 }, { "type": "unlockCg", "slot": "mira_steam" }, { "type": "rel", "f": "fac_free", "v": 8 }, { "type": "log", "t": "水声与喘息。次日关税表上多了一行手写优惠。" }] },
+            { "id": "b", "text": "只签商业条款", "effects": [{ "type": "credits", "v": 600 }, { "type": "intimacyChar", "char": "mira", "v": 1 }, { "type": "log", "t": "她披衣：也可以。但别装没动心。" }] }
+          ]
+        },
+        {
+          "id": "mira_3",
+          "needBond": 4,
+          "needArc": 2,
+          "title": "风暴航道",
+          "text": "海盗袭港夜。米拉把指挥权分你一半，枪声里她抓住你的领口：『活着回来。我还有没说完的价码。』",
+          "choices": [
+            { "id": "a", "text": "护她突围", "effects": [{ "type": "arcProgress", "arc": "mira", "v": 1 }, { "type": "manpower", "v": -6 }, { "type": "intimacyChar", "char": "mira", "v": 2 }, { "type": "unlockCg", "slot": "mira_storm" }, { "type": "log", "t": "她在弹痕旁吻你：这价码作废——改成免费。" }] },
+            { "id": "b", "text": "优先保货仓", "effects": [{ "type": "credits", "v": 1500 }, { "type": "rel", "f": "fac_free", "v": -5 }, { "type": "log", "t": "港保住了，她看你的眼神却结了冰。" }] }
+          ]
+        },
+        {
+          "id": "mira_he",
+          "needBond": 6,
+          "needArc": 3,
+          "title": "HE·自由港的潮汐誓",
+          "text": "重建后的码头灯火通明。米拉递来一枚港口私印：『联姻可以是政治。也可以是——我只想停靠你。』",
+          "choices": [
+            { "id": "he", "text": "潮汐誓（HE）", "effects": [{ "type": "arcProgress", "arc": "mira", "v": 1 }, { "type": "setFlag", "flag": "he_mira", "v": true }, { "type": "intimacyChar", "char": "mira", "v": 3 }, { "type": "unlockCg", "slot": "mira_he" }, { "type": "credits", "v": 2000 }, { "type": "log", "t": "【HE】米拉线完结。自由港成为你的永久泊位。" }] },
+            { "id": "delay", "text": "再等等风平浪静", "effects": [{ "type": "intimacyChar", "char": "mira", "v": 1 }, { "type": "log", "t": "她把私印收回袖中：潮汐会再来。" }] }
+          ]
+        }
+      ]
+    }
+  }
+}
