@@ -1,8 +1,12 @@
 # 外网游玩说明
 
-## 主链接
+## 主链接（点开即玩）
 
 **https://itoulee.github.io/ember-hegemony/**
+
+- 实现：仓库 `web/`（纯 HTML/CSS/JS，无插件）
+- 玩法对齐 Godot Phase 0.5：星图、AI、事件表、联姻、战报/六角战棋
+- 桌面 Godot 工程仍在 `game/`，供完整引擎开发
 
 该地址由 GitHub Actions 工作流 `Deploy Web Play` 在每次推送到 `master`/`main` 后更新。
 

@@ -14,94 +14,33 @@ concurrency:
   group: pages
   cancel-in-progress: true
 
-env:
-  GODOT_VERSION: "4.3"
-  GODOT_TAG: "4.3-stable"
-
 jobs:
-  export:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Cache Godot
-        id: cache-godot
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/godot-install
-            ~/.local/share/godot/export_templates
-          key: godot-${{ env.GODOT_TAG }}-linux-web-templates-v1
-
-      - name: Install Godot + Web export templates
-        if: steps.cache-godot.outputs.cache-hit != 'true'
-        run: |
-          set -e
-          mkdir -p "$HOME/godot-install" "$HOME/.local/share/godot/export_templates"
-          cd /tmp
-          curl -fsSL -o godot.zip \
-            "https://github.com/godotengine/godot-builds/releases/download/${GODOT_TAG}/Godot_v${GODOT_TAG}_linux.x86_64.zip"
-          curl -fsSL -o templates.tpz \
-            "https://github.com/godotengine/godot-builds/releases/download/${GODOT_TAG}/Godot_v${GODOT_TAG}_export_templates.tpz"
-          unzip -o godot.zip -d "$HOME/godot-install"
-          # 模板目录名必须为 x.y.stable
-          mkdir -p /tmp/tpl
-          unzip -o templates.tpz -d /tmp/tpl
-          # tpz 内为 templates/*
-          TEMPLATE_DIR="$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable"
-          rm -rf "$TEMPLATE_DIR"
-          mkdir -p "$TEMPLATE_DIR"
-          if [ -d /tmp/tpl/templates ]; then
-            cp -r /tmp/tpl/templates/* "$TEMPLATE_DIR/"
-          else
-            cp -r /tmp/tpl/* "$TEMPLATE_DIR/"
-          fi
-          ls -la "$HOME/godot-install"
-          ls -la "$TEMPLATE_DIR" | head
-
-      - name: Add Godot to PATH
-        run: |
-          GODOT_BIN=$(find "$HOME/godot-install" -type f -name "Godot*" | head -n1)
-          echo "GODOT_BIN=$GODOT_BIN" >> "$GITHUB_ENV"
-          chmod +x "$GODOT_BIN"
-          echo "Using $GODOT_BIN"
-          "$GODOT_BIN" --version
-
-      - name: Import project
-        working-directory: game
-        run: |
-          "$GODOT_BIN" --headless --path . --import || true
-          "$GODOT_BIN" --headless --path . --quit-after 2 || true
-
-      - name: Check templates present
-        run: |
-          ls -la "$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable/" | head -30
-          test -f "$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable/web_nothreads_release.zip" \
-            || test -f "$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable/web_release.zip" \
-            || (echo "Missing web templates" && ls -la "$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable/" && exit 1)
-
-      - name: Export Web
-        working-directory: game
-        run: |
-          mkdir -p ../build/web
-          "$GODOT_BIN" --headless --path . --export-release "Web" ../build/web/index.html
-          echo "--- build/web ---"
-          ls -la ../build/web
-          test -f ../build/web/index.html
-
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: build/web
-
   deploy:
-    needs: export
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare site
+        run: |
+          mkdir -p _site
+          cp -r web/* _site/
+          # 可选：若未来 Godot 构建产物存在则并列
+          if [ -d build/web ] && [ -f build/web/index.html ]; then
+            mkdir -p _site/godot
+            cp -r build/web/* _site/godot/
+          fi
+          echo "站点文件："
+          ls -la _site
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

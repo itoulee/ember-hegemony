@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>星域制霸：余烬 — 在线试玩</title>
+  <meta name="description" content="开源硬科幻星域策略 SLG 网页试玩。Godot 原型同设计，浏览器即开即玩。" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <header class="top">
+      <div>
+        <h1>星域制霸：余烬</h1>
+        <p class="sub">网页试玩 · 硬科幻星域 SLG · <a href="https://github.com/itoulee/ember-hegemony" target="_blank" rel="noopener">GitHub</a></p>
+      </div>
+      <div id="status" class="status"></div>
+    </header>
+    <div class="main">
+      <aside class="left">
+        <div id="selected" class="panel"></div>
+        <div class="actions">
+          <button type="button" id="btn-move">航行 (1AP)</button>
+          <button type="button" id="btn-attack">进攻 (1AP)</button>
+          <button type="button" id="btn-claim">登记无主 (1AP)</button>
+          <button type="button" id="btn-marry">联姻·自由港 (1AP)</button>
+          <button type="button" id="btn-end" class="primary">结束回合 (AI+事件)</button>
+          <button type="button" id="btn-hex-toggle">战斗：战报</button>
+          <button type="button" id="btn-new">新周目</button>
+        </div>
+        <p class="hint">点星图选节点。黄点=你。结束回合会触发 AI 与随机事件。</p>
+      </aside>
+      <section class="center">
+        <canvas id="map" width="720" height="520"></canvas>
+        <div id="event-box" class="event-box hidden">
+          <h3 id="event-title"></h3>
+          <p id="event-text"></p>
+          <div id="event-choices"></div>
+        </div>
+        <div id="hex-box" class="hex-box hidden">
+          <h3>六角战棋</h3>
+          <canvas id="hex" width="640" height="360"></canvas>
+          <div class="hex-actions">
+            <button type="button" id="btn-hex-end">结束己方回合</button>
+            <button type="button" id="btn-hex-flee">撤退</button>
+          </div>
+          <pre id="hex-log"></pre>
+        </div>
+      </section>
+      <aside class="right">
+        <h3>航路日志</h3>
+        <pre id="log"></pre>
+      </aside>
+    </div>
+  </div>
+  <script src="game.js"></script>
+</body>
+</html>

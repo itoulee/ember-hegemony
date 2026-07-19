@@ -8,11 +8,11 @@
 
 | 环境 | 链接 |
 |------|------|
-| **GitHub Pages（推荐）** | https://itoulee.github.io/ember-hegemony/ |
+| **GitHub Pages（点开即玩）** | https://itoulee.github.io/ember-hegemony/ |
 | 源码仓库 | https://github.com/itoulee/ember-hegemony |
 
-构建：推送 `master` 后由 `.github/workflows/deploy-web.yml` 自动 Web 导出并部署。  
-本机也可：`Godot → 项目 → 导出 → Web`，输出到任意静态托管。
+构建：推送 `master` → 部署 `web/` 静态站。  
+Godot 原生工程在 `game/`；需要引擎特性时本地 F5 或自行导出 WebAssembly。
 
 ---
 

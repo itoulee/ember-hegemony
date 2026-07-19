@@ -6,11 +6,12 @@
 
 | | |
 |--|--|
-| **在线试玩（GitHub Pages）** | **https://itoulee.github.io/ember-hegemony/** |
+| **在线试玩（点开即玩）** | **https://itoulee.github.io/ember-hegemony/** |
 | 源码 | https://github.com/itoulee/ember-hegemony |
 
-> 推送 `master` 后由 GitHub Actions 自动导出 Web 并部署。若打不开，请稍等 2–5 分钟或打开仓库 **Actions** 查看 `Deploy Web Play` 是否成功。  
-> 建议桌面 Chrome / Edge / Firefox；首次加载需下载 WASM，可能稍慢。
+> 浏览器 **HTML5 试玩版**（`web/`），与 Godot 原型同玩法：星图、AI、事件、联姻、战报/六角战棋。  
+> 推送 `master` 后 Actions 自动部署到 GitHub Pages。若 404，等 1–2 分钟或看 [Actions](https://github.com/itoulee/ember-hegemony/actions)。  
+> 桌面/手机浏览器均可；无需安装。
 
 - **引擎**：Godot 4（GL Compatibility，适配网页）  
 - **语言**：简体中文 UI / 文案  
