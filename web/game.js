@@ -8,7 +8,7 @@
   const SAVE_PREFIX = "ember_hegemony_slot_";
   const ACH_KEY = "ember_hegemony_achievements";
   const CODEX_KEY = "ember_hegemony_codex";
-  const VERSION = "2.5.0-cd";
+  const VERSION = "2.6.0-cg";
   const MATURE_KEY = "ember_mature_enabled";
   const CG_URL_KEY = "ember_cg_urls";
 
@@ -1270,7 +1270,10 @@
   }
   function cgThumbUrl(slot) {
     if (cgUrls[slot.id]) return cgUrls[slot.id];
-    // 程序占位：渐变 data URI 由 canvas 生成
+    // 真 CG 资源（批量生成）
+    if (slot.asset || slot.id) {
+      return "assets/cg/" + (slot.asset || (slot.id + ".jpg"));
+    }
     return placeholderCgDataUrl(slot);
   }
   function placeholderCgDataUrl(slot) {
@@ -1440,6 +1443,7 @@
         img.className = "cg-thumb";
         img.alt = title;
         img.src = cgThumbUrl(slot);
+        img.onerror = () => { img.src = placeholderCgDataUrl(slot); };
         card.appendChild(img);
         const input = document.createElement("input");
         input.type = "url";

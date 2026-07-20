@@ -10,10 +10,25 @@ window.EmberPortraits = (() => {
     return Math.abs(h);
   }
 
+  const REAL = {
+    lia: "assets/portraits/lia.jpg",
+    mira: "assets/portraits/mira.jpg",
+    lira: "assets/portraits/lira.jpg",
+    sarn: "assets/portraits/sarn.jpg",
+    kess: "assets/portraits/kess.jpg",
+    vorn: "assets/portraits/vorn.jpg",
+  };
+
   function draw(charOrId, w, h) {
     const id = typeof charOrId === "string" ? charOrId : (charOrId && charOrId.id) || "x";
     const key = id + "_" + w + "x" + h;
     if (cache[key]) return cache[key];
+
+    // 真立绘优先（同步返回 URL；调用方可直接用 img.src）
+    if (REAL[id]) {
+      cache[key] = REAL[id];
+      return REAL[id];
+    }
 
     const ch = typeof charOrId === "object" && charOrId ? charOrId : { id, hue: hash(id) % 360, seed: hash(id) % 100 };
     const hue = ch.hue != null ? ch.hue : hash(id) % 360;
