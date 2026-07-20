@@ -193,6 +193,19 @@ button.hidden { display: none; }
 .cg-card .cg-actions { display: flex; gap: 4px; margin-top: 4px; }
 .cg-card .cg-actions button { flex: 1; font-size: 0.72rem; padding: 5px; }
 .fav-star { color: #f0a030; }
+.dip-list { list-style: none; padding: 0; margin: 0 0 8px; font-size: 0.75rem; }
+.dip-list li { display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; margin-bottom: 6px; }
+.mini-bar { grid-column: 1 / -1; height: 4px; background: #1a2430; border-radius: 2px; overflow: hidden; }
+.mini-bar i { display: block; height: 100%; background: linear-gradient(90deg,#e85d5d,#f0a030,#4caf7a); }
+.hex-editor-bar { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 6px; }
+.hex-editor-bar button { font-size: 0.72rem; padding: 4px 8px; }
+.win-box { border: 1px solid var(--line); border-radius: 8px; padding: 8px; margin: 6px 0; }
+.mod-workshop { max-width: min(560px, 96vw); }
+.mod-workshop textarea {
+  width: 100%; box-sizing: border-box; background: #0d131c; color: #d5dde6;
+  border: 1px solid var(--line); border-radius: 8px; padding: 8px; font-family: ui-monospace, monospace; font-size: 0.75rem;
+}
+.chain-panel { margin-top: 8px; }
 
 /* 移动端日志更矮，给罗盘空间 */
 @media (max-width: 900px) {

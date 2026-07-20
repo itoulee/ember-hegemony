@@ -1,14 +1,21 @@
 {
   "id": "mature-r18",
   "name": "余烬·夜航（成人向）",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "requiresAge": 18,
   "rating": "r18",
-  "description": "成年角色之间的情欲、联姻之夜、俘虏私刑与后宫事件。仅限 18+。不含未成年人。",
+  "description": "成年角色情欲、争宠、联姻专属夜、BE/NE 分支。18+。",
   "disclaimer": "虚构成人内容。禁止向未成年人传播。",
   "relationships": {
     "enabled": true,
-    "levels": ["stranger", "acquaintance", "trusted", "bonded", "intimate", "lover"]
+    "levels": [
+      "stranger",
+      "acquaintance",
+      "trusted",
+      "bonded",
+      "intimate",
+      "lover"
+    ]
   },
   "events": [
     {
@@ -25,28 +32,58 @@
           "id": "gentle",
           "text": "温柔地进入（好感↑ 正统+）",
           "effects": [
-            { "type": "intimacy", "v": 2 },
-            { "type": "legitimacy", "v": 4 },
-            { "type": "log", "t": "你们做得缓慢而彻底。对方把你的名字嵌进喘息里。" }
+            {
+              "type": "intimacy",
+              "v": 2
+            },
+            {
+              "type": "legitimacy",
+              "v": 4
+            },
+            {
+              "type": "log",
+              "t": "你们做得缓慢而彻底。对方把你的名字嵌进喘息里。"
+            }
           ]
         },
         {
           "id": "rough",
           "text": "强势占有（情欲↑ 关系波动）",
           "effects": [
-            { "type": "intimacy", "v": 3 },
-            { "type": "relSpouse", "v": -5 },
-            { "type": "credits", "v": -200 },
-            { "type": "log", "t": "舱壁震出闷响。事后对方眼角发红，却把腿仍缠在你腰上。" }
+            {
+              "type": "intimacy",
+              "v": 3
+            },
+            {
+              "type": "relSpouse",
+              "v": -5
+            },
+            {
+              "type": "credits",
+              "v": -200
+            },
+            {
+              "type": "log",
+              "t": "舱壁震出闷响。事后对方眼角发红，却把腿仍缠在你腰上。"
+            }
           ]
         },
         {
           "id": "deny",
           "text": "只谈条约，拒绝 entangle",
           "effects": [
-            { "type": "legitimacy", "v": 2 },
-            { "type": "intimacy", "v": -1 },
-            { "type": "log", "t": "对方沉默着穿回制服。政治仍在，温度冷了。" }
+            {
+              "type": "legitimacy",
+              "v": 2
+            },
+            {
+              "type": "intimacy",
+              "v": -1
+            },
+            {
+              "type": "log",
+              "t": "对方沉默着穿回制服。政治仍在，温度冷了。"
+            }
           ]
         }
       ]
@@ -64,26 +101,52 @@
           "id": "desk",
           "text": "就在桌上（情欲↑ 功勋暗示）",
           "effects": [
-            { "type": "intimacyChar", "char": "lia", "v": 3 },
-            { "type": "merit", "v": 3 },
-            { "type": "log", "t": "表格被揉皱。她咬着你的肩压低声音，生怕通讯频道误开。" }
+            {
+              "type": "intimacyChar",
+              "char": "lia",
+              "v": 3
+            },
+            {
+              "type": "merit",
+              "v": 3
+            },
+            {
+              "type": "log",
+              "t": "表格被揉皱。她咬着你的肩压低声音，生怕通讯频道误开。"
+            }
           ]
         },
         {
           "id": "after",
           "text": "带回寝舱细做",
           "effects": [
-            { "type": "intimacyChar", "char": "lia", "v": 4 },
-            { "type": "credits", "v": -300 },
-            { "type": "log", "t": "一整夜。她学会用你的军衔当情趣称呼。" }
+            {
+              "type": "intimacyChar",
+              "char": "lia",
+              "v": 4
+            },
+            {
+              "type": "credits",
+              "v": -300
+            },
+            {
+              "type": "log",
+              "t": "一整夜。她学会用你的军衔当情趣称呼。"
+            }
           ]
         },
         {
           "id": "work",
           "text": "专注公务",
           "effects": [
-            { "type": "intel", "v": 5 },
-            { "type": "log", "t": "她整理好衣服，眼底有一瞬失落。" }
+            {
+              "type": "intel",
+              "v": 5
+            },
+            {
+              "type": "log",
+              "t": "她整理好衣服，眼底有一瞬失落。"
+            }
           ]
         }
       ]
@@ -101,27 +164,56 @@
           "id": "steam",
           "text": "在池中缠绵",
           "effects": [
-            { "type": "intimacyChar", "char": "mira", "v": 3 },
-            { "type": "relNeutral", "v": 8 },
-            { "type": "credits", "v": 400 },
-            { "type": "log", "t": "水声盖过喘息。谈妥的不只是关税。" }
+            {
+              "type": "intimacyChar",
+              "char": "mira",
+              "v": 3
+            },
+            {
+              "type": "relNeutral",
+              "v": 8
+            },
+            {
+              "type": "credits",
+              "v": 400
+            },
+            {
+              "type": "log",
+              "t": "水声盖过喘息。谈妥的不只是关税。"
+            }
           ]
         },
         {
           "id": "edge",
           "text": "边缘挑逗后离开（钓她）",
           "effects": [
-            { "type": "intimacyChar", "char": "mira", "v": 2 },
-            { "type": "influence", "v": 6 },
-            { "type": "log", "t": "她骂你骗子，却把通讯频段留给你单独加密。" }
+            {
+              "type": "intimacyChar",
+              "char": "mira",
+              "v": 2
+            },
+            {
+              "type": "influence",
+              "v": 6
+            },
+            {
+              "type": "log",
+              "t": "她骂你骗子，却把通讯频段留给你单独加密。"
+            }
           ]
         },
         {
           "id": "business",
           "text": "只谈生意",
           "effects": [
-            { "type": "credits", "v": 900 },
-            { "type": "log", "t": "她披上外袍，语气恢复港主的锋利。" }
+            {
+              "type": "credits",
+              "v": 900
+            },
+            {
+              "type": "log",
+              "t": "她披上外袍，语气恢复港主的锋利。"
+            }
           ]
         }
       ]
@@ -139,29 +231,62 @@
           "id": "seduce",
           "text": "用欲望换情报（双方合意表演）",
           "effects": [
-            { "type": "intel", "v": 12 },
-            { "type": "intimacy", "v": 1 },
-            { "type": "legitimacy", "v": -3 },
-            { "type": "log", "t": "她最后自己解开一截束带。情报与呻吟一起交出来。" }
+            {
+              "type": "intel",
+              "v": 12
+            },
+            {
+              "type": "intimacy",
+              "v": 1
+            },
+            {
+              "type": "legitimacy",
+              "v": -3
+            },
+            {
+              "type": "log",
+              "t": "她最后自己解开一截束带。情报与呻吟一起交出来。"
+            }
           ]
         },
         {
           "id": "trade",
           "text": "正经换俘，不碰",
           "effects": [
-            { "type": "credits", "v": 1200 },
-            { "type": "relWorst", "v": 6 },
-            { "type": "log", "t": "外交渠道走完。审讯室重新安静。" }
+            {
+              "type": "credits",
+              "v": 1200
+            },
+            {
+              "type": "relWorst",
+              "v": 6
+            },
+            {
+              "type": "log",
+              "t": "外交渠道走完。审讯室重新安静。"
+            }
           ]
         },
         {
           "id": "hard",
           "text": "冷酷审讯（无性，伤士气）",
           "effects": [
-            { "type": "intel", "v": 8 },
-            { "type": "manpower", "v": -4 },
-            { "type": "legitimacy", "v": -2 },
-            { "type": "log", "t": "你守住了底线，也守住了冷汗。" }
+            {
+              "type": "intel",
+              "v": 8
+            },
+            {
+              "type": "manpower",
+              "v": -4
+            },
+            {
+              "type": "legitimacy",
+              "v": -2
+            },
+            {
+              "type": "log",
+              "t": "你守住了底线，也守住了冷汗。"
+            }
           ]
         }
       ]
@@ -180,28 +305,58 @@
           "id": "one",
           "text": "只召最深的那位",
           "effects": [
-            { "type": "intimacy", "v": 2 },
-            { "type": "legitimacy", "v": 1 },
-            { "type": "log", "t": "单人夜。你们把彼此做到腿软，谁也不提别人的名字。" }
+            {
+              "type": "intimacy",
+              "v": 2
+            },
+            {
+              "type": "legitimacy",
+              "v": 1
+            },
+            {
+              "type": "log",
+              "t": "单人夜。你们把彼此做到腿软，谁也不提别人的名字。"
+            }
           ]
         },
         {
           "id": "share",
           "text": "同床共枕（混乱↑ 情欲↑↑）",
           "effects": [
-            { "type": "intimacy", "v": 4 },
-            { "type": "credits", "v": -500 },
-            { "type": "legitimacy", "v": -4 },
-            { "type": "log", "t": "舱内空气灼热。第二天参谋假装没看见吻痕。" }
+            {
+              "type": "intimacy",
+              "v": 4
+            },
+            {
+              "type": "credits",
+              "v": -500
+            },
+            {
+              "type": "legitimacy",
+              "v": -4
+            },
+            {
+              "type": "log",
+              "t": "舱内空气灼热。第二天参谋假装没看见吻痕。"
+            }
           ]
         },
         {
           "id": "ban",
           "text": "禁止后舱争风",
           "effects": [
-            { "type": "legitimacy", "v": 5 },
-            { "type": "intimacy", "v": -1 },
-            { "type": "log", "t": "命令生效。欲望被按进制度里，仍在夜里发烫。" }
+            {
+              "type": "legitimacy",
+              "v": 5
+            },
+            {
+              "type": "intimacy",
+              "v": -1
+            },
+            {
+              "type": "log",
+              "t": "命令生效。欲望被按进制度里，仍在夜里发烫。"
+            }
           ]
         }
       ]
@@ -219,18 +374,37 @@
           "id": "rite",
           "text": "完成她的仪式",
           "effects": [
-            { "type": "intimacyChar", "char": "lira", "v": 3 },
-            { "type": "intel", "v": 6 },
-            { "type": "log", "t": "失重中的交合像坠落。她在你耳边诵读失效 AI 的情诗。" }
+            {
+              "type": "intimacyChar",
+              "char": "lira",
+              "v": 3
+            },
+            {
+              "type": "intel",
+              "v": 6
+            },
+            {
+              "type": "log",
+              "t": "失重中的交合像坠落。她在你耳边诵读失效 AI 的情诗。"
+            }
           ]
         },
         {
           "id": "reject",
           "text": "拒绝邪典",
           "effects": [
-            { "type": "legitimacy", "v": 3 },
-            { "type": "relWorst", "v": -4 },
-            { "type": "log", "t": "她笑着穿上衣袍：你会回来的。" }
+            {
+              "type": "legitimacy",
+              "v": 3
+            },
+            {
+              "type": "relWorst",
+              "v": -4
+            },
+            {
+              "type": "log",
+              "t": "她笑着穿上衣袍：你会回来的。"
+            }
           ]
         }
       ]
@@ -249,18 +423,36 @@
           "id": "take",
           "text": "接受自愿的一夜",
           "effects": [
-            { "type": "intimacy", "v": 2 },
-            { "type": "manpower", "v": 2 },
-            { "type": "log", "t": "铁架床咯吱作响。黎明对方索要一份船员编制。" }
+            {
+              "type": "intimacy",
+              "v": 2
+            },
+            {
+              "type": "manpower",
+              "v": 2
+            },
+            {
+              "type": "log",
+              "t": "铁架床咯吱作响。黎明对方索要一份船员编制。"
+            }
           ]
         },
         {
           "id": "pay",
           "text": "付钱送走，不碰",
           "effects": [
-            { "type": "credits", "v": -400 },
-            { "type": "legitimacy", "v": 2 },
-            { "type": "log", "t": "你守住了某种自己的规矩。" }
+            {
+              "type": "credits",
+              "v": -400
+            },
+            {
+              "type": "legitimacy",
+              "v": 2
+            },
+            {
+              "type": "log",
+              "t": "你守住了某种自己的规矩。"
+            }
           ]
         }
       ]
@@ -279,27 +471,54 @@
           "id": "go",
           "text": "赴约（派系力↑ 情欲↑）",
           "effects": [
-            { "type": "factionPower", "v": 8 },
-            { "type": "intimacy", "v": 2 },
-            { "type": "log", "t": "水声与低喘混在一起。事后对方把一张署名票塞进你掌心。" }
+            {
+              "type": "factionPower",
+              "v": 8
+            },
+            {
+              "type": "intimacy",
+              "v": 2
+            },
+            {
+              "type": "log",
+              "t": "水声与低喘混在一起。事后对方把一张署名票塞进你掌心。"
+            }
           ]
         },
         {
           "id": "record",
           "text": "存证威胁（黑料）",
           "effects": [
-            { "type": "intel", "v": 10 },
-            { "type": "factionPower", "v": 4 },
-            { "type": "legitimacy", "v": -5 },
-            { "type": "log", "t": "你选择权力而非体温。频道那头沉默很久。" }
+            {
+              "type": "intel",
+              "v": 10
+            },
+            {
+              "type": "factionPower",
+              "v": 4
+            },
+            {
+              "type": "legitimacy",
+              "v": -5
+            },
+            {
+              "type": "log",
+              "t": "你选择权力而非体温。频道那头沉默很久。"
+            }
           ]
         },
         {
           "id": "ignore",
           "text": "删除并举报",
           "effects": [
-            { "type": "merit", "v": 5 },
-            { "type": "log", "t": "正统路线。你的床依旧冷。" }
+            {
+              "type": "merit",
+              "v": 5
+            },
+            {
+              "type": "log",
+              "t": "正统路线。你的床依旧冷。"
+            }
           ]
         }
       ]
@@ -319,19 +538,40 @@
           "id": "chair",
           "text": "在指挥椅上做",
           "effects": [
-            { "type": "intimacy", "v": 3 },
-            { "type": "legitimacy", "v": 2 },
-            { "type": "log", "t": " thruster 指示灯乱闪。你们把周年刻进肌肉记忆。" }
+            {
+              "type": "intimacy",
+              "v": 3
+            },
+            {
+              "type": "legitimacy",
+              "v": 2
+            },
+            {
+              "type": "log",
+              "t": " thruster 指示灯乱闪。你们把周年刻进肌肉记忆。"
+            }
           ]
         },
         {
           "id": "gift",
           "text": "送正交石首饰后温存",
           "effects": [
-            { "type": "credits", "v": -1500 },
-            { "type": "intimacy", "v": 4 },
-            { "type": "relSpouse", "v": 10 },
-            { "type": "log", "t": "礼物与皮肤同样滚烫。" }
+            {
+              "type": "credits",
+              "v": -1500
+            },
+            {
+              "type": "intimacy",
+              "v": 4
+            },
+            {
+              "type": "relSpouse",
+              "v": 10
+            },
+            {
+              "type": "log",
+              "t": "礼物与皮肤同样滚烫。"
+            }
           ]
         }
       ]
@@ -350,27 +590,54 @@
           "id": "both",
           "text": "拉双方回舱（高风险高欲望）",
           "effects": [
-            { "type": "intimacy", "v": 5 },
-            { "type": "manpower", "v": -3 },
-            { "type": "log", "t": "直到黎明通讯官都不敢敲舱门。" }
+            {
+              "type": "intimacy",
+              "v": 5
+            },
+            {
+              "type": "manpower",
+              "v": -3
+            },
+            {
+              "type": "log",
+              "t": "直到黎明通讯官都不敢敲舱门。"
+            }
           ]
         },
         {
           "id": "pick",
           "text": "只带走一人",
           "effects": [
-            { "type": "intimacy", "v": 2 },
-            { "type": "relSpouse", "v": -3 },
-            { "type": "log", "t": "被留下的那位摔上门。床上的人却更用力。" }
+            {
+              "type": "intimacy",
+              "v": 2
+            },
+            {
+              "type": "relSpouse",
+              "v": -3
+            },
+            {
+              "type": "log",
+              "t": "被留下的那位摔上门。床上的人却更用力。"
+            }
           ]
         },
         {
           "id": "none",
           "text": "今夜独自执勤",
           "effects": [
-            { "type": "legitimacy", "v": 4 },
-            { "type": "intel", "v": 4 },
-            { "type": "log", "t": "欲望退潮。星图重新清晰。" }
+            {
+              "type": "legitimacy",
+              "v": 4
+            },
+            {
+              "type": "intel",
+              "v": 4
+            },
+            {
+              "type": "log",
+              "t": "欲望退潮。星图重新清晰。"
+            }
           ]
         }
       ]
@@ -388,19 +655,41 @@
           "id": "sign",
           "text": "签署并以身体履约",
           "effects": [
-            { "type": "intimacyChar", "char": "helio", "v": 2 },
-            { "type": "techProgress", "v": 1 },
-            { "type": "credits", "v": -800 },
-            { "type": "log", "t": "合同章与咬痕一起盖下。折扣是真的。" }
+            {
+              "type": "intimacyChar",
+              "char": "helio",
+              "v": 2
+            },
+            {
+              "type": "techProgress",
+              "v": 1
+            },
+            {
+              "type": "credits",
+              "v": -800
+            },
+            {
+              "type": "log",
+              "t": "合同章与咬痕一起盖下。折扣是真的。"
+            }
           ]
         },
         {
           "id": "cash",
           "text": "改现金交易",
           "effects": [
-            { "type": "credits", "v": -2500 },
-            { "type": "techProgress", "v": 1 },
-            { "type": "log", "t": "对方耸肩：也可以。" }
+            {
+              "type": "credits",
+              "v": -2500
+            },
+            {
+              "type": "techProgress",
+              "v": 1
+            },
+            {
+              "type": "log",
+              "t": "对方耸肩：也可以。"
+            }
           ]
         }
       ]
@@ -418,18 +707,294 @@
           "id": "join",
           "text": "加入共有之夜",
           "effects": [
-            { "type": "intimacyChar", "char": "sarn", "v": 3 },
-            { "type": "manpower", "v": 6 },
-            { "type": "legitimacy", "v": -2 },
-            { "type": "log", "t": "沙尘与汗。你被当成受欢迎的变量。" }
+            {
+              "type": "intimacyChar",
+              "char": "sarn",
+              "v": 3
+            },
+            {
+              "type": "manpower",
+              "v": 6
+            },
+            {
+              "type": "legitimacy",
+              "v": -2
+            },
+            {
+              "type": "log",
+              "t": "沙尘与汗。你被当成受欢迎的变量。"
+            }
           ]
         },
         {
           "id": "watch",
           "text": "只旁观饮酒",
           "effects": [
-            { "type": "influence", "v": 5 },
-            { "type": "log", "t": "你保持边界，仍被敬了三杯。" }
+            {
+              "type": "influence",
+              "v": 5
+            },
+            {
+              "type": "log",
+              "t": "你保持边界，仍被敬了三杯。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r18_weekly_rival",
+      "title": "【成人】周常·争宠夜",
+      "weight": 11,
+      "cooldown": 3,
+      "rating": "r18",
+      "needIntimacy": 3,
+      "minMonth": 2,
+      "text": "后舱排班表被撕碎。两位亲密对象堵在门口：今晚二选一，或一起——否则明天全舰都知道细节。",
+      "choices": [
+        {
+          "id": "a",
+          "text": "只留收藏对象",
+          "effects": [
+            {
+              "type": "intimacy",
+              "v": 2
+            },
+            {
+              "type": "log",
+              "t": "争宠以一人的胜利告终。落败者摔门。"
+            }
+          ]
+        },
+        {
+          "id": "b",
+          "text": "一起（混乱↑）",
+          "effects": [
+            {
+              "type": "intimacy",
+              "v": 4
+            },
+            {
+              "type": "legitimacy",
+              "v": -3
+            },
+            {
+              "type": "unlockCg",
+              "slot": "harem_lounge"
+            },
+            {
+              "type": "log",
+              "t": "舱壁一整夜没安静。"
+            }
+          ]
+        },
+        {
+          "id": "c",
+          "text": "谁都不见",
+          "effects": [
+            {
+              "type": "legitimacy",
+              "v": 4
+            },
+            {
+              "type": "intimacy",
+              "v": -1
+            },
+            {
+              "type": "log",
+              "t": "你锁门执勤。欲望退潮。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r18_spouse_night",
+      "title": "【成人】联姻对象专属夜",
+      "weight": 12,
+      "cooldown": 4,
+      "rating": "r18",
+      "needSpouse": true,
+      "minMonth": 1,
+      "text": "联姻对象清场旗舰上层。制服只剩一半：「政治联署已经够了。今晚只要身体的联署。」",
+      "choices": [
+        {
+          "id": "a",
+          "text": "整夜专属",
+          "effects": [
+            {
+              "type": "intimacy",
+              "v": 3
+            },
+            {
+              "type": "relSpouse",
+              "v": 12
+            },
+            {
+              "type": "legitimacy",
+              "v": 2
+            },
+            {
+              "type": "log",
+              "t": "专属夜写进身体记忆。"
+            }
+          ]
+        },
+        {
+          "id": "b",
+          "text": "温柔后谈正统",
+          "effects": [
+            {
+              "type": "intimacy",
+              "v": 2
+            },
+            {
+              "type": "legitimacy",
+              "v": 5
+            },
+            {
+              "type": "log",
+              "t": "情欲与国策同一张床。"
+            }
+          ]
+        },
+        {
+          "id": "c",
+          "text": "冷处理",
+          "effects": [
+            {
+              "type": "relSpouse",
+              "v": -8
+            },
+            {
+              "type": "log",
+              "t": "对方独自回舱。关系结霜。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r18_be_jealousy",
+      "title": "【成人】BE·妒火",
+      "weight": 6,
+      "cooldown": 8,
+      "rating": "r18",
+      "needIntimacy": 5,
+      "minMonth": 4,
+      "text": "你忽略太久。最亲密的那位在公开频道留下诀别：要么现在只选我，要么永远失去我。",
+      "choices": [
+        {
+          "id": "a",
+          "text": "只选对方（拉回）",
+          "effects": [
+            {
+              "type": "intimacy",
+              "v": 2
+            },
+            {
+              "type": "legitimacy",
+              "v": -2
+            },
+            {
+              "type": "log",
+              "t": "你保住了人，失去了一些自由。"
+            }
+          ]
+        },
+        {
+          "id": "b",
+          "text": "拒绝独占（BE倾向）",
+          "effects": [
+            {
+              "type": "setFlag",
+              "flag": "be_jealousy",
+              "v": true
+            },
+            {
+              "type": "intimacy",
+              "v": -4
+            },
+            {
+              "type": "manpower",
+              "v": -5
+            },
+            {
+              "type": "log",
+              "t": "【BE倾向】对方离开航阀。名册空了一格。"
+            }
+          ]
+        },
+        {
+          "id": "c",
+          "text": "物质挽留",
+          "effects": [
+            {
+              "type": "credits",
+              "v": -2000
+            },
+            {
+              "type": "intimacy",
+              "v": 1
+            },
+            {
+              "type": "log",
+              "t": "礼物堵住了门，没堵住心。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r18_ne_cold",
+      "title": "【成人】NE·体面疏离",
+      "weight": 5,
+      "cooldown": 10,
+      "rating": "r18",
+      "needSpouse": true,
+      "needIntimacy": 2,
+      "minMonth": 5,
+      "text": "联姻对象提议分居不同旗舰：「保留条约，结束身体。这是最体面的中立结局。」",
+      "choices": [
+        {
+          "id": "a",
+          "text": "接受分居（NE）",
+          "effects": [
+            {
+              "type": "setFlag",
+              "flag": "ne_spouse",
+              "v": true
+            },
+            {
+              "type": "legitimacy",
+              "v": 6
+            },
+            {
+              "type": "intimacy",
+              "v": -3
+            },
+            {
+              "type": "log",
+              "t": "【NE】联姻仍在，枕边人不再。"
+            }
+          ]
+        },
+        {
+          "id": "b",
+          "text": "挽留重燃",
+          "effects": [
+            {
+              "type": "intimacy",
+              "v": 2
+            },
+            {
+              "type": "credits",
+              "v": -800
+            },
+            {
+              "type": "log",
+              "t": "你们试图用一夜重修条款。"
+            }
           ]
         }
       ]

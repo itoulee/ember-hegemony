@@ -8,7 +8,7 @@
   const SAVE_PREFIX = "ember_hegemony_slot_";
   const ACH_KEY = "ember_hegemony_achievements";
   const CODEX_KEY = "ember_hegemony_codex";
-  const VERSION = "2.3.0-arcs";
+  const VERSION = "2.4.0-ab";
   const MATURE_KEY = "ember_mature_enabled";
   const CG_URL_KEY = "ember_cg_urls";
 
@@ -24,12 +24,16 @@
     { id: "raider", name_zh: "剧本：黑旗十年", name_en: "Black Flag", mode: "raider", desc_zh: "掠航者占星建国。", desc_en: "Raider founding." },
     { id: "civilian", name_zh: "剧本：布衣卿相", name_en: "Commoner", mode: "civilian", desc_zh: "流民起步。", desc_en: "Civilian path." },
     { id: "hegemony", name_zh: "剧本：制霸主环", name_en: "Hegemony", mode: "magistrate", flags: { winHegemony: true }, desc_zh: "控制 80% 节点并维持 3 月。", desc_en: "Hold 80% nodes 3 months." },
+    { id: "keyvault", name_zh: "剧本：密钥库争夺", name_en: "Key Vault War", mode: "magistrate", flags: { winNode: "n12" }, desc_zh: "夺取并守住密钥库节点。", desc_en: "Seize and hold the Key Vault." },
+    { id: "pilgrim", name_zh: "剧本：教团巡礼", name_en: "Choir Pilgrimage", mode: "civilian", flags: { winFlag: "chain_void_done" }, desc_zh: "流民起步，完成虚空教团势力链。", desc_en: "Finish Void faction chain." },
+    { id: "hostile_takeover", name_zh: "剧本：公司敌对收购", name_en: "Hostile Takeover", mode: "magistrate", flags: { winFlag: "chain_corp_done", weakStart: true }, desc_zh: "弱开局完成公司国势力链。", desc_en: "Complete Helios corporate chain." },
   ];
   let SCENARIOS = BUILTIN_SCENARIOS.slice();
   let CHARACTERS = [];
   let ACH_DEFS = [];
   let STORY_ARCS = {};
   let CG_SLOTS = [];
+  let FACTION_CHAINS = {};
   let unlockedAch = {};
   let codex = { nodes: {}, factions: {}, chars: {}, techs: {} };
   let cgUrls = {};
@@ -103,6 +107,12 @@
     unlockedCgs: {},
     haremFav: "",
     haremSchedule: {},
+    /** chainId -> step index */
+    chainProgress: {},
+    /** { type:'nodes'|'hegemony'|'flag'|'node', value, hold } */
+    customWin: null,
+    hexEditor: false,
+    hexBrush: "nebula",
   };
 
   function bondOf(charId) {
@@ -460,8 +470,18 @@
     state.unlockedCgs = { generic_night: true };
     state.haremFav = "";
     state.haremSchedule = {};
+    state.chainProgress = {};
+    state.customWin = opts.customWin || null;
+    state.hexEditor = false;
     buildWorld(opts.mode || "magistrate");
     applyScenarioFlags(state.scenarioFlags);
+    // 剧本特殊旗
+    if (state.scenarioFlags.winNode) {
+      state.customWin = { type: "node", value: state.scenarioFlags.winNode, hold: 2, streak: 0 };
+    }
+    if (state.scenarioFlags.winFlag) {
+      state.customWin = { type: "flag", value: state.scenarioFlags.winFlag };
+    }
     if (opts.tutorial) {
       state.tutorial = { step: 0, done: {} };
       showTutorial();
@@ -753,25 +773,37 @@
       }
     }
     state.hex = {
-      nodeId: n.id, defOwner: n.owner, w: 7, h: 5, terrain,
+      nodeId: n.id, defOwner: n.owner, w: 8, h: 6, terrain,
       turnPlayer: true, selected: null, finished: false,
-      log: [`战棋：${n.name} · 紫=星云(移2) 红框=要塞(+防) · 火力舰射程2`],
+      log: [`战棋：${n.name} · 兵种:突击/火力(射2)/突击舰/盾卫 · 紫星云 红要塞 · 编辑模式可刷地形`],
       units: [
-        hu("a0", 0, "突击1", 1, 1, atkHp, atkD, 1),
-        hu("a1", 0, "突击2", 1, 3, atkHp, atkD, 1),
-        hu("a2", 0, "火力舰", 0, 2, atkHp * 0.95, atkD * 0.9, 2),
-        hu("d0", 1, "哨1", 5, 1, defHp, defD, 1),
-        hu("d1", 1, "哨2", 5, 3, defHp, defD, 1),
-        hu("d2", 1, "要塞炮", 6, 2, defHp * 1.15, defD * 1.05, 2),
+        hu("a0", 0, "突击1", 1, 1, atkHp, atkD, 1, "assault"),
+        hu("a1", 0, "突击2", 1, 3, atkHp, atkD, 1, "assault"),
+        hu("a2", 0, "火力", 0, 2, atkHp * 0.9, atkD * 0.95, 2, "artillery"),
+        hu("a3", 0, "盾卫", 0, 4, atkHp * 1.25, atkD * 0.7, 1, "guard"),
+        hu("a4", 0, "截击", 2, 2, atkHp * 0.75, atkD * 1.1, 1, "interceptor"),
+        hu("d0", 1, "哨1", 6, 1, defHp, defD, 1, "assault"),
+        hu("d1", 1, "哨2", 6, 3, defHp, defD, 1, "assault"),
+        hu("d2", 1, "要塞炮", 7, 2, defHp * 1.1, defD * 1.1, 2, "artillery"),
+        hu("d3", 1, "盾塔", 7, 4, defHp * 1.3, defD * 0.65, 1, "guard"),
       ],
     };
+    // expand terrain for 8x6
+    for (let r = 0; r < 6; r++) {
+      for (let c = 0; c < 8; c++) {
+        if (terrain[c + "," + r]) continue;
+        terrain[c + "," + r] = "normal";
+      }
+    }
     document.getElementById("hex-box").classList.remove("hidden");
-    document.getElementById("hex-hint").textContent = "点己方→邻移/射程内攻击";
+    document.getElementById("hex-hint").textContent = "点己方→移动/攻击 · 编辑:刷地形";
+    const he = document.getElementById("hex-editor-bar");
+    if (he) he.classList.toggle("hidden", !state.hexEditor && !(state.hex && state.hex.sandbox));
     drawHex();
     render();
   }
-  function hu(id, team, name, c, r, hp, atk, range) {
-    return { id, team, name, c, r, hp, max: hp, atk, range: range || 1, moved: false, attacked: false, moveLeft: 1 };
+  function hu(id, team, name, c, r, hp, atk, range, role) {
+    return { id, team, name, c, r, hp, max: hp, atk, range: range || 1, role: role || "assault", moved: false, attacked: false, moveLeft: 1 };
   }
   function hideHex() {
     document.getElementById("hex-box").classList.add("hidden");
@@ -838,7 +870,11 @@
         ctx.fillStyle = "rgba(255,255,255,0.2)"; ctx.fill();
       }
       ctx.beginPath(); ctx.arc(p.x, p.y, HEX_SIZE * 0.4, 0, Math.PI * 2);
-      ctx.fillStyle = un.team === 0 ? "#f08a30" : "#3d8bfd"; ctx.fill();
+      let col = un.team === 0 ? "#f08a30" : "#3d8bfd";
+      if (un.role === "guard") col = un.team === 0 ? "#c0a060" : "#6080c0";
+      if (un.role === "interceptor") col = un.team === 0 ? "#f06080" : "#60d0f0";
+      if (un.role === "artillery") col = un.team === 0 ? "#e0c040" : "#8060e0";
+      ctx.fillStyle = col; ctx.fill();
       if (un.range > 1) {
         ctx.strokeStyle = "#ffe066"; ctx.lineWidth = 2;
         ctx.stroke();
@@ -869,7 +905,7 @@
 
   function hexClick(mx, my) {
     const h = state.hex;
-    if (!h || h.finished || !h.turnPlayer) return;
+    if (!h || h.finished) return;
     let best = null, bestD = 1e9;
     for (let r = 0; r < h.h; r++) for (let c = 0; c < h.w; c++) {
       const p = hexPix(c, r);
@@ -877,6 +913,14 @@
       if (d < bestD) { bestD = d; best = { c, r }; }
     }
     if (!best || bestD > HEX_SIZE * HEX_SIZE) return;
+    // 地形笔刷（沙盘/编辑模式）
+    if (state.hexEditor || (h.sandbox && state.hexBrushPaint)) {
+      h.terrain[best.c + "," + best.r] = state.hexBrush || "nebula";
+      h.log.push(`地形刷 (${best.c},${best.r}) → ${state.hexBrush || "nebula"}`);
+      drawHex();
+      return;
+    }
+    if (!h.turnPlayer) return;
     const occ = unitAt(best.c, best.r);
     if (!h.selected) {
       if (occ && occ.team === 0) {
@@ -1249,8 +1293,9 @@
   function renderArcPanel() {
     const el = document.getElementById("arc-panel");
     if (!el) return;
-    el.innerHTML = "<p class='hint'>角色线：莉娅 / 米拉（亲密达标后可推进）</p>";
-    for (const arcId of ["lia", "mira"]) {
+    const keys = Object.keys(STORY_ARCS);
+    el.innerHTML = "<p class='hint'>角色线（亲密达标后推进）· " + keys.length + " 条</p>";
+    for (const arcId of keys) {
       const arc = STORY_ARCS[arcId];
       if (!arc) continue;
       const done = arcStep(arcId);
@@ -1925,6 +1970,10 @@
       case "arcProgress":
         bumpArc(eff.arc, eff.v || 1);
         break;
+      case "chainProgress":
+        bumpChain(eff.chain, eff.v || 1);
+        renderChainPanel();
+        break;
       case "setFlag":
         state.storyFlags[eff.flag] = eff.v;
         if (String(eff.flag).indexOf("he_") === 0) {
@@ -1982,14 +2031,209 @@
     tutAdvance("end");
     checkHegemonyWin();
     checkWeakMilestone();
+    checkCustomWin();
     checkGenericGoals();
+    maybeOfferFactionChain();
+    maybeAdultWeekly();
     rollEvent();
     sfx("turn");
     renderTech();
     renderMeta();
+    renderDipExtra();
     renderGoalCompass();
     renderIntimacyPanel();
+    renderChainPanel();
     render();
+  }
+
+  function chainStep(id) {
+    return state.chainProgress[id] || 0;
+  }
+  function bumpChain(id, v) {
+    state.chainProgress[id] = (state.chainProgress[id] || 0) + (v || 1);
+  }
+  function getChainEvent(chainId) {
+    const ch = FACTION_CHAINS[chainId];
+    if (!ch) return null;
+    const done = chainStep(chainId);
+    if (state.storyFlags["chain_" + chainId.replace("fac_", "") + "_done"]) return null;
+    const step = (ch.steps || []).find((s) => (s.need || 0) === done) || ch.steps[done];
+    if (!step) return null;
+    if ((step.need || 0) > done) return null;
+    return step;
+  }
+  function playChainStep(chainId) {
+    const ch = FACTION_CHAINS[chainId];
+    const step = getChainEvent(chainId);
+    if (!step || !ch) { log("该势力链暂无新节。"); return; }
+    if (state.pendingEvent) { log("先处理当前事件。"); return; }
+    state.pendingEvent = {
+      id: step.id,
+      title: "【势力链】" + ch.name_zh + " · " + step.title,
+      text: step.text,
+      choices: step.choices,
+      rating: "all",
+    };
+    showEvent(state.pendingEvent);
+    sfx("event");
+  }
+  function maybeOfferFactionChain() {
+    // 约 20% 自动弹出可推进链
+    if (state.pendingEvent || !chance(0.2)) return;
+    const ids = Object.keys(FACTION_CHAINS);
+    if (!ids.length) return;
+    const id = ids[randi(0, ids.length - 1)];
+    if (!getChainEvent(id)) return;
+    if (chance(0.5)) {
+      log("【提示】势力链可推进：" + (FACTION_CHAINS[id].name_zh || id) + "（身份页/外交区）");
+    }
+  }
+  function maybeAdultWeekly() {
+    if (!isMatureEnabled() || state.month % 3 !== 0) return;
+    if (maxBond() < 3) return;
+    if (state.pendingEvent) return;
+    // soft flag for rivalry - actual events come from pack weights
+  }
+  function checkCustomWin() {
+    const cw = state.customWin;
+    if (!cw || state.victoryClaimed) return;
+    if (cw.type === "nodes") {
+      const need = cw.value || 0.5;
+      if (nodeControlRatio() >= need) {
+        cw.streak = (cw.streak || 0) + 1;
+        if ((cw.hold || 1) <= cw.streak) {
+          tryVictory("default", "自定义胜利：控制节点达到 " + Math.round(need * 100) + "%");
+        }
+      } else cw.streak = 0;
+    } else if (cw.type === "node") {
+      const n = node(cw.value);
+      if (n && n.owner === state.player.factionId) {
+        cw.streak = (cw.streak || 0) + 1;
+        if ((cw.hold || 1) <= cw.streak) {
+          tryVictory("default", "夺取目标节点胜利：" + (n.display_name || n.name || cw.value));
+        }
+      } else cw.streak = 0;
+    } else if (cw.type === "flag") {
+      if (state.storyFlags[cw.value]) {
+        tryVictory("default", "完成剧情旗帜胜利：" + cw.value);
+      }
+    } else if (cw.type === "hegemony") {
+      // reuse hegemony logic with custom threshold
+      const need = cw.value || 0.8;
+      if (nodeControlRatio() >= need) {
+        state.hegemonyStreak = (state.hegemonyStreak || 0) + 1;
+        if (state.hegemonyStreak >= (cw.hold || 3)) {
+          tryVictory("hegemony", "自定义制霸胜利");
+        }
+      } else state.hegemonyStreak = 0;
+    }
+  }
+
+  function renderChainPanel() {
+    const el = document.getElementById("chain-panel");
+    if (!el) return;
+    const keys = Object.keys(FACTION_CHAINS);
+    if (!keys.length) {
+      el.innerHTML = "<p class='hint'>势力链数据未加载。</p>";
+      return;
+    }
+    el.innerHTML = "<p class='hint'>势力专属链（5 段）</p>";
+    for (const id of keys) {
+      const ch = FACTION_CHAINS[id];
+      const done = chainStep(id);
+      const total = (ch.steps || []).length;
+      const card = document.createElement("div");
+      card.className = "arc-card";
+      card.innerHTML = `<h4>${ch.name_zh} · ${done}/${total}</h4>`;
+      const btn = document.createElement("button");
+      btn.type = "button";
+      const next = getChainEvent(id);
+      btn.textContent = next ? "推进：" + next.title : (done >= total - 1 ? "已收束" : "暂不可推进");
+      btn.disabled = !next;
+      btn.onclick = () => playChainStep(id);
+      card.appendChild(btn);
+      el.appendChild(card);
+    }
+  }
+
+  function renderDipExtra() {
+    const box = document.getElementById("dip-extra");
+    if (!box || !state.player) return;
+    const pf = playerFac();
+    if (!pf) return;
+    let html = "<p class='hint'>外交态势</p><ul class='dip-list'>";
+    for (const f of Object.values(state.factions)) {
+      if (f.id === pf.id) continue;
+      const rel = pf.rel[f.id] || 0;
+      const ally = areAllied(pf.id, f.id) ? "盟" : "";
+      const vas = (pf.vassals || []).includes(f.id) ? "属" : (f.overlord === pf.id ? "属" : "");
+      const bar = Math.round((rel + 100) / 2);
+      html += `<li><span>${f.name}</span> <span class="muted">${rel} ${ally}${vas}</span>
+        <div class="mini-bar"><i style="width:${bar}%"></i></div></li>`;
+    }
+    html += "</ul>";
+    if (state.jointResearchWith && fac(state.jointResearchWith)) {
+      html += `<p class="hint">合研中：${fac(state.jointResearchWith).name}</p>`;
+    }
+    box.innerHTML = html;
+  }
+
+  function applyCustomWinFromUi() {
+    const type = (document.getElementById("win-type") || {}).value || "none";
+    const val = parseFloat((document.getElementById("win-value") || {}).value || "0.5");
+    const hold = parseInt((document.getElementById("win-hold") || {}).value || "1", 10);
+    if (type === "none") {
+      state.customWin = null;
+      log("已清除自定义胜利条件。");
+    } else if (type === "nodes") {
+      state.customWin = { type: "nodes", value: clamp(val, 0.1, 1), hold: hold || 1, streak: 0 };
+      log(`自定义胜利：控制 ${Math.round(state.customWin.value * 100)}% 节点并维持 ${hold} 月`);
+    } else if (type === "hegemony") {
+      state.customWin = { type: "hegemony", value: clamp(val, 0.5, 1), hold: hold || 3, streak: 0 };
+      log("自定义制霸条件已设置。");
+    } else if (type === "node") {
+      const nid = (document.getElementById("win-node") || {}).value || state.selected || "n12";
+      state.customWin = { type: "node", value: nid, hold: hold || 2, streak: 0 };
+      log("自定义胜利：占领 " + nid);
+    }
+    renderGoalCompass();
+  }
+
+  function openModWorkshop() {
+    const box = document.getElementById("mod-workshop");
+    if (!box) return;
+    box.classList.remove("hidden");
+    const ta = document.getElementById("mod-json");
+    if (ta && !ta.value) {
+      ta.value = JSON.stringify({
+        id: "my_mod",
+        name: "我的事件包",
+        events: [{
+          id: "my_evt_1",
+          title: "测试事件",
+          weight: 20,
+          cooldown: 2,
+          rating: "all",
+          text: "这是模组工作台生成的事件。",
+          choices: [
+            { id: "a", text: "+500 信用", effects: [{ type: "credits", v: 500 }] },
+            { id: "b", text: "忽略", effects: [{ type: "log", t: "无事发生" }] }
+          ]
+        }]
+      }, null, 2);
+    }
+  }
+  function applyModWorkshop() {
+    const ta = document.getElementById("mod-json");
+    if (!ta) return;
+    try {
+      const mod = JSON.parse(ta.value);
+      loadMod(mod, { skipAgeCheck: !(mod.requiresAge >= 18 || mod.rating === "r18") });
+      toast("模组已热加载");
+    } catch (e) {
+      log("模组 JSON 无效：" + e.message);
+      alert("JSON 解析失败：" + e.message);
+    }
   }
 
   function ownedNodeCount() {
@@ -2152,6 +2396,32 @@
       if (ratio >= 0.25 && !state.victoryClaimed) {
         // soft victory optional - only once when crossing
       }
+    } else if (state.customWin) {
+      const cw = state.customWin;
+      if (cw.type === "nodes" || cw.type === "hegemony") {
+        const need = cw.value || 0.5;
+        primary = en ? `Custom: hold ${Math.round(need * 100)}% nodes` : `自定义：控制 ${Math.round(need * 100)}% 节点`;
+        progress = Math.min(1, ratio / need);
+        progressLabel = `${(100 * ratio).toFixed(0)}% · streak ${cw.streak || state.hegemonyStreak || 0}/${cw.hold || 1}`;
+        steps.push(
+          { text: en ? "Reach threshold" : "达到阈值", done: ratio >= need, current: ratio < need },
+          { text: en ? "Hold months" : "维持月份", done: (cw.streak || state.hegemonyStreak || 0) >= (cw.hold || 1), current: ratio >= need },
+        );
+      } else if (cw.type === "node") {
+        const n = node(cw.value);
+        const ok = n && n.owner === state.player.factionId;
+        primary = en ? `Hold node ${cw.value}` : `守住节点 ${n ? n.name : cw.value}`;
+        progress = ok ? Math.min(1, ((cw.streak || 0) + 0.01) / (cw.hold || 1)) : 0.15;
+        progressLabel = ok ? `hold ${cw.streak || 0}/${cw.hold || 1}` : "未占领";
+        steps.push({ text: en ? "Occupy" : "占领", done: !!ok, current: !ok });
+      } else if (cw.type === "flag") {
+        const ok = !!state.storyFlags[cw.value];
+        primary = en ? `Complete flag ${cw.value}` : `完成旗帜 ${cw.value}`;
+        progress = ok ? 1 : 0.2;
+        progressLabel = ok ? "done" : "进行中";
+        steps.push({ text: cw.value, done: ok, current: !ok });
+      }
+      hint = en ? "Custom win set in System tab." : "系统页可改自定义胜利。";
     } else {
       // sandbox / default
       primary = en ? "Sandbox: set your own goal (suggested: 50% control)" : "沙盒：自定目标（建议控制 50% 节点）";
@@ -2161,7 +2431,7 @@
         { text: en ? "Explore & fight" : "探索与交战", done: owned >= 3, current: owned < 3 },
         { text: en ? "Suggested 50% control" : "建议控制 50%", done: ratio >= 0.5, current: owned >= 3 && ratio < 0.5 },
       );
-      hint = en ? "No forced win. Use scenarios for clear victories." : "无强制胜利；制霸/政变等剧本有明确胜负。";
+      hint = en ? "Set custom win in System, or pick a scenario." : "系统页可设自定义胜利，或选剧本。";
     }
 
     if (state.victoryClaimed) {
@@ -2241,6 +2511,8 @@
       haremFav: state.haremFav,
       haremSchedule: state.haremSchedule,
       harem: state.harem,
+      chainProgress: state.chainProgress,
+      customWin: state.customWin,
     };
   }
 
@@ -2278,6 +2550,8 @@
       haremFav: data.haremFav || "",
       haremSchedule: data.haremSchedule || {},
       harem: data.harem || [],
+      chainProgress: data.chainProgress || {},
+      customWin: data.customWin || null,
       pendingEvent: null,
       hex: null,
       pendingBattle: null,
@@ -2631,6 +2905,23 @@
         loadMatureSkeletonPack();
       }
     });
+    on("btn-win-apply", applyCustomWinFromUi);
+    on("btn-mod-workshop", openModWorkshop);
+    on("btn-mod-apply", applyModWorkshop);
+    on("btn-mod-close", () => {
+      const box = document.getElementById("mod-workshop");
+      if (box) box.classList.add("hidden");
+    });
+    on("btn-hex-brush", () => {
+      state.hexBrushPaint = !state.hexBrushPaint;
+      state.hexEditor = state.hexBrushPaint;
+      log(state.hexBrushPaint ? "地形笔刷：开（点击格子刷）" : "地形笔刷：关");
+      const b = document.getElementById("btn-hex-brush");
+      if (b) b.textContent = state.hexBrushPaint ? "笔刷:开" : "笔刷:关";
+    });
+    on("btn-brush-nebula", () => { state.hexBrush = "nebula"; log("笔刷=星云"); });
+    on("btn-brush-fort", () => { state.hexBrush = "fort"; log("笔刷=要塞"); });
+    on("btn-brush-normal", () => { state.hexBrush = "normal"; log("笔刷=平坦"); });
     for (let i = 1; i <= 3; i++) {
       on("btn-save" + i, () => saveSlot(i));
       on("btn-load" + i, () => loadSlot(i));
@@ -3052,8 +3343,11 @@
     startHex(fake, 100, 90);
     if (state.hex) {
       state.hex.sandbox = true;
-      state.hex.log.push("沙盘模式：胜负不写回星图。练地形与射程。");
-      document.getElementById("hex-hint").textContent = "沙盘 · 不改战略层";
+      state.hex.log.push("沙盘模式：胜负不写回星图。可开笔刷刷地形。兵种含突击/火力/盾卫/截击。");
+      document.getElementById("hex-hint").textContent = "沙盘 · 笔刷可编辑地形";
+      const he = document.getElementById("hex-editor-bar");
+      if (he) he.classList.remove("hidden");
+      state.hexBrushPaint = false;
     }
     showApp(true);
     sfx("click");
@@ -3115,6 +3409,10 @@
         desc_en: "Complete any character HE",
       });
     }
+    try {
+      const fch = await fetch("data/faction-chains.json");
+      FACTION_CHAINS = (await fch.json()).chains || {};
+    } catch { FACTION_CHAINS = {}; }
   }
 
   async function main() {

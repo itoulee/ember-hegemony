@@ -14,8 +14,40 @@
           "title": "加班灯",
           "text": "莉娅把审查表推到你面前，指尖却在桌沿摩挲：「长官，忠诚可以买——但我想先确认你的体温。」",
           "choices": [
-            { "id": "a", "text": "握住她的手", "effects": [{ "type": "arcProgress", "arc": "lia", "v": 1 }, { "type": "intimacyChar", "char": "lia", "v": 1 }, { "type": "log", "t": "她耳根发红，却没抽回手。" }] },
-            { "id": "b", "text": "只谈公务", "effects": [{ "type": "merit", "v": 2 }, { "type": "log", "t": "她收回手，职业面具重新戴上。" }] }
+            {
+              "id": "a",
+              "text": "握住她的手",
+              "effects": [
+                {
+                  "type": "arcProgress",
+                  "arc": "lia",
+                  "v": 1
+                },
+                {
+                  "type": "intimacyChar",
+                  "char": "lia",
+                  "v": 1
+                },
+                {
+                  "type": "log",
+                  "t": "她耳根发红，却没抽回手。"
+                }
+              ]
+            },
+            {
+              "id": "b",
+              "text": "只谈公务",
+              "effects": [
+                {
+                  "type": "merit",
+                  "v": 2
+                },
+                {
+                  "type": "log",
+                  "t": "她收回手，职业面具重新戴上。"
+                }
+              ]
+            }
           ]
         },
         {
@@ -25,8 +57,49 @@
           "title": "密钥室的雨",
           "text": "冷却管凝出水珠。莉娅反锁门，把你按在机柜上：「监控我关了。别用军衔叫我。」",
           "choices": [
-            { "id": "a", "text": "按她的规矩", "effects": [{ "type": "arcProgress", "arc": "lia", "v": 1 }, { "type": "intimacyChar", "char": "lia", "v": 2 }, { "type": "unlockCg", "slot": "lia_rain" }, { "type": "log", "t": "机柜嗡鸣盖过喘息。事后她把一枚私用密钥塞进你掌心。" }] },
-            { "id": "b", "text": "提醒风险", "effects": [{ "type": "intel", "v": 4 }, { "type": "intimacyChar", "char": "lia", "v": 1 }, { "type": "log", "t": "她咬唇点头，仍把额头抵在你肩上。" }] }
+            {
+              "id": "a",
+              "text": "按她的规矩",
+              "effects": [
+                {
+                  "type": "arcProgress",
+                  "arc": "lia",
+                  "v": 1
+                },
+                {
+                  "type": "intimacyChar",
+                  "char": "lia",
+                  "v": 2
+                },
+                {
+                  "type": "unlockCg",
+                  "slot": "lia_rain"
+                },
+                {
+                  "type": "log",
+                  "t": "机柜嗡鸣盖过喘息。事后她把一枚私用密钥塞进你掌心。"
+                }
+              ]
+            },
+            {
+              "id": "b",
+              "text": "提醒风险",
+              "effects": [
+                {
+                  "type": "intel",
+                  "v": 4
+                },
+                {
+                  "type": "intimacyChar",
+                  "char": "lia",
+                  "v": 1
+                },
+                {
+                  "type": "log",
+                  "t": "她咬唇点头，仍把额头抵在你肩上。"
+                }
+              ]
+            }
           ]
         },
         {
@@ -36,8 +109,53 @@
           "title": "人事档案外的名字",
           "text": "她把你的档案投在全息屏上，却在备注栏手写：可托付。『如果你登基，我不要职位——要舱门钥匙。』",
           "choices": [
-            { "id": "a", "text": "给她钥匙与名分", "effects": [{ "type": "arcProgress", "arc": "lia", "v": 1 }, { "type": "intimacyChar", "char": "lia", "v": 2 }, { "type": "legitimacy", "v": 3 }, { "type": "unlockCg", "slot": "lia_key" }, { "type": "log", "t": "她把钥匙吊在锁骨间，像一枚私印。" }] },
-            { "id": "b", "text": "只给权限不加名分", "effects": [{ "type": "arcProgress", "arc": "lia", "v": 1 }, { "type": "factionPower", "v": 5 }, { "type": "log", "t": "她苦笑：权谋者的温柔总缺一口。" }] }
+            {
+              "id": "a",
+              "text": "给她钥匙与名分",
+              "effects": [
+                {
+                  "type": "arcProgress",
+                  "arc": "lia",
+                  "v": 1
+                },
+                {
+                  "type": "intimacyChar",
+                  "char": "lia",
+                  "v": 2
+                },
+                {
+                  "type": "legitimacy",
+                  "v": 3
+                },
+                {
+                  "type": "unlockCg",
+                  "slot": "lia_key"
+                },
+                {
+                  "type": "log",
+                  "t": "她把钥匙吊在锁骨间，像一枚私印。"
+                }
+              ]
+            },
+            {
+              "id": "b",
+              "text": "只给权限不加名分",
+              "effects": [
+                {
+                  "type": "arcProgress",
+                  "arc": "lia",
+                  "v": 1
+                },
+                {
+                  "type": "factionPower",
+                  "v": 5
+                },
+                {
+                  "type": "log",
+                  "t": "她苦笑：权谋者的温柔总缺一口。"
+                }
+              ]
+            }
           ]
         },
         {
@@ -47,8 +165,54 @@
           "title": "HE·人事官的终约",
           "text": "战事间歇。莉娅穿着便服（你几乎认不出），在观测窗前等你：『别再把我写进可替换栏。把我写进你的结局。』",
           "choices": [
-            { "id": "he", "text": "承诺终约（HE）", "effects": [{ "type": "arcProgress", "arc": "lia", "v": 1 }, { "type": "setFlag", "flag": "he_lia", "v": true }, { "type": "intimacyChar", "char": "lia", "v": 3 }, { "type": "unlockCg", "slot": "lia_he" }, { "type": "legitimacy", "v": 5 }, { "type": "log", "t": "【HE】莉娅的线完结。她成为你不可替换的锚点。" }] },
-            { "id": "delay", "text": "还不是时候", "effects": [{ "type": "intimacyChar", "char": "lia", "v": 1 }, { "type": "log", "t": "她点头，眼底却有雨。线未断，只是停在门槛。" }] }
+            {
+              "id": "he",
+              "text": "承诺终约（HE）",
+              "effects": [
+                {
+                  "type": "arcProgress",
+                  "arc": "lia",
+                  "v": 1
+                },
+                {
+                  "type": "setFlag",
+                  "flag": "he_lia",
+                  "v": true
+                },
+                {
+                  "type": "intimacyChar",
+                  "char": "lia",
+                  "v": 3
+                },
+                {
+                  "type": "unlockCg",
+                  "slot": "lia_he"
+                },
+                {
+                  "type": "legitimacy",
+                  "v": 5
+                },
+                {
+                  "type": "log",
+                  "t": "【HE】莉娅的线完结。她成为你不可替换的锚点。"
+                }
+              ]
+            },
+            {
+              "id": "delay",
+              "text": "还不是时候",
+              "effects": [
+                {
+                  "type": "intimacyChar",
+                  "char": "lia",
+                  "v": 1
+                },
+                {
+                  "type": "log",
+                  "t": "她点头，眼底却有雨。线未断，只是停在门槛。"
+                }
+              ]
+            }
           ]
         }
       ]
@@ -67,8 +231,40 @@
           "title": "关税以外的账",
           "text": "米拉把账单推过来，指尖却在你腕侧画圈：『港口抽成可以谈。你的视线——现在已经超支了。』",
           "choices": [
-            { "id": "a", "text": "承认在看她", "effects": [{ "type": "arcProgress", "arc": "mira", "v": 1 }, { "type": "intimacyChar", "char": "mira", "v": 1 }, { "type": "log", "t": "她笑出声：诚实的客人有折扣。" }] },
-            { "id": "b", "text": "把话题拉回关税", "effects": [{ "type": "credits", "v": 300 }, { "type": "log", "t": "她立刻切换港主模式，锋利而专业。" }] }
+            {
+              "id": "a",
+              "text": "承认在看她",
+              "effects": [
+                {
+                  "type": "arcProgress",
+                  "arc": "mira",
+                  "v": 1
+                },
+                {
+                  "type": "intimacyChar",
+                  "char": "mira",
+                  "v": 1
+                },
+                {
+                  "type": "log",
+                  "t": "她笑出声：诚实的客人有折扣。"
+                }
+              ]
+            },
+            {
+              "id": "b",
+              "text": "把话题拉回关税",
+              "effects": [
+                {
+                  "type": "credits",
+                  "v": 300
+                },
+                {
+                  "type": "log",
+                  "t": "她立刻切换港主模式，锋利而专业。"
+                }
+              ]
+            }
           ]
         },
         {
@@ -78,8 +274,54 @@
           "title": "私汤密谈",
           "text": "蒸汽里她只围浴巾：『密钥联署要诚意。身体也算诚意的一种——你选。』",
           "choices": [
-            { "id": "a", "text": "留下过夜", "effects": [{ "type": "arcProgress", "arc": "mira", "v": 1 }, { "type": "intimacyChar", "char": "mira", "v": 2 }, { "type": "unlockCg", "slot": "mira_steam" }, { "type": "rel", "f": "fac_free", "v": 8 }, { "type": "log", "t": "水声与喘息。次日关税表上多了一行手写优惠。" }] },
-            { "id": "b", "text": "只签商业条款", "effects": [{ "type": "credits", "v": 600 }, { "type": "intimacyChar", "char": "mira", "v": 1 }, { "type": "log", "t": "她披衣：也可以。但别装没动心。" }] }
+            {
+              "id": "a",
+              "text": "留下过夜",
+              "effects": [
+                {
+                  "type": "arcProgress",
+                  "arc": "mira",
+                  "v": 1
+                },
+                {
+                  "type": "intimacyChar",
+                  "char": "mira",
+                  "v": 2
+                },
+                {
+                  "type": "unlockCg",
+                  "slot": "mira_steam"
+                },
+                {
+                  "type": "rel",
+                  "f": "fac_free",
+                  "v": 8
+                },
+                {
+                  "type": "log",
+                  "t": "水声与喘息。次日关税表上多了一行手写优惠。"
+                }
+              ]
+            },
+            {
+              "id": "b",
+              "text": "只签商业条款",
+              "effects": [
+                {
+                  "type": "credits",
+                  "v": 600
+                },
+                {
+                  "type": "intimacyChar",
+                  "char": "mira",
+                  "v": 1
+                },
+                {
+                  "type": "log",
+                  "t": "她披衣：也可以。但别装没动心。"
+                }
+              ]
+            }
           ]
         },
         {
@@ -89,8 +331,53 @@
           "title": "风暴航道",
           "text": "海盗袭港夜。米拉把指挥权分你一半，枪声里她抓住你的领口：『活着回来。我还有没说完的价码。』",
           "choices": [
-            { "id": "a", "text": "护她突围", "effects": [{ "type": "arcProgress", "arc": "mira", "v": 1 }, { "type": "manpower", "v": -6 }, { "type": "intimacyChar", "char": "mira", "v": 2 }, { "type": "unlockCg", "slot": "mira_storm" }, { "type": "log", "t": "她在弹痕旁吻你：这价码作废——改成免费。" }] },
-            { "id": "b", "text": "优先保货仓", "effects": [{ "type": "credits", "v": 1500 }, { "type": "rel", "f": "fac_free", "v": -5 }, { "type": "log", "t": "港保住了，她看你的眼神却结了冰。" }] }
+            {
+              "id": "a",
+              "text": "护她突围",
+              "effects": [
+                {
+                  "type": "arcProgress",
+                  "arc": "mira",
+                  "v": 1
+                },
+                {
+                  "type": "manpower",
+                  "v": -6
+                },
+                {
+                  "type": "intimacyChar",
+                  "char": "mira",
+                  "v": 2
+                },
+                {
+                  "type": "unlockCg",
+                  "slot": "mira_storm"
+                },
+                {
+                  "type": "log",
+                  "t": "她在弹痕旁吻你：这价码作废——改成免费。"
+                }
+              ]
+            },
+            {
+              "id": "b",
+              "text": "优先保货仓",
+              "effects": [
+                {
+                  "type": "credits",
+                  "v": 1500
+                },
+                {
+                  "type": "rel",
+                  "f": "fac_free",
+                  "v": -5
+                },
+                {
+                  "type": "log",
+                  "t": "港保住了，她看你的眼神却结了冰。"
+                }
+              ]
+            }
           ]
         },
         {
@@ -100,8 +387,842 @@
           "title": "HE·自由港的潮汐誓",
           "text": "重建后的码头灯火通明。米拉递来一枚港口私印：『联姻可以是政治。也可以是——我只想停靠你。』",
           "choices": [
-            { "id": "he", "text": "潮汐誓（HE）", "effects": [{ "type": "arcProgress", "arc": "mira", "v": 1 }, { "type": "setFlag", "flag": "he_mira", "v": true }, { "type": "intimacyChar", "char": "mira", "v": 3 }, { "type": "unlockCg", "slot": "mira_he" }, { "type": "credits", "v": 2000 }, { "type": "log", "t": "【HE】米拉线完结。自由港成为你的永久泊位。" }] },
-            { "id": "delay", "text": "再等等风平浪静", "effects": [{ "type": "intimacyChar", "char": "mira", "v": 1 }, { "type": "log", "t": "她把私印收回袖中：潮汐会再来。" }] }
+            {
+              "id": "he",
+              "text": "潮汐誓（HE）",
+              "effects": [
+                {
+                  "type": "arcProgress",
+                  "arc": "mira",
+                  "v": 1
+                },
+                {
+                  "type": "setFlag",
+                  "flag": "he_mira",
+                  "v": true
+                },
+                {
+                  "type": "intimacyChar",
+                  "char": "mira",
+                  "v": 3
+                },
+                {
+                  "type": "unlockCg",
+                  "slot": "mira_he"
+                },
+                {
+                  "type": "credits",
+                  "v": 2000
+                },
+                {
+                  "type": "log",
+                  "t": "【HE】米拉线完结。自由港成为你的永久泊位。"
+                }
+              ]
+            },
+            {
+              "id": "delay",
+              "text": "再等等风平浪静",
+              "effects": [
+                {
+                  "type": "intimacyChar",
+                  "char": "mira",
+                  "v": 1
+                },
+                {
+                  "type": "log",
+                  "t": "她把私印收回袖中：潮汐会再来。"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "lira": {
+      "id": "lira",
+      "name_zh": "莉菈虚声",
+      "name_en": "Lira",
+      "charId": "lira",
+      "he_title_zh": "虚空之外的体温",
+      "he_title_en": "虚空之外的体温",
+      "steps": [
+        {
+          "id": "lira_1",
+          "needBond": 0,
+          "title": "失效祷文",
+          "text": "莉菈把你引入无重力礼拜堂，法衣下摆漂浮：「先听完这段 AI 遗嘱，再决定要不要吻我。」",
+          "choices": [
+            {
+              "id": "a",
+              "text": "听完并靠近",
+              "effects": [
+                {
+                  "type": "arcProgress",
+                  "arc": "lira",
+                  "v": 1
+                },
+                {
+                  "type": "intimacyChar",
+                  "char": "lira",
+                  "v": 1
+                },
+                {
+                  "type": "log",
+                  "t": "她把额抵着你的：协议栈之外还有体温。"
+                }
+              ]
+            },
+            {
+              "id": "b",
+              "text": "只听祷文",
+              "effects": [
+                {
+                  "type": "log",
+                  "t": "她掩面：你很克制。"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "lira_2",
+          "needBond": 2,
+          "needArc": 1,
+          "title": "失重交叠",
+          "text": "灯灭。她在失重中环住你：「虚空教团禁止私欲——所以我们要更用力。」",
+          "choices": [
+            {
+              "id": "a",
+              "text": "回应",
+              "effects": [
+                {
+                  "type": "arcProgress",
+                  "arc": "lira",
+                  "v": 1
+                },
+                {
+                  "type": "intimacyChar",
+                  "char": "lira",
+                  "v": 2
+                },
+                {
+                  "type": "unlockCg",
+                  "slot": "lira_2"
+                },
+                {
+                  "type": "log",
+                  "t": "失重中的缠绵像坠落。"
+                }
+              ]
+            },
+            {
+              "id": "b",
+              "text": "保持距离",
+              "effects": [
+                {
+                  "type": "intimacyChar",
+                  "char": "lira",
+                  "v": 1
+                },
+                {
+                  "type": "log",
+                  "t": "她苦笑：禁忌还在。"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "lira_3",
+          "needBond": 4,
+          "needArc": 2,
+          "title": "教团裂隙",
+          "text": "教团要审判她。她把钥匙交给你：「带我走，或看着我被格式化。」",
+          "choices": [
+            {
+              "id": "a",
+              "text": "带走她",
+              "effects": [
+                {
+                  "type": "arcProgress",
+                  "arc": "lira",
+                  "v": 1
+                },
+                {
+                  "type": "intimacyChar",
+                  "char": "lira",
+                  "v": 2
+                },
+                {
+                  "type": "unlockCg",
+                  "slot": "lira_3"
+                },
+                {
+                  "type": "log",
+                  "t": "你们逃出尖塔。她说这比圣歌真实。"
+                }
+              ]
+            },
+            {
+              "id": "b",
+              "text": "谈判保她",
+              "effects": [
+                {
+                  "type": "arcProgress",
+                  "arc": "lira",
+                  "v": 1
+                },
+                {
+                  "type": "log",
+                  "t": "她获赦，眼神却空了一寸。"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "lira_he",
+          "needBond": 6,
+          "needArc": 3,
+          "title": "HE·虚空之外的体温",
+          "text": "尖塔之外。莉菈脱掉法冠：「别再叫我司仪。叫我的名字，直到星域结束。」",
+          "choices": [
+            {
+              "id": "he",
+              "text": "达成 HE",
+              "effects": [
+                {
+                  "type": "arcProgress",
+                  "arc": "lira",
+                  "v": 1
+                },
+                {
+                  "type": "setFlag",
+                  "flag": "he_lira",
+                  "v": true
+                },
+                {
+                  "type": "intimacyChar",
+                  "char": "lira",
+                  "v": 3
+                },
+                {
+                  "type": "unlockCg",
+                  "slot": "lira_he"
+                },
+                {
+                  "type": "log",
+                  "t": "【HE】莉菈虚声 线完结。"
+                }
+              ]
+            },
+            {
+              "id": "delay",
+              "text": "再等等",
+              "effects": [
+                {
+                  "type": "intimacyChar",
+                  "char": "lira",
+                  "v": 1
+                },
+                {
+                  "type": "log",
+                  "t": "莉菈虚声 的结局暂缓。"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "sarn": {
+      "id": "sarn",
+      "name_zh": "萨恩尘母",
+      "name_en": "Sarn",
+      "charId": "sarn",
+      "he_title_zh": "沙与火的共有",
+      "he_title_en": "沙与火的共有",
+      "steps": [
+        {
+          "id": "sarn_1",
+          "needBond": 0,
+          "title": "共有篝火",
+          "text": "尘带夜宴。萨恩递来烈酒：「外人也可以共享——火、粮，还有目光。」",
+          "choices": [
+            {
+              "id": "a",
+              "text": "坐到她身边",
+              "effects": [
+                {
+                  "type": "arcProgress",
+                  "arc": "sarn",
+                  "v": 1
+                },
+                {
+                  "type": "intimacyChar",
+                  "char": "sarn",
+                  "v": 1
+                },
+                {
+                  "type": "log",
+                  "t": "火光里她握住你的手不放。"
+                }
+              ]
+            },
+            {
+              "id": "b",
+              "text": "只敬酒",
+              "effects": [
+                {
+                  "type": "log",
+                  "t": "她点头：礼貌的外人。"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "sarn_2",
+          "needBond": 2,
+          "needArc": 1,
+          "title": "沙尘帐幕",
+          "text": "帐内只剩你们。她解开头巾：「公社的规矩是共享。我想先独占一晚。」",
+          "choices": [
+            {
+              "id": "a",
+              "text": "留下",
+              "effects": [
+                {
+                  "type": "arcProgress",
+                  "arc": "sarn",
+                  "v": 1
+                },
+                {
+                  "type": "intimacyChar",
+                  "char": "sarn",
+                  "v": 2
+                },
+                {
+                  "type": "unlockCg",
+                  "slot": "sarn_2"
+                },
+                {
+                  "type": "log",
+                  "t": "沙尘与汗。她在你肩上睡着。"
+                }
+              ]
+            },
+            {
+              "id": "b",
+              "text": "婉拒",
+              "effects": [
+                {
+                  "type": "intimacyChar",
+                  "char": "sarn",
+                  "v": 1
+                },
+                {
+                  "type": "log",
+                  "t": "她重新缠上头巾：潮汐还会来。"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "sarn_3",
+          "needBond": 4,
+          "needArc": 2,
+          "title": "公社表决",
+          "text": "长老会质疑她私心。她当众拉你上台：「他若是变量，我投票让变量留下。」",
+          "choices": [
+            {
+              "id": "a",
+              "text": "接受绑定",
+              "effects": [
+                {
+                  "type": "arcProgress",
+                  "arc": "sarn",
+                  "v": 1
+                },
+                {
+                  "type": "intimacyChar",
+                  "char": "sarn",
+                  "v": 2
+                },
+                {
+                  "type": "unlockCg",
+                  "slot": "sarn_3"
+                },
+                {
+                  "type": "log",
+                  "t": "表决通过。她把臂环戴到你腕上。"
+                }
+              ]
+            },
+            {
+              "id": "b",
+              "text": "保持外人身份",
+              "effects": [
+                {
+                  "type": "arcProgress",
+                  "arc": "sarn",
+                  "v": 1
+                },
+                {
+                  "type": "log",
+                  "t": "你保住灵活，她眼底有沙。"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "sarn_he",
+          "needBond": 6,
+          "needArc": 3,
+          "title": "HE·沙与火的共有",
+          "text": "丰收后的黎明。萨恩把公社私印按在你掌心：「不是抽成。是家。」",
+          "choices": [
+            {
+              "id": "he",
+              "text": "达成 HE",
+              "effects": [
+                {
+                  "type": "arcProgress",
+                  "arc": "sarn",
+                  "v": 1
+                },
+                {
+                  "type": "setFlag",
+                  "flag": "he_sarn",
+                  "v": true
+                },
+                {
+                  "type": "intimacyChar",
+                  "char": "sarn",
+                  "v": 3
+                },
+                {
+                  "type": "unlockCg",
+                  "slot": "sarn_he"
+                },
+                {
+                  "type": "log",
+                  "t": "【HE】萨恩尘母 线完结。"
+                }
+              ]
+            },
+            {
+              "id": "delay",
+              "text": "再等等",
+              "effects": [
+                {
+                  "type": "intimacyChar",
+                  "char": "sarn",
+                  "v": 1
+                },
+                {
+                  "type": "log",
+                  "t": "萨恩尘母 的结局暂缓。"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "kess": {
+      "id": "kess",
+      "name_zh": "凯斯铁幕",
+      "name_en": "Kess",
+      "charId": "kess",
+      "he_title_zh": "铁也有熔点",
+      "he_title_en": "铁也有熔点",
+      "steps": [
+        {
+          "id": "kess_1",
+          "needBond": 0,
+          "title": "舰桥纪律",
+          "text": "凯斯把你堵在舰桥出口：「海盗与调情一样可耻。但你刚才的指挥……可嘉。」",
+          "choices": [
+            {
+              "id": "a",
+              "text": "回敬一句",
+              "effects": [
+                {
+                  "type": "arcProgress",
+                  "arc": "kess",
+                  "v": 1
+                },
+                {
+                  "type": "intimacyChar",
+                  "char": "kess",
+                  "v": 1
+                },
+                {
+                  "type": "log",
+                  "t": "她嘴角极短地扬起。"
+                }
+              ]
+            },
+            {
+              "id": "b",
+              "text": "立正受训",
+              "effects": [
+                {
+                  "type": "log",
+                  "t": "她转身：下次别浪费我的时间。"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "kess_2",
+          "needBond": 2,
+          "needArc": 1,
+          "title": "维修坞密谈",
+          "text": "引擎轰鸣。她解下手套：「舰队即法律。今晚法律休假。」",
+          "choices": [
+            {
+              "id": "a",
+              "text": "接受休假",
+              "effects": [
+                {
+                  "type": "arcProgress",
+                  "arc": "kess",
+                  "v": 1
+                },
+                {
+                  "type": "intimacyChar",
+                  "char": "kess",
+                  "v": 2
+                },
+                {
+                  "type": "unlockCg",
+                  "slot": "kess_2"
+                },
+                {
+                  "type": "log",
+                  "t": "铁与热。她不允许你叫停。"
+                }
+              ]
+            },
+            {
+              "id": "b",
+              "text": "提醒条例",
+              "effects": [
+                {
+                  "type": "intimacyChar",
+                  "char": "kess",
+                  "v": 1
+                },
+                {
+                  "type": "log",
+                  "t": "她戴回手套：你赢了条例，输了夜。"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "kess_3",
+          "needBond": 4,
+          "needArc": 2,
+          "title": "铁幕抉择",
+          "text": "船团要清剿你的盟友。凯斯单独见你：「叛一次船团，或杀一次你在乎的人。」",
+          "choices": [
+            {
+              "id": "a",
+              "text": "拉她站你这边",
+              "effects": [
+                {
+                  "type": "arcProgress",
+                  "arc": "kess",
+                  "v": 1
+                },
+                {
+                  "type": "intimacyChar",
+                  "char": "kess",
+                  "v": 2
+                },
+                {
+                  "type": "unlockCg",
+                  "slot": "kess_3"
+                },
+                {
+                  "type": "log",
+                  "t": "她拔枪对天：铁幕今晚换旗。"
+                }
+              ]
+            },
+            {
+              "id": "b",
+              "text": "拒绝分裂",
+              "effects": [
+                {
+                  "type": "arcProgress",
+                  "arc": "kess",
+                  "v": 1
+                },
+                {
+                  "type": "log",
+                  "t": "她执行命令，事后把空弹壳扔给你。"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "kess_he",
+          "needBond": 6,
+          "needArc": 3,
+          "title": "HE·铁也有熔点",
+          "text": "战后甲板。凯斯的军装第一次扣错扣：「别告诉任何人我笑过。」",
+          "choices": [
+            {
+              "id": "he",
+              "text": "达成 HE",
+              "effects": [
+                {
+                  "type": "arcProgress",
+                  "arc": "kess",
+                  "v": 1
+                },
+                {
+                  "type": "setFlag",
+                  "flag": "he_kess",
+                  "v": true
+                },
+                {
+                  "type": "intimacyChar",
+                  "char": "kess",
+                  "v": 3
+                },
+                {
+                  "type": "unlockCg",
+                  "slot": "kess_he"
+                },
+                {
+                  "type": "log",
+                  "t": "【HE】凯斯铁幕 线完结。"
+                }
+              ]
+            },
+            {
+              "id": "delay",
+              "text": "再等等",
+              "effects": [
+                {
+                  "type": "intimacyChar",
+                  "char": "kess",
+                  "v": 1
+                },
+                {
+                  "type": "log",
+                  "t": "凯斯铁幕 的结局暂缓。"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "vorn": {
+      "id": "vorn",
+      "name_zh": "沃恩执政",
+      "name_en": "Vorn",
+      "charId": "vorn",
+      "he_title_zh": "秩序的例外条款",
+      "he_title_en": "秩序的例外条款",
+      "steps": [
+        {
+          "id": "vorn_1",
+          "needBond": 0,
+          "title": "冷环听证",
+          "text": "沃恩在听证席上俯视你：「余烬是热源。热源可以融化秩序——也可以被秩序框住。」",
+          "choices": [
+            {
+              "id": "a",
+              "text": "反驳并靠近",
+              "effects": [
+                {
+                  "type": "arcProgress",
+                  "arc": "vorn",
+                  "v": 1
+                },
+                {
+                  "type": "intimacyChar",
+                  "char": "vorn",
+                  "v": 1
+                },
+                {
+                  "type": "log",
+                  "t": "他第一次允许你走到席前三步。"
+                }
+              ]
+            },
+            {
+              "id": "b",
+              "text": "服从听证",
+              "effects": [
+                {
+                  "type": "log",
+                  "t": "他盖章：合格的不稳定因素。"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "vorn_2",
+          "needBond": 2,
+          "needArc": 1,
+          "title": "带宽密约",
+          "text": "深夜办公室。他把密钥手套摘下：「配额可以谈。你的野心……也可以。」",
+          "choices": [
+            {
+              "id": "a",
+              "text": "谈私下同盟",
+              "effects": [
+                {
+                  "type": "arcProgress",
+                  "arc": "vorn",
+                  "v": 1
+                },
+                {
+                  "type": "intimacyChar",
+                  "char": "vorn",
+                  "v": 2
+                },
+                {
+                  "type": "unlockCg",
+                  "slot": "vorn_2"
+                },
+                {
+                  "type": "log",
+                  "t": "握手过久。他没有先松。"
+                }
+              ]
+            },
+            {
+              "id": "b",
+              "text": "只谈公开条约",
+              "effects": [
+                {
+                  "type": "intimacyChar",
+                  "char": "vorn",
+                  "v": 1
+                },
+                {
+                  "type": "log",
+                  "t": "他戴回手套：公事公办。"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "vorn_3",
+          "needBond": 4,
+          "needArc": 2,
+          "title": "秩序裂痕",
+          "text": "冷环政变夜。沃恩把你拉进保险箱后：「保我，我把主环带宽给你。」",
+          "choices": [
+            {
+              "id": "a",
+              "text": "保他",
+              "effects": [
+                {
+                  "type": "arcProgress",
+                  "arc": "vorn",
+                  "v": 1
+                },
+                {
+                  "type": "intimacyChar",
+                  "char": "vorn",
+                  "v": 2
+                },
+                {
+                  "type": "unlockCg",
+                  "slot": "vorn_3"
+                },
+                {
+                  "type": "log",
+                  "t": "枪火外响。他靠着你低声：热源有时也是锚。"
+                }
+              ]
+            },
+            {
+              "id": "b",
+              "text": "趁乱夺权",
+              "effects": [
+                {
+                  "type": "arcProgress",
+                  "arc": "vorn",
+                  "v": 1
+                },
+                {
+                  "type": "log",
+                  "t": "他冷笑着被押走：你学得很快。"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "vorn_he",
+          "needBond": 6,
+          "needArc": 3,
+          "title": "HE·秩序的例外条款",
+          "text": "重建后的议事厅。沃恩罕见地松开领扣：「例外条款写你的名字。」",
+          "choices": [
+            {
+              "id": "he",
+              "text": "达成 HE",
+              "effects": [
+                {
+                  "type": "arcProgress",
+                  "arc": "vorn",
+                  "v": 1
+                },
+                {
+                  "type": "setFlag",
+                  "flag": "he_vorn",
+                  "v": true
+                },
+                {
+                  "type": "intimacyChar",
+                  "char": "vorn",
+                  "v": 3
+                },
+                {
+                  "type": "unlockCg",
+                  "slot": "vorn_he"
+                },
+                {
+                  "type": "log",
+                  "t": "【HE】沃恩执政 线完结。"
+                }
+              ]
+            },
+            {
+              "id": "delay",
+              "text": "再等等",
+              "effects": [
+                {
+                  "type": "intimacyChar",
+                  "char": "vorn",
+                  "v": 1
+                },
+                {
+                  "type": "log",
+                  "t": "沃恩执政 的结局暂缓。"
+                }
+              ]
+            }
           ]
         }
       ]

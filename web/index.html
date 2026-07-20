@@ -31,35 +31,16 @@
       <p id="boot-sub" class="muted">选择剧本开始 · 若列表为空请刷新或点下方备用入口</p>
       <div id="boot-error" class="boot-error hidden"></div>
       <div id="scenario-list" class="scenario-list">
-        <!-- 无 JS / 加载失败时的静态备用（会被 renderScenarioList 替换） -->
-        <button type="button" class="scenario-card" data-static-sc="tutorial">
-          <h3>教程：余烬港一百天</h3>
-          <p>引导：航行、占星、回合、交战、事件。</p>
-        </button>
-        <button type="button" class="scenario-card" data-static-sc="sandbox">
-          <h3>沙盒：无主星域</h3>
-          <p>标准开局，自由游玩。</p>
-        </button>
-        <button type="button" class="scenario-card" data-static-sc="weak">
-          <h3>剧本：小国中兴</h3>
-          <p>国力薄弱，合纵连横。</p>
-        </button>
-        <button type="button" class="scenario-card" data-static-sc="coup">
-          <h3>剧本：北阙夜（政变）</h3>
-          <p>航官开局，黄袍加身。</p>
-        </button>
-        <button type="button" class="scenario-card" data-static-sc="raider">
-          <h3>剧本：黑旗十年</h3>
-          <p>掠航者占星建国。</p>
-        </button>
-        <button type="button" class="scenario-card" data-static-sc="civilian">
-          <h3>剧本：布衣卿相</h3>
-          <p>流民起步。</p>
-        </button>
-        <button type="button" class="scenario-card" data-static-sc="hegemony">
-          <h3>剧本：制霸主环</h3>
-          <p>控制 80% 节点并维持 3 月。</p>
-        </button>
+        <button type="button" class="scenario-card" data-static-sc="tutorial"><h3>教程</h3><p>引导上手。</p></button>
+        <button type="button" class="scenario-card" data-static-sc="sandbox"><h3>沙盒</h3><p>自由游玩。</p></button>
+        <button type="button" class="scenario-card" data-static-sc="weak"><h3>小国中兴</h3><p>弱开局。</p></button>
+        <button type="button" class="scenario-card" data-static-sc="coup"><h3>北阙夜</h3><p>政变线。</p></button>
+        <button type="button" class="scenario-card" data-static-sc="raider"><h3>黑旗十年</h3><p>掠航建国。</p></button>
+        <button type="button" class="scenario-card" data-static-sc="civilian"><h3>布衣卿相</h3><p>流民起步。</p></button>
+        <button type="button" class="scenario-card" data-static-sc="hegemony"><h3>制霸主环</h3><p>80%×3月。</p></button>
+        <button type="button" class="scenario-card" data-static-sc="keyvault"><h3>密钥库争夺</h3><p>夺 n12。</p></button>
+        <button type="button" class="scenario-card" data-static-sc="pilgrim"><h3>教团巡礼</h3><p>虚空链。</p></button>
+        <button type="button" class="scenario-card" data-static-sc="hostile_takeover"><h3>公司敌对收购</h3><p>公司链。</p></button>
       </div>
       <div class="boot-row">
         <button type="button" id="boot-lang">中文 / EN</button>
@@ -136,10 +117,15 @@
             <button type="button" id="btn-tribute" data-i18n="tribute">索贡 (1AP)</button>
             <button type="button" id="btn-marry" data-i18n="marry">政治联姻 (1AP)</button>
             <button type="button" id="btn-joint" data-i18n="joint">合研条约 (1AP)</button>
+            <div id="dip-extra" class="dip-extra"></div>
+            <div id="chain-panel" class="chain-panel"></div>
           </div>
         </div>
 
-        <div id="tab-tech" class="tab-pane"><div id="tech-panel" class="tech-panel"></div></div>
+        <div id="tab-tech" class="tab-pane">
+          <div id="tech-panel" class="tech-panel"></div>
+          <p class="hint" id="tech-hint">研究排队中显示剩余星月；合研减半费用。</p>
+        </div>
 
         <div id="tab-id" class="tab-pane">
           <div class="actions">
@@ -184,6 +170,22 @@
             <button type="button" id="btn-tut">教程</button>
             <button type="button" id="btn-sandbox">快速沙盒</button>
             <button type="button" id="btn-hex-sandbox" data-i18n="hex_sandbox">战棋沙盘</button>
+            <div class="win-box">
+              <p class="hint">自定义胜利（沙盒可用）</p>
+              <label class="field">类型
+                <select id="win-type">
+                  <option value="none">无</option>
+                  <option value="nodes">控制节点比例</option>
+                  <option value="hegemony">制霸式（比例+维持）</option>
+                  <option value="node">占领指定节点</option>
+                </select>
+              </label>
+              <label class="field">比例/阈值 (0.1–1)<input id="win-value" type="number" step="0.05" min="0.1" max="1" value="0.5" /></label>
+              <label class="field">维持月<input id="win-hold" type="number" min="1" max="12" value="2" /></label>
+              <label class="field">节点 ID<input id="win-node" type="text" value="n12" placeholder="n12" /></label>
+              <button type="button" id="btn-win-apply">应用自定义胜利</button>
+            </div>
+            <button type="button" id="btn-mod-workshop">模组工作台</button>
             <div class="save-row">
               <button type="button" id="btn-save1">存档1</button>
               <button type="button" id="btn-load1">读档1</button>
@@ -235,12 +237,27 @@
         </div>
         <div id="hex-box" class="hex-box hidden">
           <h3>六角战棋 <span id="hex-hint" class="muted"></span></h3>
-          <canvas id="hex" width="640" height="380"></canvas>
+          <div id="hex-editor-bar" class="hex-editor-bar hidden">
+            <button type="button" id="btn-hex-brush">笔刷:关</button>
+            <button type="button" id="btn-brush-nebula">星云</button>
+            <button type="button" id="btn-brush-fort">要塞</button>
+            <button type="button" id="btn-brush-normal">平坦</button>
+          </div>
+          <canvas id="hex" width="720" height="420"></canvas>
           <div class="hex-actions">
             <button type="button" id="btn-hex-end">结束己方回合</button>
             <button type="button" id="btn-hex-flee">撤退</button>
           </div>
           <pre id="hex-log"></pre>
+        </div>
+        <div id="mod-workshop" class="modal mod-workshop hidden">
+          <h3>模组工作台</h3>
+          <p class="hint">编辑事件 JSON 后热加载。rating 用 all 或 r18。</p>
+          <textarea id="mod-json" rows="14" spellcheck="false"></textarea>
+          <div class="actions row">
+            <button type="button" id="btn-mod-apply" class="primary">热加载</button>
+            <button type="button" id="btn-mod-close">关闭</button>
+          </div>
         </div>
         <div id="victory-box" class="modal victory hidden">
           <div class="victory-badge" id="victory-badge">VICTORY</div>
@@ -276,9 +293,9 @@
     </div>
   </div>
 
-  <script src="i18n.js?v=2.3"></script>
-  <script src="audio.js?v=2.3"></script>
-  <script src="game.js?v=2.3"></script>
+  <script src="i18n.js?v=2.4"></script>
+  <script src="audio.js?v=2.4"></script>
+  <script src="game.js?v=2.4"></script>
   <noscript>
     <p style="padding:2rem;color:#fff;background:#111">需要启用 JavaScript 才能游玩。</p>
   </noscript>

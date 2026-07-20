@@ -1,0 +1,85 @@
+{
+  "chains": {
+    "fac_cold": {
+      "id": "fac_cold",
+      "name_zh": "冷环秩序链",
+      "name_en": "Cold Ring Chain",
+      "steps": [
+        { "id": "cold_1", "title": "配额听证会", "text": "冷环要求你上交带宽使用日志。拒绝会被标记为热源威胁。", "choices": [
+          { "id": "a", "text": "配合交出", "effects": [{ "type": "chainProgress", "chain": "fac_cold", "v": 1 }, { "type": "rel", "f": "fac_cold", "v": 10 }, { "type": "intel", "v": -3 }, { "type": "log", "t": "冷环满意。你失去一些隐私。" }] },
+          { "id": "b", "text": "提交伪造日志", "effects": [{ "type": "chainProgress", "chain": "fac_cold", "v": 1 }, { "type": "intel", "v": 5 }, { "type": "rel", "f": "fac_cold", "v": -5 }, { "type": "log", "t": "伪造过关。风险埋下。" }] },
+          { "id": "c", "text": "拒绝", "effects": [{ "type": "rel", "f": "fac_cold", "v": -15 }, { "type": "legitimacy", "v": 3 }, { "type": "log", "t": "冷环记仇。" }] }
+        ]},
+        { "id": "cold_2", "need": 1, "title": "秩序巡察舰", "text": "一艘巡察舰停在你的边境，要求临检旗舰。", "choices": [
+          { "id": "a", "text": "允许临检", "effects": [{ "type": "chainProgress", "chain": "fac_cold", "v": 1 }, { "type": "rel", "f": "fac_cold", "v": 8 }, { "type": "manpower", "v": -4 }, { "type": "log", "t": "临检耗时。关系回暖。" }] },
+          { "id": "b", "text": "武力驱离", "effects": [{ "type": "chainProgress", "chain": "fac_cold", "v": 1 }, { "type": "rel", "f": "fac_cold", "v": -20 }, { "type": "manpower", "v": -8 }, { "type": "log", "t": "擦枪走火。冷战开始。" }] }
+        ]},
+        { "id": "cold_3", "need": 2, "title": "主环席位要约", "text": "沃恩派人：若你压制海盗与教团，可获观察员席。", "choices": [
+          { "id": "a", "text": "接受条件", "effects": [{ "type": "chainProgress", "chain": "fac_cold", "v": 1 }, { "type": "influence", "v": 12 }, { "type": "rel", "f": "fac_cold", "v": 15 }, { "type": "log", "t": "观察员席到手。" }] },
+          { "id": "b", "text": "要正式投票权", "effects": [{ "type": "chainProgress", "chain": "fac_cold", "v": 1 }, { "type": "rel", "f": "fac_cold", "v": -8 }, { "type": "legitimacy", "v": 5 }, { "type": "log", "t": "谈判破裂边缘。你保住了脸面。" }] }
+        ]},
+        { "id": "cold_4", "need": 3, "title": "秩序共治草案", "text": "冷环提出共治航道协议：你出舰队，他们出合法。", "choices": [
+          { "id": "a", "text": "签署共治", "effects": [{ "type": "chainProgress", "chain": "fac_cold", "v": 1 }, { "type": "setFlag", "flag": "chain_cold_done", "v": true }, { "type": "jointResearch", "v": 1 }, { "type": "rel", "f": "fac_cold", "v": 20 }, { "type": "log", "t": "【势力链完结】冷环秩序链完成。" }] },
+          { "id": "b", "text": "拒绝被框住", "effects": [{ "type": "chainProgress", "chain": "fac_cold", "v": 1 }, { "type": "setFlag", "flag": "chain_cold_done", "v": true }, { "type": "legitimacy", "v": 8 }, { "type": "rel", "f": "fac_cold", "v": -12 }, { "type": "log", "t": "【势力链完结】你拒绝共治，自立热源。" }] }
+        ]},
+        { "id": "cold_5", "need": 4, "title": "余波", "text": "链已结束的占位收束。", "choices": [
+          { "id": "a", "text": "回顾", "effects": [{ "type": "log", "t": "冷环线已完结。" }] }
+        ]}
+      ]
+    },
+    "fac_corp": {
+      "id": "fac_corp",
+      "name_zh": "赫利俄斯收购链",
+      "name_en": "Helios Corporate Chain",
+      "steps": [
+        { "id": "corp_1", "title": "试用合同", "text": "公司国发来试用采购：低价正交石换你的航道数据。", "choices": [
+          { "id": "a", "text": "签约", "effects": [{ "type": "chainProgress", "chain": "fac_corp", "v": 1 }, { "type": "credits", "v": 1200 }, { "type": "intel", "v": -4 }, { "type": "rel", "f": "fac_corp", "v": 10 }, { "type": "log", "t": "现金流改善。" }] },
+          { "id": "b", "text": "拒绝", "effects": [{ "type": "rel", "f": "fac_corp", "v": -8 }, { "type": "legitimacy", "v": 2 }, { "type": "log", "t": "你保住数据主权。" }] }
+        ]},
+        { "id": "corp_2", "need": 1, "title": "竞业禁止", "text": "合同小字：禁止你与尘带公社交易。", "choices": [
+          { "id": "a", "text": "接受竞业", "effects": [{ "type": "chainProgress", "chain": "fac_corp", "v": 1 }, { "type": "credits", "v": 800 }, { "type": "rel", "f": "fac_dust", "v": -15 }, { "type": "log", "t": "公司满意。尘带记恨。" }] },
+          { "id": "b", "text": "撕毁小字", "effects": [{ "type": "chainProgress", "chain": "fac_corp", "v": 1 }, { "type": "rel", "f": "fac_corp", "v": -12 }, { "type": "rel", "f": "fac_dust", "v": 8 }, { "type": "log", "t": "律师函飞来。" }] }
+        ]},
+        { "id": "corp_3", "need": 2, "title": "敌对收购", "text": "赫利俄提出：收购冷环科研站，利润五五。", "choices": [
+          { "id": "a", "text": "参与收购", "effects": [{ "type": "chainProgress", "chain": "fac_corp", "v": 1 }, { "type": "credits", "v": 2500 }, { "type": "rel", "f": "fac_cold", "v": -18 }, { "type": "manpower", "v": -10 }, { "type": "log", "t": "收购得手。冷环震怒。" }] },
+          { "id": "b", "text": "告密冷环", "effects": [{ "type": "chainProgress", "chain": "fac_corp", "v": 1 }, { "type": "rel", "f": "fac_cold", "v": 12 }, { "type": "rel", "f": "fac_corp", "v": -20 }, { "type": "intel", "v": 8 }, { "type": "log", "t": "你出卖了收购。公司拉黑。" }] }
+        ]},
+        { "id": "corp_4", "need": 3, "title": "董事会席位", "text": "董事席：用你的舰队为公司护航一年。", "choices": [
+          { "id": "a", "text": "入董", "effects": [{ "type": "chainProgress", "chain": "fac_corp", "v": 1 }, { "type": "credits", "v": 3000 }, { "type": "influence", "v": 10 }, { "type": "log", "t": "你成了公司的枪。" }] },
+          { "id": "b", "text": "只要钱不要席", "effects": [{ "type": "chainProgress", "chain": "fac_corp", "v": 1 }, { "type": "credits", "v": 1800 }, { "type": "log", "t": "现金了结。" }] }
+        ]},
+        { "id": "corp_5", "need": 4, "title": "清算或共生", "text": "公司内部爆雷。救或不救？", "choices": [
+          { "id": "a", "text": "注资救市", "effects": [{ "type": "chainProgress", "chain": "fac_corp", "v": 1 }, { "type": "setFlag", "flag": "chain_corp_done", "v": true }, { "type": "credits", "v": -2000 }, { "type": "rel", "f": "fac_corp", "v": 25 }, { "type": "log", "t": "【势力链完结】公司共生。" }] },
+          { "id": "b", "text": "趁机收购资产", "effects": [{ "type": "chainProgress", "chain": "fac_corp", "v": 1 }, { "type": "setFlag", "flag": "chain_corp_done", "v": true }, { "type": "credits", "v": 4000 }, { "type": "rel", "f": "fac_corp", "v": -30 }, { "type": "log", "t": "【势力链完结】你吞噬了公司残骸。" }] }
+        ]}
+      ]
+    },
+    "fac_void": {
+      "id": "fac_void",
+      "name_zh": "虚空教团巡礼",
+      "name_en": "Void Pilgrimage",
+      "steps": [
+        { "id": "void_1", "title": "失效圣歌", "text": "教团请你听一段失效 AI 的循环圣歌。据说能安定舰队。", "choices": [
+          { "id": "a", "text": "全舰播放", "effects": [{ "type": "chainProgress", "chain": "fac_void", "v": 1 }, { "type": "manpower", "v": 5 }, { "type": "rel", "f": "fac_void", "v": 10 }, { "type": "log", "t": "士气微妙上升。" }] },
+          { "id": "b", "text": "拒绝异端", "effects": [{ "type": "rel", "f": "fac_void", "v": -10 }, { "type": "legitimacy", "v": 3 }, { "type": "log", "t": "正统派鼓掌。" }] }
+        ]},
+        { "id": "void_2", "need": 1, "title": "遗迹钥匙", "text": "他们要你护送一把遗迹钥匙穿过海盗区。", "choices": [
+          { "id": "a", "text": "护送", "effects": [{ "type": "chainProgress", "chain": "fac_void", "v": 1 }, { "type": "manpower", "v": -8 }, { "type": "intel", "v": 10 }, { "type": "rel", "f": "fac_void", "v": 12 }, { "type": "log", "t": "钥匙送达。你得到残缺星图。" }] },
+          { "id": "b", "text": "扣下研究", "effects": [{ "type": "chainProgress", "chain": "fac_void", "v": 1 }, { "type": "techProgress", "v": 1 }, { "type": "rel", "f": "fac_void", "v": -18 }, { "type": "log", "t": "教团诅咒你的引擎。" }] }
+        ]},
+        { "id": "void_3", "need": 2, "title": "巡礼护卫", "text": "司仪要穿越三颗中立星做巡礼，需要护航。", "choices": [
+          { "id": "a", "text": "护航", "effects": [{ "type": "chainProgress", "chain": "fac_void", "v": 1 }, { "type": "influence", "v": 8 }, { "type": "credits", "v": -500 }, { "type": "log", "t": "巡礼完成。" }] },
+          { "id": "b", "text": "收费护航", "effects": [{ "type": "chainProgress", "chain": "fac_void", "v": 1 }, { "type": "credits", "v": 900 }, { "type": "rel", "f": "fac_void", "v": -5 }, { "type": "log", "t": "他们付了钱，眼神冷。" }] }
+        ]},
+        { "id": "void_4", "need": 3, "title": "格式化威胁", "text": "教团激进派要格式化一颗有人定居的殖民站「净化噪声」。", "choices": [
+          { "id": "a", "text": "阻止净化", "effects": [{ "type": "chainProgress", "chain": "fac_void", "v": 1 }, { "type": "legitimacy", "v": 8 }, { "type": "rel", "f": "fac_void", "v": -12 }, { "type": "manpower", "v": -6 }, { "type": "log", "t": "你救下殖民站。" }] },
+          { "id": "b", "text": "袖手旁观", "effects": [{ "type": "chainProgress", "chain": "fac_void", "v": 1 }, { "type": "rel", "f": "fac_void", "v": 15 }, { "type": "legitimacy", "v": -10 }, { "type": "log", "t": "噪声消失。良心也是。" }] }
+        ]},
+        { "id": "void_5", "need": 4, "title": "圣歌终章", "text": "教团分裂。你支持改革派还是正统派？", "choices": [
+          { "id": "a", "text": "改革派", "effects": [{ "type": "chainProgress", "chain": "fac_void", "v": 1 }, { "type": "setFlag", "flag": "chain_void_done", "v": true }, { "type": "influence", "v": 12 }, { "type": "log", "t": "【势力链完结】虚空改革得势。" }] },
+          { "id": "b", "text": "正统派", "effects": [{ "type": "chainProgress", "chain": "fac_void", "v": 1 }, { "type": "setFlag", "flag": "chain_void_done", "v": true }, { "type": "intel", "v": 10 }, { "type": "log", "t": "【势力链完结】旧圣歌回响。" }] }
+        ]}
+      ]
+    }
+  }
+}

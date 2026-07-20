@@ -7,6 +7,18 @@
     { "id": "mira_storm", "title_zh": "米拉·风暴港", "title_en": "Mira · Storm Port", "char": "mira", "rating": "all", "defaultPrompt": "port battle, determined woman captain" },
     { "id": "mira_he", "title_zh": "米拉·HE", "title_en": "Mira HE", "char": "mira", "rating": "all", "defaultPrompt": "harbor lights, vow, couple" },
     { "id": "generic_night", "title_zh": "旗舰深夜", "title_en": "Flagship Night", "char": null, "rating": "r18", "defaultPrompt": "starship cabin night, intimate mood" },
-    { "id": "harem_lounge", "title_zh": "后舱休息室", "title_en": "Harem Lounge", "char": null, "rating": "r18", "defaultPrompt": "lounge, multiple silhouettes, tasteful" }
+    { "id": "harem_lounge", "title_zh": "后舱休息室", "title_en": "Harem Lounge", "char": null, "rating": "r18", "defaultPrompt": "lounge, multiple silhouettes, tasteful" },
+    { "id": "lira_2", "title_zh": "莉菈·失重", "title_en": "Lira 2", "char": "lira", "rating": "r18", "defaultPrompt": "zero-g chapel" },
+    { "id": "lira_3", "title_zh": "莉菈·出逃", "title_en": "Lira 3", "char": "lira", "rating": "all", "defaultPrompt": "escape spire" },
+    { "id": "lira_he", "title_zh": "莉菈·HE", "title_en": "Lira HE", "char": "lira", "rating": "all", "defaultPrompt": "vow outside void" },
+    { "id": "sarn_2", "title_zh": "萨恩·帐幕", "title_en": "Sarn 2", "char": "sarn", "rating": "r18", "defaultPrompt": "dust tent" },
+    { "id": "sarn_3", "title_zh": "萨恩·表决", "title_en": "Sarn 3", "char": "sarn", "rating": "all", "defaultPrompt": "commune vote" },
+    { "id": "sarn_he", "title_zh": "萨恩·HE", "title_en": "Sarn HE", "char": "sarn", "rating": "all", "defaultPrompt": "harvest dawn" },
+    { "id": "kess_2", "title_zh": "凯斯·维修坞", "title_en": "Kess 2", "char": "kess", "rating": "r18", "defaultPrompt": "engine bay" },
+    { "id": "kess_3", "title_zh": "凯斯·换旗", "title_en": "Kess 3", "char": "kess", "rating": "all", "defaultPrompt": "fleet mutiny" },
+    { "id": "kess_he", "title_zh": "凯斯·HE", "title_en": "Kess HE", "char": "kess", "rating": "all", "defaultPrompt": "deck smile" },
+    { "id": "vorn_2", "title_zh": "沃恩·密约", "title_en": "Vorn 2", "char": "vorn", "rating": "all", "defaultPrompt": "office night" },
+    { "id": "vorn_3", "title_zh": "沃恩·政变夜", "title_en": "Vorn 3", "char": "vorn", "rating": "all", "defaultPrompt": "safe room" },
+    { "id": "vorn_he", "title_zh": "沃恩·HE", "title_en": "Vorn HE", "char": "vorn", "rating": "all", "defaultPrompt": "council exception" }
   ]
 }
