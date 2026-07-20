@@ -761,19 +761,19 @@
     const defHp = Math.max(35, defP / 3);
     const atkD = 22 + atkP * 0.04;
     const defD = 20 + defP * 0.035;
-    // terrain map on hex grid
+    // terrain map on hex grid 8×6
     const terrain = {};
-    for (let r = 0; r < 5; r++) {
-      for (let c = 0; c < 7; c++) {
+    for (let r = 0; r < 6; r++) {
+      for (let c = 0; c < 8; c++) {
         let t = "normal";
         if (n.terrain === "nebula" && (c + r) % 3 === 0) t = "nebula";
-        if (n.terrain === "fort" && c >= 4) t = "fort";
+        if (n.terrain === "fort" && c >= 5) t = "fort";
         if (rand() < 0.12) t = chance(0.5) ? "nebula" : "fort";
         terrain[c + "," + r] = t;
       }
     }
     state.hex = {
-      nodeId: n.id, defOwner: n.owner, w: 8, h: 6, terrain,
+      nodeId: n.id, defOwner: n.owner || "fac_cold", w: 8, h: 6, terrain,
       turnPlayer: true, selected: null, finished: false,
       log: [`战棋：${n.name} · 兵种:突击/火力(射2)/突击舰/盾卫 · 紫星云 红要塞 · 编辑模式可刷地形`],
       units: [
@@ -788,13 +788,6 @@
         hu("d3", 1, "盾塔", 7, 4, defHp * 1.3, defD * 0.65, 1, "guard"),
       ],
     };
-    // expand terrain for 8x6
-    for (let r = 0; r < 6; r++) {
-      for (let c = 0; c < 8; c++) {
-        if (terrain[c + "," + r]) continue;
-        terrain[c + "," + r] = "normal";
-      }
-    }
     document.getElementById("hex-box").classList.remove("hidden");
     document.getElementById("hex-hint").textContent = "点己方→移动/攻击 · 编辑:刷地形";
     const he = document.getElementById("hex-editor-bar");
