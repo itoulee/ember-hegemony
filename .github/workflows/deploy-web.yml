@@ -28,13 +28,18 @@ jobs:
         run: |
           mkdir -p _site
           cp -r web/* _site/
-          # 可选：若未来 Godot 构建产物存在则并列
+          # 文档镜像（itch 说明）
+          mkdir -p _site/docs
+          cp docs/ITCH.md _site/docs/ITCH.md 2>/dev/null || true
+          cp docs/EXPANSION.md _site/docs/EXPANSION.md 2>/dev/null || true
           if [ -d build/web ] && [ -f build/web/index.html ]; then
             mkdir -p _site/godot
             cp -r build/web/* _site/godot/
           fi
           echo "站点文件："
           ls -la _site
+          test -f _site/index.html
+          test -f _site/mirror.html
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

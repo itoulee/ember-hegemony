@@ -114,12 +114,38 @@ text = "六角战棋"
 layout_mode = 2
 text = "新周目"
 
+[node name="SaveRow" type="HBoxContainer" parent="Root/LeftPanel/Actions"]
+layout_mode = 2
+
+[node name="BtnSave1" type="Button" parent="Root/LeftPanel/Actions/SaveRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "存档1"
+
+[node name="BtnLoad1" type="Button" parent="Root/LeftPanel/Actions/SaveRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "读档1"
+
+[node name="SaveRow2" type="HBoxContainer" parent="Root/LeftPanel/Actions"]
+layout_mode = 2
+
+[node name="BtnSave2" type="Button" parent="Root/LeftPanel/Actions/SaveRow2"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "存档2"
+
+[node name="BtnLoad2" type="Button" parent="Root/LeftPanel/Actions/SaveRow2"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "读档2"
+
 [node name="Hint" type="Label" parent="Root/LeftPanel"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.55, 0.6, 0.65, 1)
 theme_override_font_sizes/font_size = 11
 autowrap_mode = 3
-text = "点击星图选节点。结束回合触发 AI 与事件。选「六角战棋」后进攻进入战场。黄点=你。"
+text = "网页完整版见 GitHub Pages。本 Godot 包：星图/AI/事件/战棋/存档。黄点=你。"
 
 [node name="Center" type="VBoxContainer" parent="Root"]
 layout_mode = 2
@@ -181,3 +207,7 @@ scroll_following = true
 [connection signal="pressed" from="Root/LeftPanel/Actions/ResolverRow/BtnRep" to="." method="_on_resolver_report"]
 [connection signal="pressed" from="Root/LeftPanel/Actions/ResolverRow/BtnHex" to="." method="_on_resolver_hex"]
 [connection signal="pressed" from="Root/LeftPanel/Actions/BtnNew" to="." method="_on_new_game_pressed"]
+[connection signal="pressed" from="Root/LeftPanel/Actions/SaveRow/BtnSave1" to="." method="_on_save1_pressed"]
+[connection signal="pressed" from="Root/LeftPanel/Actions/SaveRow/BtnLoad1" to="." method="_on_load1_pressed"]
+[connection signal="pressed" from="Root/LeftPanel/Actions/SaveRow2/BtnSave2" to="." method="_on_save2_pressed"]
+[connection signal="pressed" from="Root/LeftPanel/Actions/SaveRow2/BtnLoad2" to="." method="_on_load2_pressed"]

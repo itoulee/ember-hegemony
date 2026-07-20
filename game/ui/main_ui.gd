@@ -139,3 +139,23 @@ func _on_resolver_hex() -> void:
 	GameState.battle_session.set_kind(BattleSession.ResolverKind.HEX)
 	GameState.log_zh("战斗解析器：六角战棋（进攻将进入战场）")
 	_refresh()
+
+
+func _on_save1_pressed() -> void:
+	GameState.save_slot(1)
+	_refresh()
+
+
+func _on_save2_pressed() -> void:
+	GameState.save_slot(2)
+	_refresh()
+
+
+func _on_load1_pressed() -> void:
+	GameState.load_slot_meta(1)
+	_refresh()
+
+
+func _on_load2_pressed() -> void:
+	GameState.load_slot_meta(2)
+	_refresh()

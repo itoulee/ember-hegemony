@@ -22,11 +22,124 @@ var log_buffer: PackedStringArray = PackedStringArray()
 ## 交互战棋上下文（切场景期间保持）
 var pending_hex_context: BattleContext = null
 var pending_hex_node_id: String = ""
+var scenario_id: String = "sandbox"
+var save_service: SaveService = SaveService.new()
+## 目标罗盘文案（网页对齐的简化版）
+var goal_primary: String = "控制更多节点，发展势力"
+var owned_ratio_cache: float = 0.0
 
 
 func _ready() -> void:
 	event_runtime.load_from_path("res://data/events.json")
 	new_game(20260718)
+
+
+func goal_block_zh() -> String:
+	_refresh_goal()
+	return "目标：%s\n控制占比约 %.0f%%" % [goal_primary, owned_ratio_cache * 100.0]
+
+
+func _refresh_goal() -> void:
+	var total := star_map.nodes.size()
+	if total <= 0:
+		owned_ratio_cache = 0.0
+		return
+	var owned := 0
+	var pf := player_faction()
+	var fid := pf.id if pf else ""
+	for id in star_map.nodes:
+		var n: StarNode = star_map.nodes[id]
+		if n.owner_faction_id == fid:
+			owned += 1
+	owned_ratio_cache = float(owned) / float(total)
+	match scenario_id:
+		"hegemony":
+			goal_primary = "制霸：控制≥80%节点"
+		"coup":
+			goal_primary = "政变登基（航官路线）"
+		"raider":
+			goal_primary = "掠航占星并建国"
+		_:
+			goal_primary = "扩张势力或完成事件"
+
+
+func export_save_dict() -> Dictionary:
+	var nodes_out: Array = []
+	for id in star_map.nodes:
+		var n: StarNode = star_map.nodes[id]
+		nodes_out.append({
+			"id": n.id,
+			"name": n.display_name,
+			"owner": n.owner_faction_id,
+			"garrison": n.garrison,
+			"income": n.income,
+		})
+	var fac_out: Dictionary = {}
+	for id in factions:
+		var f: Faction = factions[id]
+		fac_out[id] = {
+			"id": f.id,
+			"name": f.display_name,
+			"credits": f.credits,
+			"manpower": f.manpower,
+		}
+	var p := get_player()
+	return {
+		"version": "godot-0.2-parity",
+		"month": month,
+		"ap": ap,
+		"scenario_id": scenario_id,
+		"player": {
+			"id": p.id if p else "",
+			"identity": p.identity_zh() if p else "",
+			"loc": p.location_node_id if p else "",
+			"faction": p.faction_id if p else "",
+		},
+		"factions": fac_out,
+		"nodes": nodes_out,
+		"selected": selected_node_id,
+	}
+
+
+func save_slot(i: int) -> void:
+	var err := save_service.save_slot(i, export_save_dict())
+	if err == OK:
+		log_zh("已写入存档槽 %d（user://saves）" % i)
+	else:
+		log_zh("存档失败：%s" % error_string(err))
+	EventBus.world_changed.emit()
+
+
+func load_slot_meta(i: int) -> void:
+	var d := save_service.load_slot(i)
+	if d.is_empty():
+		log_zh("槽 %d 为空或损坏" % i)
+		return
+	# 最小恢复：月份/资源/节点归属（身份完整重建略）
+	month = int(d.get("month", month))
+	ap = int(d.get("ap", ap))
+	scenario_id = str(d.get("scenario_id", scenario_id))
+	var facs: Dictionary = d.get("factions", {})
+	for id in facs:
+		if factions.has(id):
+			var f: Faction = factions[id]
+			var row: Dictionary = facs[id]
+			f.credits = int(row.get("credits", f.credits))
+			f.manpower = float(row.get("manpower", f.manpower))
+	for row in d.get("nodes", []):
+		var nid := str(row.get("id", ""))
+		var n := star_map.get_node(nid)
+		if n:
+			n.owner_faction_id = str(row.get("owner", n.owner_faction_id))
+			n.garrison = float(row.get("garrison", n.garrison))
+	selected_node_id = str(d.get("selected", selected_node_id))
+	var pd: Dictionary = d.get("player", {})
+	var p := get_player()
+	if p and pd.has("loc"):
+		p.location_node_id = str(pd.get("loc", p.location_node_id))
+	log_zh("已读档槽 %d（简化恢复）" % i)
+	_refresh_goal()
+	EventBus.world_changed.emit()
 
 
 func new_game(p_seed: int = 0) -> void:
@@ -430,8 +543,11 @@ func status_block_zh() -> String:
 	var ev := "无"
 	if event_runtime.has_pending():
 		ev = str(event_runtime.pending.get("title", "待选"))
+	_refresh_goal()
 	return "\n".join([
 		"星月 %d　AP %d　模式：%s" % [month, ap, mode],
+		"剧本：%s" % scenario_id,
+		"目标：%s (%.0f%%)" % [goal_primary, owned_ratio_cache * 100.0],
 		"身份：%s　品阶 %d" % [p.identity_zh(), p.rank],
 		"势力：%s" % f.display_name,
 		"信用点：%d　兵力：%.0f" % [f.credits, f.manpower],

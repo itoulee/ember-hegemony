@@ -22,7 +22,49 @@ a { color: var(--cold); }
 .sub { margin: 4px 0 0; color: var(--muted); font-size: 0.8rem; }
 .status { white-space: pre-line; font-size: 0.78rem; line-height: 1.4; background: var(--panel); padding: 8px 10px; border-radius: 8px; min-width: 200px; max-width: 320px; }
 .tutorial-bar { flex: 1 1 220px; background: rgba(240,160,48,0.12); border: 1px solid var(--accent); color: #ffd89a; border-radius: 8px; padding: 8px 10px; font-size: 0.85rem; line-height: 1.4; }
-.tutorial-bar.hidden { display: none; }
+.tutorial-bar {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px;
+}
+.tutorial-bar.hidden { display: none !important; }
+.tutorial-bar-actions { flex-shrink: 0; }
+.tut-skip {
+  font-size: 0.78rem !important; padding: 6px 10px !important;
+  border-color: var(--danger) !important; color: #ffb4b4 !important;
+}
+
+/* 教程气泡 */
+.coach {
+  position: fixed; inset: 0; z-index: 900; pointer-events: none;
+}
+.coach.hidden { display: none !important; }
+.coach-card {
+  pointer-events: auto; position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%);
+  width: min(420px, 92vw); background: rgba(18,26,36,0.98); border: 1px solid var(--accent);
+  border-radius: 12px; padding: 12px 14px; box-shadow: 0 12px 40px rgba(0,0,0,0.45);
+}
+.coach-step { font-size: 0.72rem; color: var(--accent); margin-bottom: 4px; letter-spacing: 0.06em; }
+.coach-card p { margin: 0 0 10px; font-size: 0.9rem; line-height: 1.45; }
+.coach-actions { display: flex; gap: 8px; }
+.coach-actions button { flex: 1; text-align: center; }
+.coach-spotlight {
+  pointer-events: none; position: fixed; border: 2px solid var(--accent);
+  border-radius: 10px; box-shadow: 0 0 0 9999px rgba(0,0,0,0.45);
+  transition: all 0.2s ease; display: none;
+}
+.coach-spotlight.on { display: block; }
+
+/* 事件对话立绘 */
+.event-layout { display: grid; grid-template-columns: 120px 1fr; gap: 12px; align-items: start; }
+@media (max-width: 600px) {
+  .event-layout { grid-template-columns: 88px 1fr; gap: 8px; }
+}
+.event-portrait-wrap { text-align: center; }
+.event-portrait {
+  width: 100%; max-width: 120px; aspect-ratio: 3/4; object-fit: cover;
+  border-radius: 10px; border: 1px solid var(--line); background: #0d131c;
+}
+.event-speaker { font-size: 0.75rem; color: var(--accent); margin-top: 4px; }
+.event-body h3 { margin-top: 0; }
 
 .main { flex: 1; display: grid; grid-template-columns: minmax(220px, 260px) 1fr minmax(200px, 280px); gap: 8px; padding: 8px; min-height: 0; }
 .left, .right { background: var(--panel); border-radius: 10px; padding: 10px; border: 1px solid var(--line); overflow: auto; max-height: calc(100vh - 100px); }
@@ -207,17 +249,34 @@ button.hidden { display: none; }
 }
 .chain-panel { margin-top: 8px; }
 
-/* 移动端日志更矮，给罗盘空间 */
+@media (max-width: 900px) {
+  .main { grid-template-columns: 1fr; }
+  .left, .right { max-height: none; }
+  .left.mobile-hide, .right.mobile-hide { display: none; }
+  .status { max-width: 100%; width: 100%; font-size: 0.85rem; }
+  .map-wrap { height: 42vh; min-height: 220px; }
+  #log { height: 22vh; }
+  .goal-compass { margin: 0 8px 6px; font-size: 0.9rem; }
+  /* C2：大按钮 */
+  button, .tab, .scenario-card {
+    min-height: 44px;
+    font-size: 0.95rem !important;
+    padding: 10px 12px !important;
+  }
+  .tab { font-size: 0.8rem !important; padding: 10px 6px !important; }
+  .tabs { gap: 6px; }
+  .icon-btn { min-width: 44px; min-height: 44px; font-size: 1.1rem; }
+  .boot-card { padding: 16px; }
+  .scenario-list { max-height: 55vh; }
+}
+
+/* 触控反馈 */
+.touch-ready button:active { transform: scale(0.98); opacity: 0.92; }
+
 @media (max-width: 900px) {
   .goal-compass { margin: 0 8px 6px; }
   #log { height: 22vh; }
 }
 
-@media (max-width: 900px) {
-  .main { grid-template-columns: 1fr; }
-  .left, .right { max-height: none; }
-  .left.mobile-hide, .right.mobile-hide { display: none; }
-  .status { max-width: 100%; width: 100%; }
-  .map-wrap { height: 48vh; }
-  #log { height: 28vh; }
-}
+/* 触控反馈 */
+.touch-ready button:active { transform: scale(0.98); opacity: 0.92; }

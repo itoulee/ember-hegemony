@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>星域制霸：余烬 — P2</title>
-  <meta name="description" content="多剧本、成就图鉴、音效、角色、中英切换的开源星域 SLG。" />
+  <title>星域制霸：余烬</title>
+  <meta name="description" content="开源硬科幻星域 SLG。多剧本、成人可选、角色线、战棋。" />
+  <meta name="theme-color" content="#0a0e14" />
   <!-- GitHub Pages 项目页：无尾斜杠时相对路径会指错目录，用 base 固定 -->
   <script>
     (function () {
@@ -22,9 +23,9 @@
       }
     })();
   </script>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=2.5" />
 </head>
-<body>
+<body class="touch-ready">
   <div id="boot" class="boot">
     <div class="boot-card">
       <h1 id="boot-title">星域制霸：余烬</h1>
@@ -49,9 +50,10 @@
         <button type="button" id="boot-retry">重新加载列表</button>
       </div>
       <p class="hint">
-        在线：<a href="https://itoulee.github.io/ember-hegemony/">https://itoulee.github.io/ember-hegemony/</a>
-        （请带末尾 <code>/</code>）·
-        <a href="https://github.com/itoulee/ember-hegemony" target="_blank" rel="noopener">GitHub</a>
+        在线：<a href="https://itoulee.github.io/ember-hegemony/">Pages 主站</a>
+        · <a href="mirror.html">镜像入口</a>
+        · <a href="https://github.com/itoulee/ember-hegemony" target="_blank" rel="noopener">GitHub</a>
+        · <a href="docs/ITCH.md">itch 发布说明</a>
       </p>
     </div>
   </div>
@@ -65,10 +67,27 @@
           <p class="sub" id="ui-sub">P2 网页试玩 · <a href="https://github.com/itoulee/ember-hegemony/" target="_blank" rel="noopener">GitHub</a></p>
         </div>
       </div>
-      <div id="tutorial-bar" class="tutorial-bar hidden"></div>
+      <div id="tutorial-bar" class="tutorial-bar hidden">
+        <div id="tutorial-bar-text"></div>
+        <div class="tutorial-bar-actions">
+          <button type="button" id="btn-tut-skip" class="tut-skip">跳过教程</button>
+        </div>
+      </div>
       <div id="scenario-banner" class="scenario-banner hidden"></div>
       <div id="status" class="status"></div>
     </header>
+
+    <div id="coach" class="coach hidden">
+      <div class="coach-card">
+        <div class="coach-step" id="coach-step">1/5</div>
+        <p id="coach-text"></p>
+        <div class="coach-actions">
+          <button type="button" id="coach-next" class="primary">下一步提示</button>
+          <button type="button" id="coach-skip">跳过全部</button>
+        </div>
+      </div>
+      <div id="coach-spotlight" class="coach-spotlight"></div>
+    </div>
 
     <div id="goal-compass" class="goal-compass" aria-live="polite">
       <div class="goal-head">
@@ -231,9 +250,17 @@
           </div>
         </div>
         <div id="event-box" class="event-box hidden">
-          <h3 id="event-title"></h3>
-          <p id="event-text"></p>
-          <div id="event-choices"></div>
+          <div class="event-layout">
+            <div class="event-portrait-wrap">
+              <img id="event-portrait" class="event-portrait" alt="" />
+              <div id="event-speaker" class="event-speaker"></div>
+            </div>
+            <div class="event-body">
+              <h3 id="event-title"></h3>
+              <p id="event-text"></p>
+              <div id="event-choices"></div>
+            </div>
+          </div>
         </div>
         <div id="hex-box" class="hex-box hidden">
           <h3>六角战棋 <span id="hex-hint" class="muted"></span></h3>
@@ -293,9 +320,10 @@
     </div>
   </div>
 
-  <script src="i18n.js?v=2.4"></script>
-  <script src="audio.js?v=2.4"></script>
-  <script src="game.js?v=2.4"></script>
+  <script src="i18n.js?v=2.5"></script>
+  <script src="audio.js?v=2.5"></script>
+  <script src="portraits.js?v=2.5"></script>
+  <script src="game.js?v=2.5"></script>
   <noscript>
     <p style="padding:2rem;color:#fff;background:#111">需要启用 JavaScript 才能游玩。</p>
   </noscript>

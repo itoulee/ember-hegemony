@@ -8,7 +8,7 @@
   const SAVE_PREFIX = "ember_hegemony_slot_";
   const ACH_KEY = "ember_hegemony_achievements";
   const CODEX_KEY = "ember_hegemony_codex";
-  const VERSION = "2.4.0-ab";
+  const VERSION = "2.5.0-cd";
   const MATURE_KEY = "ember_mature_enabled";
   const CG_URL_KEY = "ember_cg_urls";
 
@@ -57,11 +57,11 @@
   }
 
   const TUTORIAL_STEPS = [
-    { id: "move", text: "教程①：点击邻星「灰轨一号/正交矿带」等，再点「航行」。", need: "move" },
-    { id: "claim", text: "教程②：选中一颗无主星（灰色），点「登记无主」。若附近无无主，先结束回合或航行靠近。", need: "claim" },
-    { id: "end", text: "教程③：点「结束回合」，观察 AI 与收入。", need: "end" },
-    { id: "attack", text: "教程④：贴近敌星并「进攻」，任选战报或战棋。", need: "attack" },
-    { id: "event", text: "教程⑤：若弹出事件请选一项；若无事件可再结束回合直到出现。完成后点「沙盒新周目」自由玩。", need: "event" },
+    { id: "move", text: "教程①：点击邻星，再点「航行」。", need: "move", target: "#btn-move" },
+    { id: "claim", text: "教程②：选中无主星（灰），点「登记无主」。", need: "claim", target: "#btn-claim" },
+    { id: "end", text: "教程③：点「结束回合」，观察 AI 与收入。", need: "end", target: "#btn-end" },
+    { id: "attack", text: "教程④：贴近敌星「进攻」（战报或战棋）。", need: "attack", target: "#btn-attack" },
+    { id: "event", text: "教程⑤：处理弹出事件；可多结束几回合直到出现。", need: "event", target: "#event-box" },
   ];
 
   const state = {
@@ -567,25 +567,72 @@
     state.tutorial.step++;
     if (state.tutorial.step >= TUTORIAL_STEPS.length) {
       log("教程完成！可自由游玩或读档。");
-      state.tutorial = null;
-      hideTutorial();
-      unlockAchieve("tutorial_done");
-      tryVictory("tutorial", "教程结业。目标罗盘将切换为自由目标提示。");
-      renderGoalCompass();
+      finishTutorial(true);
     } else {
       showTutorial();
       renderGoalCompass();
     }
+  }
+  function finishTutorial(completed) {
+    state.tutorial = null;
+    hideTutorial();
+    hideCoach();
+    if (completed) {
+      unlockAchieve("tutorial_done");
+      tryVictory("tutorial", "教程结业。目标罗盘将切换为自由目标提示。");
+    } else {
+      log("已跳过教程。随时可在系统页重开教程。");
+      sfx("skip");
+    }
+    renderGoalCompass();
+  }
+  function skipTutorial() {
+    if (!state.tutorial) return;
+    finishTutorial(false);
   }
   function showTutorial() {
     const el = document.getElementById("tutorial-bar");
     if (!state.tutorial) { hideTutorial(); return; }
     const st = TUTORIAL_STEPS[state.tutorial.step];
     el.classList.remove("hidden");
-    el.textContent = st ? st.text : "";
+    const textEl = document.getElementById("tutorial-bar-text");
+    if (textEl) textEl.textContent = st ? st.text : "";
+    showCoach(st);
   }
   function hideTutorial() {
-    document.getElementById("tutorial-bar").classList.add("hidden");
+    const el = document.getElementById("tutorial-bar");
+    if (el) el.classList.add("hidden");
+    hideCoach();
+  }
+  function showCoach(st) {
+    const coach = document.getElementById("coach");
+    if (!coach || !st || !state.tutorial) return;
+    coach.classList.remove("hidden");
+    const stepEl = document.getElementById("coach-step");
+    const textEl = document.getElementById("coach-text");
+    if (stepEl) stepEl.textContent = `${state.tutorial.step + 1}/${TUTORIAL_STEPS.length}`;
+    if (textEl) textEl.textContent = st.text;
+    const spot = document.getElementById("coach-spotlight");
+    if (spot && st.target) {
+      const t = document.querySelector(st.target);
+      if (t && !t.classList.contains("hidden")) {
+        const r = t.getBoundingClientRect();
+        spot.classList.add("on");
+        spot.style.left = (r.left - 4) + "px";
+        spot.style.top = (r.top - 4) + "px";
+        spot.style.width = (r.width + 8) + "px";
+        spot.style.height = (r.height + 8) + "px";
+      } else {
+        spot.classList.remove("on");
+      }
+    }
+    sfx("ui");
+  }
+  function hideCoach() {
+    const coach = document.getElementById("coach");
+    if (coach) coach.classList.add("hidden");
+    const spot = document.getElementById("coach-spotlight");
+    if (spot) spot.classList.remove("on");
   }
 
   function moveTo(id) {
@@ -1068,7 +1115,7 @@
     log(`与 ${fac(t).name} 缔结同盟。`);
     unlockAchieve("allied");
     codexFac(t);
-    sfx("click");
+    sfx("ally");
     render();
   }
 
@@ -1082,6 +1129,7 @@
     // loyalty hit if fleets "abroad" simplified
     playerFac().manpower = Math.max(10, playerFac().manpower - 5);
     log(`废除与 ${fac(t).name} 的同盟。舰队整肃 -5 兵力。`);
+    sfx("break");
     render();
   }
 
@@ -1171,7 +1219,7 @@
     ];
     log(`【成人·召见】${scenes[randi(0, scenes.length - 1)]}（亲密 ${lv}/10）`);
     if (lv >= 5) state.player.legitimacy = (state.player.legitimacy || 0) + 1;
-    sfx("claim");
+    sfx("intimacy");
     if (bondOf(charId) >= 3) unlockCg("generic_night");
     renderIntimacyPanel();
     renderHaremPanel();
@@ -1521,7 +1569,7 @@
       checkTechBranchAchieve();
       if (q.id === "a4") state.player.legitimacy += 5;
       state.player.techQueue = null;
-      sfx("event");
+      sfx("research");
     }
   }
 
@@ -1679,6 +1727,7 @@
       log("政变成功！你成为执政官。");
       unlockAchieve("coup_ok");
       sfx("win");
+      sfx("coup");
       if (state.scenarioId === "coup" || state.scenarioFlags.boostCoup) {
         tryVictory("coup", "北阙夜落幕。你已黄袍加身。");
       }
@@ -1847,11 +1896,42 @@
     tutAdvance("event");
   }
 
+  function resolveEventSpeaker(e) {
+    // 从标题/效果推断立绘角色
+    const title = (e && e.title) || "";
+    const map = [
+      [/莉娅|lia/i, "lia"],
+      [/米拉|mira/i, "mira"],
+      [/莉菈|lira|虚声/i, "lira"],
+      [/萨恩|sarn|尘/i, "sarn"],
+      [/凯斯|kess|铁幕/i, "kess"],
+      [/沃恩|vorn|冷环/i, "vorn"],
+      [/人事|联姻|成人|后舱|旗舰/i, "lia"],
+    ];
+    for (const [re, id] of map) {
+      if (re.test(title)) return CHARACTERS.find((c) => c.id === id) || { id, name_zh: id, hue: 30, seed: 1 };
+    }
+    if (e && e._modId) return { id: "narrator", name_zh: "航路通讯", hue: 200, seed: 9 };
+    return { id: "comm", name_zh: "旗舰通讯", hue: 210, seed: 3 };
+  }
   function showEvent(e) {
     const box = document.getElementById("event-box");
+    if (!box) return;
     box.classList.remove("hidden");
-    document.getElementById("event-title").textContent = "事件：" + e.title;
-    document.getElementById("event-text").textContent = e.text;
+    document.getElementById("event-title").textContent = (e.title || "事件");
+    document.getElementById("event-text").textContent = e.text || "";
+    const speaker = resolveEventSpeaker(e);
+    const sp = document.getElementById("event-speaker");
+    if (sp) sp.textContent = speaker.name_zh || speaker.id || "";
+    const img = document.getElementById("event-portrait");
+    if (img) {
+      if (window.EmberPortraits) {
+        img.src = EmberPortraits.draw(speaker, 180, 240);
+        img.alt = speaker.name_zh || "";
+      } else {
+        img.removeAttribute("src");
+      }
+    }
     const ch = document.getElementById("event-choices");
     ch.innerHTML = "";
     for (const c of e.choices || []) {
@@ -1861,9 +1941,11 @@
       b.onclick = () => chooseEvent(c);
       ch.appendChild(b);
     }
+    sfx("open");
   }
   function hideEvent() {
-    document.getElementById("event-box").classList.add("hidden");
+    const box = document.getElementById("event-box");
+    if (box) box.classList.add("hidden");
   }
 
   function chooseEvent(c) {
@@ -2898,6 +2980,14 @@
         loadMatureSkeletonPack();
       }
     });
+    on("btn-tut-skip", skipTutorial);
+    on("coach-skip", skipTutorial);
+    on("coach-next", () => {
+      if (!state.tutorial) return;
+      // 仅刷新提示/聚光灯，不强制完成步骤
+      showTutorial();
+      sfx("ui");
+    });
     on("btn-win-apply", applyCustomWinFromUi);
     on("btn-mod-workshop", openModWorkshop);
     on("btn-mod-apply", applyModWorkshop);
@@ -3161,37 +3251,29 @@
 
   function drawPortrait(canvas, ch) {
     if (!canvas || !ch) return;
+    if (window.EmberPortraits) {
+      const url = EmberPortraits.draw(ch, 112, 112);
+      const img = new Image();
+      img.onload = () => {
+        const ctx = canvas.getContext("2d");
+        canvas.width = 56;
+        canvas.height = 56;
+        ctx.drawImage(img, 0, 0, 56, 56);
+      };
+      img.src = url;
+      return;
+    }
     const ctx = canvas.getContext("2d");
-    const w = canvas.width = 56;
-    const h = canvas.height = 56;
+    canvas.width = 56;
+    canvas.height = 56;
     const seed = ch.seed || 1;
     const hue = ch.hue == null ? 200 : ch.hue;
     ctx.fillStyle = `hsl(${hue}, 25%, 12%)`;
-    ctx.fillRect(0, 0, w, h);
-    // stars
-    for (let i = 0; i < 12; i++) {
-      const x = (seed * 17 + i * 13) % w;
-      const y = (seed * 31 + i * 19) % h;
-      ctx.fillStyle = `hsla(${hue}, 40%, 70%, 0.35)`;
-      ctx.fillRect(x, y, 1, 1);
-    }
-    // head
+    ctx.fillRect(0, 0, 56, 56);
     ctx.beginPath();
     ctx.arc(28, 24, 12, 0, Math.PI * 2);
-    ctx.fillStyle = `hsl(${hue}, 35%, ${38 + (seed % 10)}%)`;
+    ctx.fillStyle = `hsl(${hue}, 35%, 40%)`;
     ctx.fill();
-    // shoulders
-    ctx.beginPath();
-    ctx.ellipse(28, 48, 18, 12, 0, Math.PI, 0);
-    ctx.fillStyle = `hsl(${(hue + 40) % 360}, 40%, 28%)`;
-    ctx.fill();
-    // visor line
-    ctx.strokeStyle = `hsl(${hue}, 70%, 60%)`;
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(18, 24);
-    ctx.lineTo(38, 24);
-    ctx.stroke();
   }
 
   function renderMeta() {

@@ -1,5 +1,5 @@
 /**
- * 简易 Web Audio：环境 BGM + 点击/胜负音效（无外部资源）
+ * Web Audio：BGM + 扩展音效（无外部文件）
  */
 window.EmberAudio = (() => {
   let ctx = null;
@@ -18,10 +18,8 @@ window.EmberAudio = (() => {
   }
 
   function loadPref() {
-    const v = localStorage.getItem("ember_audio");
-    if (v === "0") enabled = false;
-    const b = localStorage.getItem("ember_bgm");
-    if (b === "1") bgmOn = true;
+    if (localStorage.getItem("ember_audio") === "0") enabled = false;
+    if (localStorage.getItem("ember_bgm") === "1") bgmOn = true;
   }
   loadPref();
 
@@ -30,7 +28,6 @@ window.EmberAudio = (() => {
     localStorage.setItem("ember_audio", enabled ? "1" : "0");
     if (!enabled) stopBgm();
   }
-
   function setBgm(on) {
     bgmOn = !!on;
     localStorage.setItem("ember_bgm", bgmOn ? "1" : "0");
@@ -56,39 +53,70 @@ window.EmberAudio = (() => {
     o.stop(t + dur + 0.02);
   }
 
+  function chord(freqs, dur, type, gain) {
+    freqs.forEach((f, i) => setTimeout(() => beep(f, dur, type, gain), i * 40));
+  }
+
   function sfx(name) {
     if (!enabled) return;
     switch (name) {
       case "click":
-        beep(520, 0.05, "triangle", 0.03);
+        beep(520, 0.04, "triangle", 0.028);
         break;
       case "move":
-        beep(280, 0.08, "sine", 0.035);
+        beep(260, 0.07, "sine", 0.03);
+        beep(320, 0.06, "sine", 0.02);
         break;
       case "claim":
-        beep(440, 0.1, "square", 0.03);
-        beep(660, 0.12, "sine", 0.025);
+        chord([440, 554, 659], 0.1, "square", 0.025);
         break;
       case "win":
-        beep(523, 0.12, "sine", 0.04);
-        setTimeout(() => beep(659, 0.12, "sine", 0.04), 100);
-        setTimeout(() => beep(784, 0.18, "sine", 0.04), 200);
+        chord([523, 659, 784, 1046], 0.12, "sine", 0.035);
         break;
       case "lose":
-        beep(200, 0.2, "sawtooth", 0.03);
-        setTimeout(() => beep(150, 0.25, "sawtooth", 0.025), 120);
+        beep(220, 0.18, "sawtooth", 0.03);
+        setTimeout(() => beep(160, 0.22, "sawtooth", 0.025), 100);
         break;
       case "event":
-        beep(360, 0.1, "triangle", 0.04);
-        setTimeout(() => beep(480, 0.1, "triangle", 0.03), 80);
+        beep(360, 0.08, "triangle", 0.035);
+        setTimeout(() => beep(480, 0.1, "triangle", 0.03), 70);
         break;
       case "achieve":
-        beep(600, 0.08, "sine", 0.04);
-        setTimeout(() => beep(800, 0.1, "sine", 0.04), 90);
-        setTimeout(() => beep(1000, 0.15, "sine", 0.035), 180);
+        chord([600, 800, 1000], 0.1, "sine", 0.035);
         break;
       case "turn":
-        beep(180, 0.06, "sine", 0.025);
+        beep(180, 0.05, "sine", 0.022);
+        break;
+      case "coup":
+        beep(120, 0.15, "square", 0.04);
+        setTimeout(() => chord([300, 450, 600], 0.12, "sawtooth", 0.03), 120);
+        break;
+      case "intimacy":
+        beep(480, 0.1, "sine", 0.03);
+        setTimeout(() => beep(720, 0.14, "sine", 0.028), 90);
+        setTimeout(() => beep(960, 0.1, "triangle", 0.02), 180);
+        break;
+      case "research":
+        beep(700, 0.06, "square", 0.02);
+        setTimeout(() => beep(900, 0.08, "square", 0.02), 60);
+        break;
+      case "ally":
+        chord([392, 494, 587], 0.1, "triangle", 0.03);
+        break;
+      case "break":
+        beep(400, 0.05, "sawtooth", 0.03);
+        setTimeout(() => beep(280, 0.1, "sawtooth", 0.025), 50);
+        break;
+      case "ui":
+        beep(640, 0.03, "triangle", 0.02);
+        break;
+      case "skip":
+        beep(300, 0.04, "square", 0.02);
+        beep(200, 0.05, "square", 0.015);
+        break;
+      case "open":
+        beep(200, 0.05, "sine", 0.02);
+        setTimeout(() => beep(400, 0.08, "sine", 0.025), 40);
         break;
       default:
         beep(400, 0.05, "sine", 0.02);
@@ -98,10 +126,10 @@ window.EmberAudio = (() => {
   function startBgm() {
     if (!enabled || !bgmOn) return;
     stopBgm();
+    bgmOn = true;
     const c = ensure();
     if (!c) return;
-    bgmOn = true;
-    const notes = [110, 130.81, 146.83, 164.81, 146.83, 130.81];
+    const notes = [110, 130.81, 146.83, 164.81, 146.83, 130.81, 123.47, 110];
     let i = 0;
     function tick() {
       if (!bgmOn || !enabled) return;
@@ -111,14 +139,14 @@ window.EmberAudio = (() => {
       const g = c.createGain();
       o.type = "sine";
       o.frequency.value = f;
-      g.gain.value = 0.012;
+      g.gain.value = 0.011;
       o.connect(g);
       g.connect(c.destination);
       const t = c.currentTime;
-      g.gain.exponentialRampToValueAtTime(0.001, t + 1.2);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 1.15);
       o.start(t);
-      o.stop(t + 1.25);
-      bgmTimer = setTimeout(tick, 1400);
+      o.stop(t + 1.2);
+      bgmTimer = setTimeout(tick, 1350);
     }
     tick();
   }
@@ -129,8 +157,8 @@ window.EmberAudio = (() => {
     bgmTimer = null;
   }
 
-  function isEnabled() { return enabled; }
-  function isBgm() { return bgmOn && enabled; }
-
-  return { sfx, setEnabled, setBgm, isEnabled, isBgm, startBgm, stopBgm, ensure };
+  return {
+    sfx, setEnabled, setBgm, isEnabled: () => enabled,
+    isBgm: () => bgmOn && enabled, startBgm, stopBgm, ensure,
+  };
 })();
